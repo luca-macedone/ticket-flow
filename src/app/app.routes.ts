@@ -5,6 +5,8 @@ import { Dashboard } from './views/dashboard/dashboard';
 import { RoleGuard } from './roleguard.service';
 import { Backoffice } from './views/backoffice/backoffice';
 import { NotFoundRedirectComponent } from './views/notfound';
+import { ProjectsList } from './views/projects/projects-list/projects-list';
+import { ProjectView } from './views/projects/project-view/project-view';
 
 export const routes: Routes = [
     {
@@ -15,7 +17,30 @@ export const routes: Routes = [
         path: "dashboard",
         component: Dashboard,
         canActivate: [RoleGuard],
-        data: { roles: ['user', 'admin'] }
+        data: {
+            roles: ['admin', 'user'],
+            breadcrumb: 'Dashboard'
+        },
+        children: [
+            {
+                path: "",
+                component: ProjectsList,
+                canActivate: [RoleGuard],
+                data: {
+                    roles: ['admin', 'user'],
+                    breadcrumb: 'Projects'
+                }
+            },
+            {
+                path: ":id",
+                component: ProjectView,
+                canActivate: [RoleGuard],
+                data: {
+                    roles: ['admin', 'user']
+                }
+            },
+
+        ]
     },
     {
         path: "backoffice",
