@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { UserService } from '../../data/user.service';
+import { User, UserService } from '../../data/user.service';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -12,7 +12,7 @@ export class Home {
 
   userForm!: FormGroup;
   reason: string | null = null;
-  defaultUsers: { id: number, role: string, name: string }[] = [];
+  defaultUsers: User[] = [];
 
   constructor(private fb: FormBuilder, private userService: UserService, private router: Router, private route: ActivatedRoute) { }
 

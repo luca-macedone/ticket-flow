@@ -1,53 +1,15 @@
 import { Component } from '@angular/core';
+import { RouterLink } from "@angular/router";
+import { Project, ProjectService } from '../../../data/projects.service';
 
 @Component({
   selector: 'app-projects-list',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './projects-list.html',
 })
 export class ProjectsList {
-  defaultProjects = [
-    {
-      id: 0,
-      name: 'alten',
-      isVisibile: true,
-      description: "lorem ipsum",
-      tasks: []
-    },
-    {
-      id: 1,
-      name: 'abb',
-      isVisibile: true,
-      description: "lorem ipsum",
-      tasks: []
-    },
-    {
-      id: 2,
-      name: 'siemens',
-      isVisibile: true,
-      description: "lorem ipsum",
-      tasks: []
-    },
-    {
-      id: 3,
-      name: 'friem',
-      isVisibile: false,
-      description: "lorem ipsum",
-      tasks: []
-    },
-    {
-      id: 4,
-      name: 'ferrari',
-      isVisibile: true,
-      description: "lorem ipsum",
-      tasks: []
-    },
-    {
-      id: 5,
-      name: 'hitachi',
-      isVisibile: false,
-      description: "lorem ipsum",
-      tasks: []
-    },
-  ]
+  projects: Project[] = []
+  constructor(private projectService: ProjectService) {
+    this.projects = projectService.getProjects()
+  }
 }

@@ -32,7 +32,7 @@ export const routes: Routes = [
                 }
             },
             {
-                path: ":id",
+                path: "projects/:id",
                 component: ProjectView,
                 canActivate: [RoleGuard],
                 data: {
