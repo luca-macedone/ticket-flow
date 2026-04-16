@@ -1,0 +1,75 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mysql"
+}
+
+model User {
+    id        BigInt    @id @unique @default(autoincrement())
+    email     String    @unique
+    pswHash   String // argon2
+    name      String
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    role      Role      @default(ON_APPROVAL)
+    projects  Project[]
+}
+
+model Project {
+    id          BigInt    @id @unique @default(autoincrement())
+    projectName String
+    description String?
+    startDate   DateTime
+    endDate     DateTime?
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+    company     Company   @relation(fields: [companyId], references: [id])
+    users       User[]
+    tasks       Task[]
+    companyId   BigInt
+}
+
+model Company {
+    id            BigInt    @id @unique @default(autoincrement())
+    companyName   String
+    nationality   String
+    description   String?
+    referralEmail String    @unique
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
+    projects      Project[]
+}
+
+model Task {
+    id              BigInt    @id @unique @default(autoincrement())
+    taskCode        String    @unique
+    taskName        String
+    taskDescription String?
+    startDate       DateTime?
+    endDate         DateTime?
+    status          Status    @default(ON_QUEUE)
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+    project         Project?  @relation(fields: [projectId], references: [id])
+    projectId       BigInt?
+}
+
+enum Role {
+    USER
+    ADMIN
+    GUEST
+    ON_APPROVAL
+}
+
+enum Status {
+    ON_HOLD
+    ON_APPROVAL
+    ON_QUEUE
+    FULFILLMENT
+    APPROVED
+    REJECTED
+    DONE
+    CANCELLED
+}
