@@ -1,6 +1,6 @@
 
 import { z } from "zod";
-import { idSchema, isoDate } from "./common.schema";
+import { idSchema, isoDate } from "./common.schema.js";
 
 export const ProjectShape = z.object({
     projectName: z.string().trim().min(2).max(100),

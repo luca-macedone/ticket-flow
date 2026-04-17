@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { StatusEnum } from "./enums";
-import { idSchema } from "./common.schema";
+import { StatusEnum } from "./enums.js";
+import { idSchema } from "./common.schema.js";
 
 export const TaskShape = z.object({
     taskCode: z.string().trim().min(3).max(20),
