@@ -7,13 +7,14 @@ datasource db {
 }
 
 model User {
-    id        BigInt    @id @unique @default(autoincrement())
-    email     String    @unique
+    id        BigInt     @id @unique @default(autoincrement())
+    email     String     @unique
     pswHash   String // argon2
     name      String
-    createdAt DateTime  @default(now())
-    updatedAt DateTime  @updatedAt
-    role      Role      @default(ON_APPROVAL)
+    createdAt DateTime   @default(now())
+    updatedAt DateTime   @updatedAt
+    role      Role       @default(USER)
+    status    UserStatus @default(PENDING_APPROVAL)
     projects  Project[]
 }
 
@@ -60,7 +61,13 @@ enum Role {
     USER
     ADMIN
     GUEST
-    ON_APPROVAL
+}
+
+enum UserStatus {
+    PENDING_APPROVAL
+    APPROVED
+    REJECTED
+    SUSPENDED
 }
 
 enum Status {

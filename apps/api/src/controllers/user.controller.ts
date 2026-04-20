@@ -64,7 +64,35 @@ export async function createUser(req: Request, res: Response) {
                 pswHash,
                 name,
                 role,
-                projects
+                projects,
+                status: "APPROVED"
+            }
+        });
+
+        res.status(201).json(user);
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({
+            message: "Internal Server Error"
+        })
+    }
+}
+
+//? post:/users
+export async function registerUser(req: Request, res: Response) {
+    try {
+        const {
+            email,
+            pswHash,
+            name,
+        } = req.body;
+        const user = await prisma.user.create({
+            data: {
+                email,
+                pswHash,
+                name,
+                role: "USER",
+                status: "PENDING_APPROVAL"
             }
         });
 
@@ -86,7 +114,8 @@ export async function updateUser(req: Request, res: Response) {
             pswHash,
             name,
             role,
-            projects
+            projects,
+            status
         } = req.body;
 
         const data: any = {};
@@ -95,12 +124,41 @@ export async function updateUser(req: Request, res: Response) {
         if (name !== undefined) data.name = name;
         if (role !== undefined) data.role = role;
         if (projects !== undefined) data.projects = projects;
+        if (status !== undefined) data.status = status;
 
         const user = await prisma.user.update({
             where: {
                 id: userId
             },
             data
+        });
+
+        res.status(200).json(user);
+    } catch (error) {
+        console.error(error)
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === "P2025") {
+                return res.status(404).json({ message: "User not found" });
+            }
+        }
+        res.status(500).json({
+            message: "Internal Server Error"
+        })
+    }
+}
+
+//? patch:/admin/users/:id/approve
+export async function approveUser(req: Request, res: Response) {
+    try {
+        const userId = BigInt(req.params.id as string)
+
+        const user = await prisma.user.update({
+            where: {
+                id: userId
+            },
+            data: {
+                status: "APPROVED"
+            }
         });
 
         res.status(200).json(user);

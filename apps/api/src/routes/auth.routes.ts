@@ -19,6 +19,10 @@ router.post("/login", async (req: Request, res: Response) => {
         return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    if (user.status !== "APPROVED") {
+        return res.status(403).json({ message: "User not approved yet" })
+    }
+
     const accessToken = signAccessToken({
         userId: user.id.toString(),
         role: user.role
