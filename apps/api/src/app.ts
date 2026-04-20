@@ -3,6 +3,8 @@ import taskRoutes from "./routes/task.routes"
 import companyRoutes from "./routes/company.routes"
 import projectRoutes from "./routes/project.routes"
 import userRoutes from "./routes/user.routes"
+import authRoutes from "./routes/auth.routes"
+import { globalErrorHandler } from "./middlewares/globalErrorHandler";
 
 export const app = express();
 
@@ -15,7 +17,10 @@ app.get("/health", (_, res) => {
     res.status(200).json({ status: "ok" });
 })
 
+app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/companies", companyRoutes);
 app.use("/api/tasks", taskRoutes);
+
+app.use(globalErrorHandler)
