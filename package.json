@@ -7,8 +7,8 @@
         "build:api": "pnpm --filter @apps/api build",
         "build:fe": "pnpm --filter @apps/frontend build",
         "build": "pnpm build:deps && pnpm build:api && pnpm build:fe",
-        "lint": "pnpm -r lint",
-        "test": "pnpm -r test",
+        "lint": "pnpm -r --if-present lint",
+        "test": "pnpm -r --if-present test",
         "dev:fe": "pnpm --filter @apps/frontend dev",
         "dev:api": "pnpm --filter @apps/api dev"
     }

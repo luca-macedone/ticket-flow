@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../db";
 import { Prisma } from "@prisma/client";
+import bcrypt from "bcrypt";
 
 //? get:/users
 export async function getUsers(req: Request, res: Response) {
@@ -53,15 +54,18 @@ export async function createUser(req: Request, res: Response) {
     try {
         const {
             email,
-            pswHash,
+            password,
             name,
             role,
             projects
         } = req.body;
+
+        const hashed = await bcrypt.hash(password, 12);
+
         const user = await prisma.user.create({
             data: {
                 email,
-                pswHash,
+                pswHash: hashed,
                 name,
                 role,
                 projects,
@@ -83,9 +87,12 @@ export async function registerUser(req: Request, res: Response) {
     try {
         const {
             email,
-            pswHash,
+            password,
             name,
         } = req.body;
+
+        const pswHash = await bcrypt.hash(password, 12);
+
         const user = await prisma.user.create({
             data: {
                 email,

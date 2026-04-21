@@ -23,7 +23,7 @@ export async function getProjects(req: Request, res: Response) {
 }
 
 //? get:/projects/:id
-export async function getTaskById(req: Request, res: Response) {
+export async function getProjectById(req: Request, res: Response) {
     try {
         const projectId = BigInt(req.params.id as string);
         const project = await prisma.project.findUnique({

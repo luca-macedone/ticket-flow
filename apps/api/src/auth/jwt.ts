@@ -4,7 +4,7 @@ const ACCESS_SECRET = process.env.JWT_ACCESS_SECRET!;
 const ACCESS_EXPIRES = process.env.JWT_ACCESS_EXPIRES!;
 
 export interface JwtPayload {
-    userId: number;
+    userId: string;
     role: string;
 }
 
@@ -19,7 +19,7 @@ export function verifyAccessToken(token: string): JwtPayload {
     const decoded = jwt.verify(token, ACCESS_SECRET) as JwtPayload;
 
     return {
-        userId: Number(decoded.userId),
+        userId: decoded.userId,
         role: String(decoded.role)
     }
 }

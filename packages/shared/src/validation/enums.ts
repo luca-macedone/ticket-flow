@@ -4,7 +4,13 @@ export const RoleEnum = z.enum([
     "USER",
     "ADMIN",
     "GUEST",
-    "ON_APPROVAL",
+]);
+
+export const UserStatusEnum = z.enum([
+    "PENDING_APPROVAL",
+    "APPROVED",
+    "REJECTED",
+    "SUSPENDED"
 ]);
 
 export const StatusEnum = z.enum([

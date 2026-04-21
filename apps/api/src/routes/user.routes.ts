@@ -8,7 +8,11 @@ import { requireRole } from "../middlewares/requireRole";
 const router = Router();
 
 
-router.get("/", getUsers);
+router.get("/",
+    requireAuth,
+    requireRole("ADMIN"),
+    getUsers
+);
 router.get(
     "/me",
     requireAuth,
@@ -21,6 +25,7 @@ router.get(
 );
 router.get(
     "/:id",
+    requireAuth,
     requireRole("ADMIN"),
     getUserById
 );
@@ -31,18 +36,21 @@ router.post(
 )
 router.post(
     "/",
+    requireAuth,
     requireRole("ADMIN"),
     zodValidate(CreateUserSchema),
     createUser
 );
 router.patch(
     "/:id",
+    requireAuth,
     requireRole("ADMIN"),
     zodValidate(UpdateUserSchema),
     updateUser
 );
 router.delete(
     "/:id",
+    requireAuth,
     requireRole("ADMIN"),
     deleteUser
 );

@@ -1,15 +1,19 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "./requireAuth";
 
+const ROLE_HIERARCHY = { GUEST: 0, USER: 1, ADMIN: 2 };
+
 export function requireRole(...allowedRoles: string[]) {
     return (req: AuthRequest, res: Response, next: NextFunction) => {
         if (!req.user) {
             return res.status(401).json({ message: "Not authenticated" });
         }
 
-        if (!allowedRoles.includes(req.user.role)) {
-            return res.status(403).json({ message: "Forbidden" });
-        }
+        const userLevel = ROLE_HIERARCHY[req.user.role as keyof typeof ROLE_HIERARCHY] ?? -1;
+
+        const minRequired = Math.min(...allowedRoles.map(r => ROLE_HIERARCHY[r as keyof typeof ROLE_HIERARCHY] ?? 99));
+
+        if (userLevel < minRequired) return res.status(403).json({ message: "Forbidden" });
 
         next();
     }

@@ -3,9 +3,9 @@
     "compilerOptions": {
         "outDir": "dist",
         "rootDir": "src",
-        "module": "node16",
+        "module": "commonjs",
         "esModuleInterop": true,
-        "moduleResolution": "node16"
+        "moduleResolution": "node"
     },
     "include": [
         "src"
