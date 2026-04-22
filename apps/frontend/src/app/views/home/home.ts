@@ -1,37 +1,31 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { User, UserService } from '../../data/user.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { LoginForm } from "../../components/login-form/login-form";
+import { RegisterForm } from "../../components/register-form/register-form";
 
 @Component({
   selector: 'app-home',
-  imports: [FormsModule, ReactiveFormsModule],
+  imports: [FormsModule, ReactiveFormsModule, LoginForm, RegisterForm],
   templateUrl: './home.html',
 })
 export class Home {
-
-  userForm!: FormGroup;
   reason: string | null = null;
-  defaultUsers: User[] = [];
+  isFormVisible = signal<boolean>(false)
+  formType = signal<"register" | "login">("login")
 
-  constructor(private fb: FormBuilder, private userService: UserService, private router: Router, private route: ActivatedRoute) { }
+  constructor(private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.defaultUsers = this.userService.getUsers();
-    this.userForm = this.fb.group({
-      selectedUser: [-1]
-    });
     this.reason = this.route.snapshot.queryParams['reason']
   }
 
-  async onSubmit() {
+  toggleForm() {
+    this.isFormVisible.set(!this.isFormVisible())
+  }
 
-    const userId = this.userForm.value.selectedUser;
-
-    if (userId === null) return;
-
-    console.log('form', userId);
-    sessionStorage.setItem('userId', String(userId));
-    this.router.navigate(['dashboard'])
+  changeForm(type: "register" | "login") {
+    this.formType.set(type)
   }
 }

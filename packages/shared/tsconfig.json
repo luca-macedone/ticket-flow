@@ -9,7 +9,7 @@
         "baseUrl": ".",
         "paths": {
             "./validation": [
-                "src/validation/index.ts"
+                "src/schemas/index.ts"
             ]
         }
     },

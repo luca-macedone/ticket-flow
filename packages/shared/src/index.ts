@@ -1,4 +1,4 @@
-export * from "./validation/index.js";
+export * from "./schemas/index.js";
 export { z } from 'zod';
 
 export type ApiResult<T> = {

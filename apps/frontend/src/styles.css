@@ -1,3 +1,23 @@
+@import url('https://fonts.googleapis.com/css?family=LINE%20Seed%20JP:700|Urbanist:400');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    :root {
+        --text: 17.80% 0.006 0.00;
+        --background: 96.87% 0.002 0.00;
+        --primary: 40.29% 0.133 0.07;
+        --secondary: 80.78% 0.041 0.11;
+        --accent: 76.81% 0.025 0.15;
+    }
+
+    .dark {
+        --text: 94.32% 0.004 0.00;
+        --background: 14.24% 0.003 0.00;
+        --primary: 72.22% 0.133 0.06;
+        --secondary: 53.42% 0.054 0.10;
+        --accent: 78.32% 0.024 0.16;
+    }
+}
