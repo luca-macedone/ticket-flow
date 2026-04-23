@@ -8,10 +8,16 @@ import adminRoutes from "./routes/admin.routes"
 import { globalErrorHandler } from "./middlewares/globalErrorHandler";
 import swaggerUi from "swagger-ui-express";
 import { generateOpenApiDoc } from "./openapi/generator";
+import cookieParser from "cookie-parser";
 
 export const app = express();
 
+app.use(cookieParser());
 app.use(express.json());
+
+// BigInt doesn't serialize with JSON.stringify by default
+(BigInt.prototype as any).toJSON = function () { return this.toString(); };
+
 
 if (process.env.NODE_ENV === "development") {
     app.use("/docs", swaggerUi.serve, swaggerUi.setup(generateOpenApiDoc()));

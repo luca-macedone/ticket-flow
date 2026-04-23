@@ -20,6 +20,11 @@ export const prisma = globalForPrisma.prisma ??
         log: process.env.NODE_ENV === "development"
             ? ["query", "error", "warn"]
             : ["error"],
+        omit: {
+            user: {
+                pswHash: true
+            }
+        },
     });
 
 if (process.env.NODE_ENV !== "production") {

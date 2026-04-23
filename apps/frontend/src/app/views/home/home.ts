@@ -1,7 +1,6 @@
 import { Component, signal } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { User, UserService } from '../../data/user.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { LoginForm } from "../../components/login-form/login-form";
 import { RegisterForm } from "../../components/register-form/register-form";
 
@@ -13,7 +12,7 @@ import { RegisterForm } from "../../components/register-form/register-form";
 export class Home {
   reason: string | null = null;
   isFormVisible = signal<boolean>(false)
-  formType = signal<"register" | "login">("login")
+  formType = signal<"register" | "login" | "pending">("login")
 
   constructor(private route: ActivatedRoute) { }
 
@@ -23,9 +22,10 @@ export class Home {
 
   toggleForm() {
     this.isFormVisible.set(!this.isFormVisible())
+    this.formType.set("login")
   }
 
-  changeForm(type: "register" | "login") {
+  changeForm(type: "register" | "login" | "pending") {
     this.formType.set(type)
   }
 }

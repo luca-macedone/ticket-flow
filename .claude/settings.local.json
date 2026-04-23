@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C c:/Users/lmacedone/Repos/ticket-flow log --oneline -20)"
+    ]
+  }
+}

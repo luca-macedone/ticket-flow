@@ -28,6 +28,8 @@
                 Welcome Back
                 } @else if(formType() == "register") {
                 Create Account
+                } @else if(formType() == "pending") {
+                Under Approval
                 }
             </h2>
             <button (click)="toggleForm()"
@@ -36,9 +38,14 @@
             </button>
         </header>
         @if(formType() == "login") {
-        <app-login-form />
+        <app-login-form (changeView)="changeForm($event)" />
         } @else if(formType() == "register"){
-        <app-register-form />
+        <app-register-form (changeView)="changeForm($event)" />
+        } @else if(formType() == "pending") {
+        <div class="flex flex-col items-center gap-4 py-4 text-center">
+            <p class="text-lg">Your account is under approval.</p>
+            <p class="text-sm opacity-70">You will receive a notification whit the approval response.</p>
+        </div>
         }
     </section>
     }

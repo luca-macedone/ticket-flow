@@ -1,34 +1,89 @@
-import bcript from "bcrypt";
+import bcrypt from "bcrypt";
 import { Request, Response, Router } from "express";
 import { prisma } from "../db";
-import { signAccessToken } from "../auth/jwt";
+import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../auth/jwt";
+import { requireAuth } from "../middlewares/requireAuth";
+import { zodValidate } from "../middlewares/zodValidate";
+import { LoginSchema } from "@packages/shared";
 
 const router = Router();
 
-router.post("/login", async (req: Request, res: Response) => {
+const ACCESS_COOKIE_OPTIONS = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict' as const,
+    maxAge: 15 * 60 * 1000,            // 15m
+};
+
+const REFRESH_COOKIE_OPTIONS = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict' as const,
+    maxAge: 7 * 24 * 60 * 60 * 1000,  // 7d
+    path: '/api/auth/refresh',          // cookie inviato solo su questo path
+};
+
+router.post("/login", zodValidate(LoginSchema), async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({
+        where: { email },
+        omit: { pswHash: false }  // override del global omit
+    });
+    if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
-    if (!user) {
-        return res.status(401).json({ message: "Invalid credentials" });
-    }
-
-    const valid = await bcript.compare(password, user.pswHash);
-    if (!valid) {
-        return res.status(401).json({ message: "Invalid credentials" });
-    }
+    const valid = await bcrypt.compare(password, user.pswHash);
+    if (!valid) return res.status(401).json({ message: "Invalid credentials" });
 
     if (user.status !== "APPROVED") {
-        return res.status(403).json({ message: "User not approved yet" })
+        return res.status(403).json({ message: "User not approved yet", name: user.name });
     }
 
-    const accessToken = signAccessToken({
-        userId: user.id.toString(),
-        role: user.role
-    })
+    const payload = { userId: user.id.toString(), role: user.role.toLowerCase() };
 
-    res.json({ accessToken });
-})
+    res.cookie('accessToken', signAccessToken(payload), ACCESS_COOKIE_OPTIONS);
+    res.cookie('refreshToken', signRefreshToken(payload), REFRESH_COOKIE_OPTIONS);
+    res.json({ name: user.name, role: user.role.toLowerCase(), status: user.status });
+});
+
+
+router.get('/me', requireAuth, async (req: Request, res: Response) => {
+    const user = await prisma.user.findUnique({
+        where: { id: BigInt(req.user.userId) },
+        select: { name: true, role: true, status: true }
+    });
+    if (!user) return res.status(401).json({ message: 'User not found' });
+    res.json({ name: user.name, role: user.role.toLowerCase(), status: user.status });
+});
+
+router.post("/refresh", async (req: Request, res: Response) => {
+    const token = req.cookies?.refreshToken;
+    if (!token) return res.status(401).json({ message: "No refresh token" });
+
+    try {
+        const payload = verifyRefreshToken(token);
+
+        // verifica che l'utente esista ancora ed sia ancora approvato
+        const user = await prisma.user.findUnique({ where: { id: BigInt(payload.userId) } });
+        if (!user || user.status !== "APPROVED") {
+            return res.status(401).json({ message: "Invalid session" });
+        }
+
+        const newPayload = { userId: user.id.toString(), role: user.role.toLowerCase() };
+
+        // rotation: emetti nuovi access + refresh
+        res.cookie('accessToken', signAccessToken(newPayload), ACCESS_COOKIE_OPTIONS);
+        res.cookie('refreshToken', signRefreshToken(newPayload), REFRESH_COOKIE_OPTIONS);
+        res.sendStatus(200);
+    } catch {
+        res.status(401).json({ message: "Invalid or expired refresh token" });
+    }
+});
+
+router.post("/logout", (_req: Request, res: Response) => {
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken', { path: '/api/auth/refresh' });
+    res.sendStatus(204);
+});
 
 export default router;

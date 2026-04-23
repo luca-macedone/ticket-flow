@@ -11,9 +11,11 @@ export async function getUsers(req: Request, res: Response) {
         const skip = (page - 1) * take;
 
         const users = await prisma.user.findMany({
+            omit: { pswHash: true },
             skip,
             take
         });
+
         res.status(200).json(users);
     } catch (error) {
         console.error(error)
@@ -28,7 +30,8 @@ export async function getUserById(req: Request, res: Response) {
     try {
         const userId = BigInt(req.params.id as string);
         const user = await prisma.user.findUnique({
-            where: { id: userId }
+            where: { id: userId },
+            omit: { pswHash: true }
         });
 
         if (!user) {
@@ -57,7 +60,6 @@ export async function createUser(req: Request, res: Response) {
             password,
             name,
             role,
-            projects
         } = req.body;
 
         const hashed = await bcrypt.hash(password, 12);
@@ -68,17 +70,17 @@ export async function createUser(req: Request, res: Response) {
                 pswHash: hashed,
                 name,
                 role,
-                projects,
                 status: "APPROVED"
             }
         });
 
         res.status(201).json(user);
     } catch (error) {
-        console.error(error)
-        res.status(500).json({
-            message: "Internal Server Error"
-        })
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+            return res.status(409).json({ message: "Email already in use" });
+        }
+        console.error(error);
+        res.status(500).json({ message: "Internal Server Error" });
     }
 }
 
@@ -103,13 +105,16 @@ export async function registerUser(req: Request, res: Response) {
             }
         });
 
-        res.status(201).json(user);
+        const { pswHash: _, ...safeUser } = user;
+        res.status(201).json(safeUser);
     } catch (error) {
-        console.error(error)
-        res.status(500).json({
-            message: "Internal Server Error"
-        })
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+            return res.status(409).json({ message: 'Email already in use' });
+        }
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
     }
+
 }
 
 //? patch:/users/:id
@@ -118,20 +123,16 @@ export async function updateUser(req: Request, res: Response) {
         const userId = BigInt(req.params.id as string)
         const {
             email,
-            pswHash,
             name,
             role,
             projects,
-            status
         } = req.body;
 
         const data: any = {};
         if (email !== undefined) data.email = email;
-        if (pswHash !== undefined) data.pswHash = pswHash;
         if (name !== undefined) data.name = name;
         if (role !== undefined) data.role = role;
         if (projects !== undefined) data.projects = projects;
-        if (status !== undefined) data.status = status;
 
         const user = await prisma.user.update({
             where: {

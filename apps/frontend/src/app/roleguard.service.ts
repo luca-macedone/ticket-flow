@@ -1,24 +1,30 @@
 import { Injectable } from "@angular/core";
 import { ActivatedRouteSnapshot, CanActivate, Router } from "@angular/router";
-import { UserService } from "./data/user.service";
+import { AuthService } from "./services/auth.service";
+import { firstValueFrom } from "rxjs";
 
-@Injectable({
-    providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class RoleGuard implements CanActivate {
-    constructor(private authService: UserService, private router: Router) { }
+    constructor(private auth: AuthService, private router: Router) { }
 
-    canActivate(route: ActivatedRouteSnapshot): boolean {
-        const expectedRoles = route.data['roles'] as Array<string>;
-        const userRole = this.authService.getUserRole();
+    async canActivate(route: ActivatedRouteSnapshot): Promise<boolean> {
+        let user = this.auth.user();
 
-        if (!this.authService.isLoggedIn()) {
-            this.router.navigate([''], { queryParams: { reason: 'user not logged in' } })
-            return false;
+        // Al reload la pagina, il signal è null: ripristina stato da /me
+        if (!user) {
+            try {
+                user = await firstValueFrom(this.auth.me());
+            } catch {
+                this.router.navigate([''], { queryParams: { reason: 'user not logged in' } });
+                return false;
+            }
         }
 
-        if (!userRole || !expectedRoles.includes(userRole)) {
-            this.router.navigate(['/unauthorized'], { queryParams: { reason: 'user not authorized' } });
+        // if (user.status === 'PENDING_APPROVAL') return true;
+
+        const expectedRoles = route.data['roles'] as string[];
+        if (!expectedRoles?.includes(user.role)) {
+            this.router.navigate(['']);
             return false;
         }
 

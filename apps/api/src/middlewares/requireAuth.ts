@@ -8,24 +8,17 @@ export interface AuthRequest extends Request {
     }
 }
 
-export function requireAuth(
-    req: AuthRequest,
-    res: Response,
-    next: NextFunction
-) {
-    const header = req.headers.authorization;
+export function requireAuth(req: AuthRequest, res: Response, next: NextFunction) {
+    const token = req.cookies?.accessToken;
 
-    if (!header || !header.startsWith("Bearer ")) {
+    if (!token) {
         return res.status(401).json({ message: "Missing token" });
     }
 
-    const token = header.substring(7);
-
     try {
-        const payload = verifyAccessToken(token);
-        req.user = payload;
+        req.user = verifyAccessToken(token);
         next();
-    } catch (error) {
+    } catch {
         return res.status(401).json({ message: "Invalid or expired token" });
     }
 }

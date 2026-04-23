@@ -1,7 +1,8 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet, RouterLinkWithHref } from "@angular/router";
+import { Component, computed, inject, signal } from '@angular/core';
+import { RouterOutlet, RouterLinkWithHref, Router } from "@angular/router";
 import { Breadcrump } from "../../components/breadcrump/breadcrump";
-import { UserService } from '../../data/user.service';
+import { AuthService } from '../../services/auth.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -10,9 +11,12 @@ import { UserService } from '../../data/user.service';
   styleUrl: './dashboard.css',
 })
 export class Dashboard {
-  userName = signal("");
+  private auth = inject(AuthService);
 
-  constructor(private userService: UserService) {
-    this.userName.set(userService.getUserName() as string)
+  user = this.auth.user;
+  isPending = computed(() => this.auth.user()?.status === 'PENDING_APPROVAL');
+
+  logout() {
+    firstValueFrom(this.auth.logout());
   }
 }
