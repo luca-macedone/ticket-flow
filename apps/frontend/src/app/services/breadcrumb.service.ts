@@ -22,20 +22,22 @@ export class BreadcrumbService {
     breadcrumbs: any[] = []
   ): any[] {
     const label = route.data['breadcrumb'];
-    const path = route.routeConfig?.path;
+    const pathSegments = route.url.map(s => s.path).join('/');
 
-    if (label && path) {
-      const nextUrl = `${url}/${path}`;
-      breadcrumbs.push({ label: label, url: nextUrl });
-      url = nextUrl;
+    if (pathSegments) {
+      url = `${url}/${pathSegments}`;
+      if (label) {
+        breadcrumbs.push({ label, url });
+      }
     }
 
     if (route.firstChild) {
-      return this.buildBreadcrumbs(route.firstChild, url, breadcrumbs)
+      return this.buildBreadcrumbs(route.firstChild, url, breadcrumbs);
     }
 
-    return breadcrumbs
+    return breadcrumbs;
   }
+
 
   getBreadcrumbs() {
     return this.breadcrumbs

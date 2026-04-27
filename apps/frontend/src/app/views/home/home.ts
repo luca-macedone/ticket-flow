@@ -3,10 +3,11 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { LoginForm } from "../../components/login-form/login-form";
 import { RegisterForm } from "../../components/register-form/register-form";
+import { NgIcon } from "@ng-icons/core";
 
 @Component({
   selector: 'app-home',
-  imports: [FormsModule, ReactiveFormsModule, LoginForm, RegisterForm],
+  imports: [FormsModule, ReactiveFormsModule, LoginForm, RegisterForm, NgIcon],
   templateUrl: './home.html',
 })
 export class Home {

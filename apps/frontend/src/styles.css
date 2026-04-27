@@ -4,6 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ? old
 @layer base {
     :root {
         --text: 17.80% 0.006 0.00;
@@ -19,5 +20,23 @@
         --primary: 72.22% 0.133 0.06;
         --secondary: 53.42% 0.054 0.10;
         --accent: 78.32% 0.024 0.16;
+    }
+}
+*/
+@layer base {
+    :root {
+        --text: 14.95% 0.032 -0.05;
+        --background: 94.50% 0.018 -0.02;
+        --primary: 32.49% 0.077 -0.14;
+        --secondary: 92.60% -0.053 0.15;
+        --accent: 73.87% -0.185 0.15;
+    }
+
+    .dark {
+        --text: 92.00% 0.024 -0.03;
+        --background: 12.88% 0.030 -0.04;
+        --primary: 71.72% 0.095 -0.13;
+        --secondary: 67.72% -0.049 0.14;
+        --accent: 82.77% -0.193 0.16;
     }
 }

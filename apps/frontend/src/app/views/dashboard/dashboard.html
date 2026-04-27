@@ -1,37 +1,74 @@
-<div class="h-screen w-full bg-amber-400/10 grid grid-cols-6 overflow-hidden">
-    <aside class="flex flex-col gap-3 border-e-2 bg-amber-400/10 border-amber-200 p-3 col-span-1 justify-between">
-        <header>
-            <a routerLink="/dashboard" class="text-3xl font-mono text-amber-600 font-semibold">Ticket Flow</a>
+<div class="h-screen w-full grid grid-cols-6 overflow-hidden bg-background text-text font-body relative">
+    <aside class="flex flex-col gap-3 col-span-1 justify-between p-3 border-e-2 border-text/10">
+        <header class="flex flex-col gap-3 bg-text/10 p-3 rounded-2xl">
+            <a routerLink="/dashboard" class="font-heading text-2xl">Ticket<em class="text-primary">Flow</em></a>
         </header>
-        <footer class="flex justify-end">
+        <nav class="h-full p-6 bg-text/10 rounded-2xl">
+            <ul class="w-full flex flex-col gap-3">
+                <li class="w-full px-6 py-2 cursor-pointer hover:bg-primary/20 rounded-full default:bg-transparent transition-colors ease-in"
+                    routerLinkActive="bg-primary/60 hover:bg-primary/60 font-semibold">
+                    <a routerLink="/dashboard/overview" class="w-full h-full flex items-center gap-3">
+                        <ng-icon name="heroHome" size="20" />
+                        Overview
+                    </a>
+                </li>
+                <li class="w-full px-6 py-2 cursor-pointer hover:bg-primary/20 rounded-full default:bg-transparent transition-colors ease-in"
+                    routerLinkActive="bg-primary/60 hover:bg-primary/60 font-semibold">
+                    <a routerLink="/dashboard/projects" class="w-full h-full flex items-center gap-3">
+                        <ng-icon name="heroCube" size="20" />
+                        Projects
+                    </a>
+                </li>
+                @if (isAdmin()) {
+                <li class="w-full px-6 py-2 cursor-pointer hover:bg-primary/20 rounded-full default:bg-transparent transition-colors ease-in"
+                    routerLinkActive="bg-primary/60 hover:bg-primary/60 font-semibold">
+                    <a routerLink="/dashboard/companies" class="w-full h-full flex items-center gap-3">
+                        <ng-icon name="heroBuildingOffice2" size="20" />
+                        Companies
+                    </a>
+                </li>
+                <li class="w-full px-6 py-2 cursor-pointer hover:bg-primary/20 rounded-full default:bg-transparent transition-colors ease-in"
+                    routerLinkActive="bg-primary/60 hover:bg-primary/60 font-semibold">
+                    <a routerLink="/dashboard/users" class="w-full h-full flex items-center gap-3">
+                        <ng-icon name="heroUsers" size="20" />
+                        Users
+                    </a>
+                </li>
+                }
+            </ul>
+        </nav>
+        <footer class="flex justify-between items-center bg-text/10 p-3 rounded-2xl">
+            <div class="capitalize text-primary font-bold px-3 py-1.5 rounded-full bg-background/60">{{ user()?.name ??
+                'user' }}</div>
             <button (click)="logout()"
-                class="px-3 py-1.5 rounded-full bg-amber-800 text-amber-50 hover:cursor-pointer hover:opacity-95">
+                class="px-3 py-1.5 rounded-full hover:cursor-pointer hover:opacity-95 flex items-center gap-3 bg-background/60">
                 Log Out
+                <ng-icon name="heroArrowRightOnRectangle" size="20" />
             </button>
         </footer>
     </aside>
-
-    <section class="grid grid-cols-5 grid-flow-row col-span-5 max-h-24">
-        <div class="col-span-5 p-5 border-b-2 border-amber-200 flex flex-col gap-3">
-            <h2 class="text-2xl font-mono font-bold border-s-8 border-amber-700 ps-4">
-                <span class="capitalize">{{ user()?.name ?? 'user' }}</span>'s Dashboard
-            </h2>
+    <section class="grid grid-cols-5 grid-flow-row col-span-5 max-h-24 p-3">
+        <div class="col-span-5 p-3 flex flex-col gap-2.5 backdrop-blur-xl bg-text/10 rounded-2xl">
             <app-breadcrump />
         </div>
-
         @if (isPending()) {
-        <div class="col-span-5 m-5 p-4 rounded-lg border-2 border-amber-400 bg-amber-50 flex items-center gap-3">
-            <span class="text-amber-700 text-xl">⏳</span>
+        <div class="col-span-5 m-5 p-4 rounded-lg border-2 flex items-center gap-3">
+            <span class="text-xl">⏳</span>
             <div>
-                <p class="font-semibold text-amber-800">Account in attesa di approvazione</p>
-                <p class="text-sm text-amber-700">Le funzionalità saranno disponibili una volta che un amministratore
-                    approva il tuo account.</p>
+                <p class="font-semibold">Account on approval phase</p>
+                <p class="text-sm">The functionalities are disabled during the approval phase.</p>
             </div>
         </div>
         } @else {
-        <div class="col-span-5 max-h-60 flex flex-col">
+        <div class="col-span-5 max-h-60 flex flex-col gap-3">
             <router-outlet />
         </div>
         }
     </section>
+    @if (reason && reason.length > 0) {
+    <div
+        class="absolute top-3 right-0 left-0 z-50 mx-auto p-4 rounded-4xl border-2 border-primary/40 bg-primary/30 rounded-full text-base text-background dark:text-text min-w-[300px] w-fit px-6 text-center backdrop-blur-xl">
+        <strong class="font-mono capitalize">Error:</strong> {{reason}}
+    </div>
+    }
 </div>
