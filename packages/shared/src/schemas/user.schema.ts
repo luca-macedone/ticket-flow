@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { RoleEnum } from "./enums.js";
 
 const PasswordSchema = z.string()
     .min(8, "Minimo 8 caratteri")
@@ -35,14 +36,14 @@ export const CreateUserSchema = UserBaseSchema.extend({
 export const UpdateUserSchema = z.object({
     email: z.string().trim().email().optional(),
     name: z.string().trim().min(2).max(100).optional(),
-    role: z.enum(["USER", "ADMIN", "GUEST"]).optional(),
+    role: RoleEnum.optional(),
 });
 
 export const UserResponseSchema = UserBaseSchema.extend({
     id: z.string(),
     email: z.string().trim().email(),
     name: z.string().trim().min(2).max(100),
-    role: z.enum(["USER", "ADMIN", "GUEST"]),
+    role: RoleEnum,
     createdAt: z.string().datetime(),
     updatedAt: z.string().datetime(),
 });
@@ -51,4 +52,5 @@ export const RegisterApiSchema = z.object({
     email: z.string().trim().email(),
     password: PasswordSchema,
     name: z.string().trim().min(2).max(100),
+    role: z.enum(["AGENT", "CUSTOMER"]),
 });

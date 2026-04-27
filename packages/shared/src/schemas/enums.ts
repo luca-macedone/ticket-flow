@@ -1,9 +1,9 @@
 import z from "zod";
 
 export const RoleEnum = z.enum([
-    "USER",
     "ADMIN",
-    "GUEST",
+    "AGENT",
+    "CUSTOMER",
 ]);
 
 export const UserStatusEnum = z.enum([

@@ -7,15 +7,17 @@ datasource db {
 }
 
 model User {
-    id        BigInt     @id @unique @default(autoincrement())
-    email     String     @unique
-    pswHash   String // argon2
-    name      String
-    createdAt DateTime   @default(now())
-    updatedAt DateTime   @updatedAt
-    role      Role       @default(USER)
-    status    UserStatus @default(PENDING_APPROVAL)
-    projects  Project[]
+    id            BigInt     @id @unique @default(autoincrement())
+    email         String     @unique
+    pswHash       String // argon2
+    name          String
+    createdAt     DateTime   @default(now())
+    updatedAt     DateTime   @updatedAt
+    role          Role       @default(CUSTOMER)
+    status        UserStatus @default(PENDING_APPROVAL)
+    projects      Project[]
+    assignedTasks Task[]     @relation("assignedTasks")
+    reportedTasks Task[]     @relation("reportedTasks")
 }
 
 model Project {
@@ -44,23 +46,45 @@ model Company {
 }
 
 model Task {
-    id              BigInt    @id @unique @default(autoincrement())
-    taskCode        String    @unique
+    id              BigInt       @id @unique @default(autoincrement())
+    taskCode        String       @unique
     taskName        String
     taskDescription String?
     startDate       DateTime?
     endDate         DateTime?
-    status          Status    @default(ON_QUEUE)
-    createdAt       DateTime  @default(now())
-    updatedAt       DateTime  @updatedAt
-    project         Project?  @relation(fields: [projectId], references: [id])
+    status          Status       @default(ON_QUEUE)
+    category        TaskCategory @default(GENERAL)
+    priority        Priority     @default(MEDIUM)
+    createdAt       DateTime     @default(now())
+    updatedAt       DateTime     @updatedAt
+    resolvedAt      DateTime?
+    project         Project?     @relation(fields: [projectId], references: [id])
     projectId       BigInt?
+    assignee        User?        @relation("assignedTasks", fields: [assigneeId], references: [id])
+    assigneeId      BigInt?
+    reporter        User?        @relation("reportedTasks", fields: [reporterId], references: [id])
+    reporterId      BigInt?
 }
 
 enum Role {
-    USER
+    CUSTOMER
+    AGENT
     ADMIN
-    GUEST
+}
+
+enum TaskCategory {
+    GENERAL
+    BUG
+    FEATURE
+    SUPPORT
+    MAINTENANCE
+}
+
+enum Priority {
+    LOW
+    MEDIUM
+    HIGH
+    URGENT
 }
 
 enum UserStatus {

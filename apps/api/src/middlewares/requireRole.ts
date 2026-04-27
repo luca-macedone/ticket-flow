@@ -1,7 +1,7 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "./requireAuth";
 
-const ROLE_HIERARCHY = { GUEST: 0, USER: 1, ADMIN: 2 };
+const ROLE_HIERARCHY = { CUSTOMER: 0, AGENT: 1, ADMIN: 2 };
 
 export function requireRole(...allowedRoles: string[]) {
     return (req: AuthRequest, res: Response, next: NextFunction) => {

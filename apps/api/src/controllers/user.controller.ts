@@ -91,6 +91,7 @@ export async function registerUser(req: Request, res: Response) {
             email,
             password,
             name,
+            role
         } = req.body;
 
         const pswHash = await bcrypt.hash(password, 12);
@@ -100,7 +101,7 @@ export async function registerUser(req: Request, res: Response) {
                 email,
                 pswHash,
                 name,
-                role: "USER",
+                role,
                 status: "PENDING_APPROVAL"
             }
         });
@@ -158,15 +159,17 @@ export async function updateUser(req: Request, res: Response) {
 //? patch:/admin/users/:id/approve
 export async function approveUser(req: Request, res: Response) {
     try {
-        const userId = BigInt(req.params.id as string)
+        const userId = BigInt(req.params.id as string);
+        const { role } = req.body;
+
+        const data: any = { status: "APPROVED" };
+        if (role) data.role = role;
 
         const user = await prisma.user.update({
             where: {
                 id: userId
             },
-            data: {
-                status: "APPROVED"
-            }
+            data
         });
 
         res.status(200).json(user);
