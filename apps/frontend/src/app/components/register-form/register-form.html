@@ -24,6 +24,17 @@
                 class="px-6 py-2 bg-background/10 border border-secondary/40 rounded-xl focus-visible:border-accent/40 ring-0 outline-none transition-all ease-in font-body"
                 id="user-confirm-password" type="password" formControlName="confirmPassword">
         </label>
+        <label class="flex flex-col" for="user-role">
+            Role
+            <select
+                class="px-6 py-2 bg-background/10 border border-secondary/40 rounded-xl focus-visible:border-accent/40 ring-0 outline-none transition-all ease-in font-body"
+                id="user-role" formControlName="role">
+                <option value="" disabled>Select a role...</option>
+                <option value="CUSTOMER">Customer</option>
+                <option value="AGENT">Agent</option>
+            </select>
+        </label>
+
         @if(hasErrors){
         <div class="px-3 py-2 bg-background/20 border-primary/40 border rounded-xl">
             <strong class="text-primary text-lg">ERROR</strong>

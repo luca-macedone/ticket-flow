@@ -1,20 +1,18 @@
 <section class="p-5">
-    <header>
-        <h3 class="text-2xl font-black uppercase border-b-2 border-amber-600 pb-5">{{project()?.name}}</h3>
-        <nav>navigation buttons</nav>
+    @if (loading()) {
+    <p class="text-text/60">Caricamento...</p>
+    } @else if (error()) {
+    <p class="text-red-400">{{ error() }}</p>
+    } @else if (project()) {
+    <header class="border-b-2 border-amber-600 pb-5 mb-5">
+        <h3 class="text-2xl font-black uppercase">{{ project()!.projectName }}</h3>
+        <p class="text-text/50 text-sm mt-1">
+            {{ project()!.startDate | date:'dd/MM/yyyy' }}
+            @if (project()!.endDate) { → {{ project()!.endDate | date:'dd/MM/yyyy' }} }
+        </p>
     </header>
     <main>
-        <p>
-            {{project()?.description}}
-        </p>
-        <div>
-            <span>
-                Ongoing Tickets:
-            </span>
-            <span class="text-2xl font-bold">
-                {{project()?.tasks?.length}}
-            </span>
-        </div>
+        <p class="text-text/70">{{ project()!.description ?? 'Nessuna descrizione.' }}</p>
     </main>
-    <footer></footer>
+    }
 </section>

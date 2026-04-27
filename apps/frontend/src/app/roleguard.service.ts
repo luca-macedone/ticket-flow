@@ -20,7 +20,7 @@ export class RoleGuard implements CanActivate {
             }
         }
 
-        // if (user.status === 'PENDING_APPROVAL') return true;
+        if (user.status === 'PENDING_APPROVAL') return true;
 
         const expectedRoles = route.data['roles'] as string[];
         if (!expectedRoles?.includes(user.role)) {

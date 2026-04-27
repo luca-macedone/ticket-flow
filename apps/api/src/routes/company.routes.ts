@@ -10,13 +10,13 @@ const router = Router();
 router.get(
     "/",
     requireAuth,
-    requireRole("USER"),
+    requireRole("CUSTOMER"),
     getCompanies
 );
 router.get(
     "/:id",
     requireAuth,
-    requireRole("USER"),
+    requireRole("CUSTOMER"),
     getCompanyById
 );
 router.post(

@@ -10,13 +10,13 @@ const router = Router();
 router.get(
     "/",
     requireAuth,
-    requireRole("USER"),
+    requireRole("CUSTOMER"),
     getProjects
 );
 router.get(
     "/:id",
     requireAuth,
-    requireRole("USER"),
+    requireRole("CUSTOMER"),
     getProjectById
 );
 router.post(

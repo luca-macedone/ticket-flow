@@ -1,27 +1,35 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Project, ProjectService } from '../../../data/projects.service';
+import { firstValueFrom } from 'rxjs';
+import { Project, ProjectService } from '../../../services/project.service';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-project-view',
-  imports: [],
+  imports: [DatePipe],
   templateUrl: './project-view.html',
-  styleUrl: './project-view.css',
 })
 export class ProjectView {
-  projectId = signal(-1);
-  project = signal(null as Project | null);
+  private route = inject(ActivatedRoute);
+  private projectService = inject(ProjectService);
 
-  constructor(private route: ActivatedRoute, private projectService: ProjectService) { }
+  project = signal<Project | null>(null);
+  loading = signal(true);
+  error = signal<string | null>(null);
 
   ngOnInit() {
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.subscribe(async params => {
       const id = params.get('id');
-
-      this.projectId.set(Number(id))
-      const project = this.projectService.getProjectById(Number(id))
-
-      this.project.set(project)
-    })
+      if (!id) return;
+      try {
+        this.loading.set(true);
+        const data = await firstValueFrom(this.projectService.getProjectById(id));
+        this.project.set(data);
+      } catch {
+        this.error.set('Progetto non trovato.');
+      } finally {
+        this.loading.set(false);
+      }
+    });
   }
 }

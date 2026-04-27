@@ -18,6 +18,8 @@ export class Dashboard {
   user = this.auth.user;
   isAdmin = computed(() => this.auth.user()?.role === 'admin');
   isPending = computed(() => this.auth.user()?.status === 'PENDING_APPROVAL');
+  isRejected = computed(() => this.auth.user()?.status === 'REJECTED');
+
   reason: string | null = null;
 
   ngOnInit() {

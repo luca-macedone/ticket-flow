@@ -47,7 +47,7 @@
             </button>
         </footer>
     </aside>
-    <section class="grid grid-cols-5 grid-flow-row col-span-5 max-h-24 p-3">
+    <section class="grid grid-cols-5 grid-flow-row col-span-5 p-3 h-fit">
         <div class="col-span-5 p-3 flex flex-col gap-2.5 backdrop-blur-xl bg-text/10 rounded-2xl">
             <app-breadcrump />
         </div>
@@ -59,8 +59,17 @@
                 <p class="text-sm">The functionalities are disabled during the approval phase.</p>
             </div>
         </div>
+        } @else if (isRejected()) {
+        <div class="col-span-5 m-5 p-4 rounded-lg border-2 border-red-500/40 flex items-center gap-3">
+            <span class="text-xl">✗</span>
+            <div>
+                <p class="font-semibold">Account rifiutato</p>
+                <p class="text-sm">La tua richiesta di accesso è stata rifiutata. Contatta un amministratore per
+                    maggiori informazioni.</p>
+            </div>
+        </div>
         } @else {
-        <div class="col-span-5 max-h-60 flex flex-col gap-3">
+        <div class="col-span-5 flex flex-col gap-3">
             <router-outlet />
         </div>
         }

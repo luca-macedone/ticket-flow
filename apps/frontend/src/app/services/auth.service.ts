@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 export interface AuthUser {
   name: string;
   role: string;
-  status: 'PENDING_APPROVAL' | 'APPROVED';
+  status: 'PENDING_APPROVAL' | 'APPROVED' | 'REJECTED';
 }
 
 @Injectable({ providedIn: 'root' })
@@ -22,8 +22,8 @@ export class AuthService {
     ).pipe(tap(u => this.user.set(u)));
   }
 
-  register(name: string, email: string, password: string) {
-    return this.http.post<{ id: string }>('/api/users/register', { email, password, name });
+  register(name: string, email: string, password: string, role: string) {
+    return this.http.post<{ id: string }>('/api/users/register', { email, password, name, role });
   }
 
   refresh() {

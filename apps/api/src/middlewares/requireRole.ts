@@ -9,7 +9,7 @@ export function requireRole(...allowedRoles: string[]) {
             return res.status(401).json({ message: "Not authenticated" });
         }
 
-        const userLevel = ROLE_HIERARCHY[req.user.role as keyof typeof ROLE_HIERARCHY] ?? -1;
+        const userLevel = ROLE_HIERARCHY[req.user.role.toUpperCase() as keyof typeof ROLE_HIERARCHY] ?? -1;
 
         const minRequired = Math.min(...allowedRoles.map(r => ROLE_HIERARCHY[r as keyof typeof ROLE_HIERARCHY] ?? 99));
 

@@ -1,31 +1,33 @@
-<section class="p-5 min-h-60">
-    <h3 class="text-xl font-mono font-bold border-s-8 border-amber-700 ps-4">Projects</h3>
-    <div class="grid grid-cols-3 gap-3 pt-5">
-        @for (project of projects.filter(x => x.isVisibile); track project.id) {
-        <a [routerLink]="`/dashboard/projects/${project.id}`"
-            class="border-2 p-5 rounded-xl border-amber-300 max-h-48 flex flex-col gap-3 hover:scale-95 hover:opacity-95 hover:cursor-pointer transition-all ease-in">
-            <header>
-                <h5 class="font-semibold capitalize">
-                    {{project.name}}
-                </h5>
-            </header>
-            <main class="flex flex-col  h-full w-full gap-3">
-                <p class="bg-amber-100 rounded-2xl p-5">
-                    {{project.description}}
-                </p>
-                <div class="flex justify-end items-baseline gap-5 py-3">
-                    <span>
-                        Ongoing Tickets:
-                    </span>
-                    <span class="text-2xl font-bold">
-                        {{project.tasks.length}}
-                    </span>
+<section class="flex flex-col gap-4 p-4 border border-text/10 rounded-2xl">
+    <h2 class="text-xl font-semibold font-heading text-primary">Project list</h2>
 
-                </div>
-            </main>
-        </a>
-        } @empty {
-        <li>Nothing.</li>
-        }
-    </div>
+    @if (loading()) {
+    <p class="text-text/60">Loading...</p>
+    } @else if (error()) {
+    <p class="text-red-400">{{ error() }}</p>
+    } @else {
+    <table class="w-full border-separate border-spacing-y-1 p-2 bg-text/10">
+        <thead>
+            <tr class="text-left text-text/50 text-xs uppercase tracking-wide">
+                <th class="px-4 py-2">Name</th>
+                <th class="px-4 py-2">Description</th>
+                <th class="px-4 py-2">Registered</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (project of projects(); track project.id) {
+            <tr class="bg-text/5 rounded-xl hover:bg-text/10 cursor-pointer"
+                [routerLink]="'/dashboard/projects/' + project.id">
+                <td class="px-4 py-3 font-medium">{{ project.projectName }}</td>
+                <td class="px-4 py-3 text-text/70">{{ project.description }}</td>
+                <td class="px-4 py-3 capitalize">{{ project.startDate | date:'dd/MM/yyyy' }}</td>
+            </tr>
+            } @empty {
+            <tr>
+                <td colspan="6" class="px-4 py-6 text-center text-text/50">No project found.</td>
+            </tr>
+            }
+        </tbody>
+    </table>
+    }
 </section>

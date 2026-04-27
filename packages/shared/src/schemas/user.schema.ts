@@ -28,6 +28,7 @@ export const UserBaseSchema = z.object({
 export const CreateUserSchema = UserBaseSchema.extend({
     password: PasswordSchema,
     confirmPassword: PasswordSchema,
+    role: z.enum(["AGENT", "CUSTOMER"])
 }).refine(d => d.password === d.confirmPassword, {
     message: "Le password non coincidono",
     path: ["confirmPassword"],

@@ -17,6 +17,7 @@ export class RegisterForm {
 		password: new FormControl("", [Validators.required, Validators.minLength(8)]),
 		confirmPassword: new FormControl("", [Validators.required, Validators.minLength(8)]),
 		name: new FormControl("", [Validators.required, Validators.minLength(2), Validators.maxLength(100)]),
+		role: new FormControl("", [Validators.required])
 	})
 	errors: Record<string, string[]> = {};
 	private auth = inject(AuthService);
@@ -45,7 +46,7 @@ export class RegisterForm {
 
 		try {
 			await firstValueFrom(this.auth.register(
-				result.data.name, result.data.email, result.data.password
+				result.data.name, result.data.email, result.data.password, result.data.role
 			));
 			// pending: setta lo stato e naviga alla dashboard bloccata
 			this.changeView.emit("pending");

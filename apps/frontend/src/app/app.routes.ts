@@ -3,11 +3,12 @@ import { Routes } from '@angular/router';
 import { Home } from './views/home/home';
 import { Dashboard } from './views/dashboard/dashboard';
 import { RoleGuard } from './roleguard.service';
-import { Backoffice } from './views/backoffice/backoffice';
 import { NotFoundRedirectComponent } from './views/notfound';
 import { ProjectsList } from './views/projects/projects-list/projects-list';
 import { ProjectView } from './views/projects/project-view/project-view';
 import { Overview } from './views/overview/overview';
+import { UserList } from './views/users/user-list/user-list';
+import { CompaniesList } from './views/companies/companies-list/companies-list';
 
 export const routes: Routes = [
     {
@@ -19,7 +20,7 @@ export const routes: Routes = [
         component: Dashboard,
         canActivate: [RoleGuard],
         data: {
-            roles: ['admin', 'user'],
+            roles: ['admin', 'agent', 'customer'],
             breadcrumb: 'Dashboard'
         },
         children: [
@@ -30,8 +31,10 @@ export const routes: Routes = [
             },
             {
                 path: "overview",
+                canActivate: [RoleGuard],
                 data: {
                     breadcrumb: "Overview",
+                    roles: ['admin', 'agent', 'customer']
                 },
                 component: Overview
             },
@@ -44,7 +47,7 @@ export const routes: Routes = [
                         component: ProjectsList,
                         canActivate: [RoleGuard],
                         data: {
-                            roles: ['admin', 'user'],
+                            roles: ['admin', 'agent', 'customer'],
                         },
                     },
                     {
@@ -52,7 +55,7 @@ export const routes: Routes = [
                         component: ProjectView,
                         canActivate: [RoleGuard],
                         data: {
-                            roles: ['admin', 'user'],
+                            roles: ['admin', 'agent', 'customer'],
                             breadcrumb: 'Project'
                         }
                     }
@@ -64,10 +67,10 @@ export const routes: Routes = [
                 children: [
                     {
                         path: "",
-                        component: ProjectsList,
+                        component: CompaniesList,
                         canActivate: [RoleGuard],
                         data: {
-                            roles: ['admin', 'user'],
+                            roles: ['admin'],
                         },
                     },
                     {
@@ -75,7 +78,7 @@ export const routes: Routes = [
                         component: ProjectView,
                         canActivate: [RoleGuard],
                         data: {
-                            roles: ['admin', 'user'],
+                            roles: ['admin'],
                             breadcrumb: 'Company'
                         }
                     }
@@ -87,21 +90,21 @@ export const routes: Routes = [
                 children: [
                     {
                         path: "",
-                        component: ProjectsList,
+                        component: UserList,
                         canActivate: [RoleGuard],
                         data: {
-                            roles: ['admin', 'user'],
+                            roles: ['admin'],
                         },
                     },
-                    {
-                        path: ':id',
-                        component: ProjectView,
-                        canActivate: [RoleGuard],
-                        data: {
-                            roles: ['admin', 'user'],
-                            breadcrumb: 'User'
-                        }
-                    }
+                    // {
+                    //     path: ':id',
+                    //     component: ProjectView,
+                    //     canActivate: [RoleGuard],
+                    //     data: {
+                    //         roles: ['admin'],
+                    //         breadcrumb: 'User'
+                    //     }
+                    // }
                 ],
             },
         ]

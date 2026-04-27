@@ -10,7 +10,7 @@ const router = Router();
 router.get(
     "/",
     requireAuth,
-    requireRole("USER"),
+    requireRole("CUSTOMER"),
     getTasks
 );
 router.get(
@@ -29,20 +29,20 @@ router.get(
 router.get(
     "/:id",
     requireAuth,
-    requireRole("USER"),
+    requireRole("CUSTOMER"),
     getTaskById
 );
 router.post(
     "/",
     requireAuth,
-    requireRole("USER"),
+    requireRole("CUSTOMER"),
     zodValidate(CreateTaskSchema),
     createTask
 );
 router.patch(
     "/:id",
     requireAuth,
-    requireRole("USER"),
+    requireRole("CUSTOMER"),
     zodValidate(UpdateTaskSchema),
     updateTask
 );
