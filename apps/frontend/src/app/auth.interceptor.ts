@@ -9,7 +9,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req).pipe(
         catchError((err: HttpErrorResponse) => {
             // evita loop infinito sull'endpoint di refresh stesso
-            if (err.status === 401 && !req.url.includes('/auth/refresh')) {
+            if (err.status === 401 && !req.url.includes('/auth/refresh') && !req.url.includes('/auth/login')) {
                 return auth.refresh().pipe(
                     switchMap(() => next(req)),
                     catchError(() => {

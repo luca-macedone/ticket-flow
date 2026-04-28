@@ -26,14 +26,12 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.set("json replacer", (_key: string, val: unknown) => {
-    typeof val === "bigint" ? val.toString() : val
+    return typeof val === "bigint" ? val.toString() : val
 })
 
 if (process.env.NODE_ENV === "development") {
     app.use("/docs", swaggerUi.serve, swaggerUi.setup(generateOpenApiDoc()));
 }
-
-// console.log('DATABASE_URL =', process.env.DB_HOST + ':' + process.env.DB_PORT + '/' + process.env.DB_NAME)
 
 // health check
 app.get("/health", (_, res) => {

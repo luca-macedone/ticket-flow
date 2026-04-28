@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 
 import { Home } from './views/home/home';
 import { Dashboard } from './views/dashboard/dashboard';
-import { RoleGuard } from './roleguard.service';
+import { roleGuard } from './roleguard.service';
 import { NotFoundRedirectComponent } from './views/notfound';
 import { ProjectsList } from './views/projects/projects-list/projects-list';
 import { ProjectView } from './views/projects/project-view/project-view';
@@ -18,7 +18,7 @@ export const routes: Routes = [
     {
         path: "dashboard",
         component: Dashboard,
-        canActivate: [RoleGuard],
+        canActivate: [roleGuard],
         data: {
             roles: ['admin', 'agent', 'customer'],
             breadcrumb: 'Dashboard'
@@ -31,7 +31,7 @@ export const routes: Routes = [
             },
             {
                 path: "overview",
-                canActivate: [RoleGuard],
+                canActivate: [roleGuard],
                 data: {
                     breadcrumb: "Overview",
                     roles: ['admin', 'agent', 'customer']
@@ -45,7 +45,7 @@ export const routes: Routes = [
                     {
                         path: "",
                         component: ProjectsList,
-                        canActivate: [RoleGuard],
+                        canActivate: [roleGuard],
                         data: {
                             roles: ['admin', 'agent', 'customer'],
                         },
@@ -53,7 +53,7 @@ export const routes: Routes = [
                     {
                         path: ':id',
                         component: ProjectView,
-                        canActivate: [RoleGuard],
+                        canActivate: [roleGuard],
                         data: {
                             roles: ['admin', 'agent', 'customer'],
                             breadcrumb: 'Project'
@@ -68,7 +68,7 @@ export const routes: Routes = [
                     {
                         path: "",
                         component: CompaniesList,
-                        canActivate: [RoleGuard],
+                        canActivate: [roleGuard],
                         data: {
                             roles: ['admin'],
                         },
@@ -76,7 +76,7 @@ export const routes: Routes = [
                     {
                         path: ':id',
                         component: ProjectView,
-                        canActivate: [RoleGuard],
+                        canActivate: [roleGuard],
                         data: {
                             roles: ['admin'],
                             breadcrumb: 'Company'
@@ -91,7 +91,7 @@ export const routes: Routes = [
                     {
                         path: "",
                         component: UserList,
-                        canActivate: [RoleGuard],
+                        canActivate: [roleGuard],
                         data: {
                             roles: ['admin'],
                         },
@@ -99,7 +99,7 @@ export const routes: Routes = [
                     // {
                     //     path: ':id',
                     //     component: ProjectView,
-                    //     canActivate: [RoleGuard],
+                    //     canActivate: [roleGuard],
                     //     data: {
                     //         roles: ['admin'],
                     //         breadcrumb: 'User'

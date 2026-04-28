@@ -12,15 +12,15 @@
     @let ov = adminOverview();
     @if (ov) {
     <div class="grid grid-cols-3 gap-3">
-        <div class="border border-text/10 rounded-2xl p-4 flex flex-col gap-1">
+        <div class="border border-text/10 rounded-2xl p-4 flex flex-col gap-1 bg-text/10">
             <span class="text-xs text-text/50 uppercase tracking-wide">Open Tickets</span>
             <span class="text-3xl font-bold text-primary">{{ ov.tickets.open }}</span>
         </div>
-        <div class="border border-text/10 rounded-2xl p-4 flex flex-col gap-1">
+        <div class="border border-text/10 rounded-2xl p-4 flex flex-col gap-1 bg-text/10">
             <span class="text-xs text-text/50 uppercase tracking-wide">Resolved</span>
             <span class="text-3xl font-bold text-green-500">{{ ov.tickets.resolved }}</span>
         </div>
-        <div class="border border-text/10 rounded-2xl p-4 flex flex-col gap-1">
+        <div class="border border-text/10 rounded-2xl p-4 flex flex-col gap-1 bg-text/10">
             <span class="text-xs text-text/50 uppercase tracking-wide">Avg Resolution</span>
             <span class="text-3xl font-bold">
                 {{ ov.tickets.avgResolutionHours }}<small class="text-base ml-1 font-normal text-text/50">h</small>
@@ -28,7 +28,7 @@
         </div>
     </div>
     <div class="grid grid-cols-2 gap-3">
-        <div class="border border-text/10 rounded-2xl p-4 flex flex-col gap-2">
+        <div class="border border-text/10 rounded-2xl p-4 flex flex-col gap-2 bg-text/10">
             <h3 class="text-xs font-semibold text-text/50 uppercase tracking-wide">Agent Workload</h3>
             @for (a of ov.agentWorkload; track a.agentId) {
             <div class="flex justify-between items-center py-1">
@@ -39,7 +39,7 @@
             <p class="text-text/40 ">No active agents.</p>
             }
         </div>
-        <div class="border border-text/10 rounded-2xl p-4 flex flex-col gap-2">
+        <div class="border border-text/10 rounded-2xl p-4 flex flex-col gap-2 bg-text/10">
             <h3 class="text-xs font-semibold text-text/50 uppercase tracking-wide">By Category</h3>
             @for (c of ov.byCategory; track c.category) {
             <div class="flex justify-between items-center py-1">
