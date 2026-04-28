@@ -1,33 +1,11 @@
 <section class="flex flex-col gap-4 p-4 border border-text/10 rounded-2xl">
     <h2 class="text-xl font-semibold font-heading text-primary">Project list</h2>
-
     @if (loading()) {
     <p class="text-text/60">Loading...</p>
     } @else if (error()) {
     <p class="text-red-400">{{ error() }}</p>
     } @else {
-    <table class="w-full border-separate border-spacing-y-1 p-2 bg-text/10">
-        <thead>
-            <tr class="text-left text-text/50 text-xs uppercase tracking-wide">
-                <th class="px-4 py-2">Name</th>
-                <th class="px-4 py-2">Description</th>
-                <th class="px-4 py-2">Registered</th>
-            </tr>
-        </thead>
-        <tbody>
-            @for (project of projects(); track project.id) {
-            <tr class="bg-text/5 rounded-xl hover:bg-text/10 cursor-pointer"
-                [routerLink]="'/dashboard/projects/' + project.id">
-                <td class="px-4 py-3 font-medium">{{ project.projectName }}</td>
-                <td class="px-4 py-3 text-text/70">{{ project.description }}</td>
-                <td class="px-4 py-3 capitalize">{{ project.startDate | date:'dd/MM/yyyy' }}</td>
-            </tr>
-            } @empty {
-            <tr>
-                <td colspan="6" class="px-4 py-6 text-center text-text/50">No project found.</td>
-            </tr>
-            }
-        </tbody>
-    </table>
+    <app-data-table [columns]="columns" [rows]="projects()" emptyMessage="No project found."
+        (rowClick)="navigate($event)" />
     }
 </section>

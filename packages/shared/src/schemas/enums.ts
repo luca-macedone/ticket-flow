@@ -23,3 +23,18 @@ export const StatusEnum = z.enum([
     "DONE",
     "CANCELLED",
 ]);
+
+export const TicketCategoryEnum = z.enum([
+    "GENERAL",
+    "BUG",
+    "FEATURE",
+    "SUPPORT",
+    "MAINTENANCE",
+]);
+
+export const PriorityEnum = z.enum([
+    "LOW",
+    "MEDIUM",
+    "HIGH",
+    "URGENT",
+]);

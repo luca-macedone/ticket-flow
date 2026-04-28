@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { prisma } from "../db";
-import { AuthRequest } from "../middlewares/requireAuth";
 
 const CLOSED = ['DONE', 'CANCELLED', 'REJECTED'] as const;
 
@@ -9,31 +8,31 @@ export async function getAdminOverview(req: Request, res: Response) {
         const [
             openCount,
             resolvedCount,
-            resolvedTasks,
+            resolvedTickets,
             traffic,
             agentWorkloadRaw,
             byCategory,
             byProject,
             byCompany,
         ] = await Promise.all([
-            prisma.task.count({ where: { status: { notIn: [...CLOSED] } } }),
+            prisma.ticket.count({ where: { status: { notIn: [...CLOSED] } } }),
 
-            prisma.task.count({ where: { status: 'DONE' } }),
+            prisma.ticket.count({ where: { status: 'DONE' } }),
 
-            prisma.task.findMany({
+            prisma.ticket.findMany({
                 where: { status: 'DONE', resolvedAt: { not: null } },
                 select: { createdAt: true, resolvedAt: true },
             }),
 
             prisma.$queryRaw<Array<{ date: string; count: bigint }>>`
                 SELECT DATE(createdAt) as date, COUNT(*) as count
-                FROM Task
+                FROM Ticket
                 WHERE createdAt >= DATE_SUB(NOW(), INTERVAL 15 DAY)
                 GROUP BY DATE(createdAt)
                 ORDER BY date ASC
             `,
 
-            prisma.task.groupBy({
+            prisma.ticket.groupBy({
                 by: ['assigneeId'],
                 where: {
                     assigneeId: { not: null },
@@ -42,12 +41,12 @@ export async function getAdminOverview(req: Request, res: Response) {
                 _count: { id: true },
             }),
 
-            prisma.task.groupBy({
+            prisma.ticket.groupBy({
                 by: ['category'],
                 _count: { id: true },
             }),
 
-            prisma.task.groupBy({
+            prisma.ticket.groupBy({
                 by: ['projectId'],
                 where: { projectId: { not: null } },
                 _count: { id: true },
@@ -55,17 +54,17 @@ export async function getAdminOverview(req: Request, res: Response) {
 
             prisma.$queryRaw<Array<{ companyName: string; count: bigint }>>`
                 SELECT c.companyName, COUNT(t.id) as count
-                FROM Task t
+                FROM Ticket t
                 JOIN Project p ON t.projectId = p.id
                 JOIN Company c ON p.companyId = c.id
                 GROUP BY c.id, c.companyName
             `,
         ]);
 
-        const avgResolutionHours = resolvedTasks.length > 0
-            ? resolvedTasks.reduce((acc, t) =>
+        const avgResolutionHours = resolvedTickets.length > 0
+            ? resolvedTickets.reduce((acc, t) =>
                 acc + (t.resolvedAt!.getTime() - t.createdAt.getTime()), 0
-            ) / resolvedTasks.length / 1000 / 60 / 60
+            ) / resolvedTickets.length / 1000 / 60 / 60
             : 0;
 
         const agentIds = agentWorkloadRaw

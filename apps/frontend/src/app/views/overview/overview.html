@@ -12,129 +12,60 @@
     @let ov = adminOverview();
     @if (ov) {
     <div class="grid grid-cols-3 gap-3">
-        <div class="border border-text/10 rounded-2xl p-4 flex flex-col gap-1 bg-text/10">
-            <span class="text-xs text-text/50 uppercase tracking-wide">Open Tickets</span>
+        <app-base-card title="open tickets" description="total tickets still open">
             <span class="text-3xl font-bold text-primary">{{ ov.tickets.open }}</span>
-        </div>
-        <div class="border border-text/10 rounded-2xl p-4 flex flex-col gap-1 bg-text/10">
-            <span class="text-xs text-text/50 uppercase tracking-wide">Resolved</span>
+        </app-base-card>
+        <app-base-card title="resolved" description="total tickets resolved">
             <span class="text-3xl font-bold text-green-500">{{ ov.tickets.resolved }}</span>
-        </div>
-        <div class="border border-text/10 rounded-2xl p-4 flex flex-col gap-1 bg-text/10">
-            <span class="text-xs text-text/50 uppercase tracking-wide">Avg Resolution</span>
-            <span class="text-3xl font-bold">
-                {{ ov.tickets.avgResolutionHours }}<small class="text-base ml-1 font-normal text-text/50">h</small>
+        </app-base-card>
+        <app-base-card title="avg resolution (hours)">
+            <span class="font-bold text-3xl">
+                {{ ov.tickets.avgResolutionHours }}<small class="text-xl ml-1 font-normal text-text/50">h</small>
             </span>
-        </div>
+        </app-base-card>
     </div>
     <div class="grid grid-cols-2 gap-3">
-        <div class="border border-text/10 rounded-2xl p-4 flex flex-col gap-2 bg-text/10">
-            <h3 class="text-xs font-semibold text-text/50 uppercase tracking-wide">Agent Workload</h3>
-            @for (a of ov.agentWorkload; track a.agentId) {
-            <div class="flex justify-between items-center py-1">
-                <span class="">{{ a.agentName }}</span>
-                <span class="font-mono font-bold text-primary ">{{ a.open }}</span>
+        <app-base-card title="agent workload" description="amount of tickets divided by agent">
+            <div class="h-full">
+                @for (a of ov.agentWorkload; track a.agentId) {
+                <div class="flex justify-between items-center py-1">
+                    <span>{{ a.agentName }}</span>
+                    <span class="font-mono font-bold text-primary">{{ a.open }}</span>
+                </div>
+                } @empty {
+                <p class="text-text/40">No active agents.</p>
+                }
             </div>
-            } @empty {
-            <p class="text-text/40 ">No active agents.</p>
-            }
-        </div>
-        <div class="border border-text/10 rounded-2xl p-4 flex flex-col gap-2 bg-text/10">
-            <h3 class="text-xs font-semibold text-text/50 uppercase tracking-wide">By Category</h3>
-            @for (c of ov.byCategory; track c.category) {
-            <div class="flex justify-between items-center py-1">
-                <span class="">{{ c.category }}</span>
-                <span class="font-mono font-bold ">{{ c.count }}</span>
+        </app-base-card>
+        <app-base-card title="by Category">
+            <div class="h-full">
+                @for (c of ov.byCategory; track c.category) {
+                <div class="flex justify-between items-center py-1">
+                    <span class="capitalize">{{ c.category.toLowerCase() }}</span>
+                    <span class="font-mono font-bold">{{ c.count }}</span>
+                </div>
+                }
             </div>
-            }
-        </div>
+        </app-base-card>
     </div>
     }
     }
     @if (isAgent()) {
-    <div class="flex flex-col gap-3 border border-text/10 rounded-2xl p-4">
+    <div class="flex flex-col gap-3 border border-text/10 rounded-2xl p-3">
         <h3 class="text-xl font-semibold font-heading text-primary">
-            My Queue <span class="text-text/50 font-normal text-base">({{ myQueue().length }} open)</span>
+            My Queue <span class="text-text/50 font-normal text-base">({{ totalItems() }} open)</span>
         </h3>
-        <table class="w-full border-separate border-spacing-y-1 p-2 bg-text/10">
-            <thead>
-                <tr class="text-left text-text/50 text-xs uppercase tracking-wide">
-                    <th class="px-4 py-2">Code</th>
-                    <th class="px-4 py-2">Title</th>
-                    <th class="px-4 py-2">Project</th>
-                    <th class="px-4 py-2">Priority</th>
-                    <th class="px-4 py-2">Status</th>
-                    <th class="px-4 py-2">Created</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for (t of myQueue(); track t.id) {
-                <tr class="bg-text/5 hover:bg-text/10 cursor-pointer">
-                    <td class="px-4 py-3 font-mono text-xs text-text/50 rounded-l-xl">{{ t.taskCode }}</td>
-                    <td class="px-4 py-3 font-medium ">{{ t.taskName }}</td>
-                    <td class="px-4 py-3  text-text/70">{{ t.project?.projectName ?? '—' }}</td>
-                    <td class="px-4 py-3">
-                        <span class="text-xs px-2 py-0.5 rounded-full" [ngClass]="priorityClass(t.priority)">
-                            {{ t.priority }}
-                        </span>
-                    </td>
-                    <td class="px-4 py-3">
-                        <span class="text-xs px-2 py-0.5 rounded-full" [ngClass]="statusClass(t.status)">
-                            {{ t.status }}
-                        </span>
-                    </td>
-                    <td class="px-4 py-3  text-text/50 rounded-r-xl">{{ t.createdAt | date:'dd/MM/yyyy' }}</td>
-                </tr>
-                } @empty {
-                <tr>
-                    <td colspan="6" class="px-4 py-6 text-center text-text/50">Queue is empty.</td>
-                </tr>
-                }
-            </tbody>
-        </table>
+        <app-data-table [columns]="agentColumns" [rows]="rows()" [total]="totalItems()" [page]="currentPage()"
+            [pageSize]="pageSize" emptyMessage="Queue is empty." (pageChange)="goToPage($event)" />
     </div>
     }
     @if (!isAdmin() && !isAgent()) {
-    <div class="flex flex-col gap-3 border border-text/10 rounded-2xl p-4">
+    <div class="flex flex-col gap-3 border border-text/10 rounded-2xl p-3">
         <h3 class="text-xl font-semibold font-heading text-primary">
-            My Tickets <span class="text-text/50 font-normal text-base">({{ myTickets().length }})</span>
+            My Tickets <span class="text-text/50 font-normal text-base">({{ totalItems() }})</span>
         </h3>
-        <table class="w-full border-separate border-spacing-y-1 p-2 bg-text/10">
-            <thead>
-                <tr class="text-left text-text/50 text-xs uppercase tracking-wide">
-                    <th class="px-4 py-2">Code</th>
-                    <th class="px-4 py-2">Title</th>
-                    <th class="px-4 py-2">Project</th>
-                    <th class="px-4 py-2">Assignee</th>
-                    <th class="px-4 py-2">Priority</th>
-                    <th class="px-4 py-2">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for (t of myTickets(); track t.id) {
-                <tr class="bg-text/5 hover:bg-text/10 cursor-pointer">
-                    <td class="px-4 py-3 font-mono text-xs text-text/50 rounded-l-xl">{{ t.taskCode }}</td>
-                    <td class="px-4 py-3 font-medium ">{{ t.taskName }}</td>
-                    <td class="px-4 py-3  text-text/70">{{ t.project?.projectName ?? '—' }}</td>
-                    <td class="px-4 py-3  text-text/70">{{ t.assignee?.name ?? '—' }}</td>
-                    <td class="px-4 py-3">
-                        <span class="text-xs px-2 py-0.5 rounded-full" [ngClass]="priorityClass(t.priority)">
-                            {{ t.priority }}
-                        </span>
-                    </td>
-                    <td class="px-4 py-3 rounded-r-xl">
-                        <span class="text-xs px-2 py-0.5 rounded-full" [ngClass]="statusClass(t.status)">
-                            {{ t.status }}
-                        </span>
-                    </td>
-                </tr>
-                } @empty {
-                <tr>
-                    <td colspan="6" class="px-4 py-6 text-center text-text/50">No tickets submitted yet.</td>
-                </tr>
-                }
-            </tbody>
-        </table>
+        <app-data-table [columns]="customerColumns" [rows]="rows()" [total]="totalItems()" [page]="currentPage()"
+            [pageSize]="pageSize" emptyMessage="No tickets submitted yet." (pageChange)="goToPage($event)" />
     </div>
     }
     }

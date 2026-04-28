@@ -3,7 +3,7 @@ import { registry } from './registry';
 import {
     CreateUserSchema, UpdateUserSchema, UserResponseSchema,
     CreateProjectSchema, UpdateProjectSchema, ProjectResponseSchema,
-    CreateTaskSchema, UpdateTaskSchema, TaskResponseSchema,
+    CreateTicketSchema, UpdateTicketSchema, TicketResponseSchema,
     CreateCompanySchema, UpdateCompanySchema, CompanyResponseSchema,
     LoginSchema, LoginResponseSchema,
     IdParamSchema, PaginationQuerySchema
@@ -16,9 +16,9 @@ export const Schemas = {
     CreateProject: registry.register('CreateProject', CreateProjectSchema),
     UpdateProject: registry.register('UpdateProject', UpdateProjectSchema),
     ProjectResponse: registry.register('ProjectResponse', ProjectResponseSchema),
-    CreateTask: registry.register('CreateTask', CreateTaskSchema),
-    UpdateTask: registry.register('UpdateTask', UpdateTaskSchema),
-    TaskResponse: registry.register('TaskResponse', TaskResponseSchema),
+    CreateTicket: registry.register('CreateTicket', CreateTicketSchema),
+    UpdateTicket: registry.register('UpdateTicket', UpdateTicketSchema),
+    TicketResponse: registry.register('TicketResponse', TicketResponseSchema),
     CreateCompany: registry.register('CreateCompany', CreateCompanySchema),
     UpdateCompany: registry.register('UpdateCompany', UpdateCompanySchema),
     CompanyResponse: registry.register('CompanyResponse', CompanyResponseSchema),

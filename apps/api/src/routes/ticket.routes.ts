@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { createTask, deleteTask, getMyQueue, getMyTickets, getTaskById, getTasks, updateTask } from "../controllers/task.controller";
+import { createTicket, deleteTicket, getMyQueue, getMyTickets, getTicketById, getTickets, updateTicket } from "../controllers/ticket.controller";
 import { zodValidate } from "../middlewares/zodValidate";
-import { CreateTaskSchema, UpdateTaskSchema } from "@packages/shared";
+import { CreateTicketSchema, UpdateTicketSchema } from "@packages/shared";
 import { requireAuth } from "../middlewares/requireAuth";
 import { requireRole } from "../middlewares/requireRole";
 
@@ -11,7 +11,7 @@ router.get(
     "/",
     requireAuth,
     requireRole("CUSTOMER"),
-    getTasks
+    getTickets
 );
 router.get(
     "/my-queue",
@@ -30,27 +30,27 @@ router.get(
     "/:id",
     requireAuth,
     requireRole("CUSTOMER"),
-    getTaskById
+    getTicketById
 );
 router.post(
     "/",
     requireAuth,
     requireRole("CUSTOMER"),
-    zodValidate(CreateTaskSchema),
-    createTask
+    zodValidate(CreateTicketSchema),
+    createTicket
 );
 router.patch(
     "/:id",
     requireAuth,
     requireRole("CUSTOMER"),
-    zodValidate(UpdateTaskSchema),
-    updateTask
+    zodValidate(UpdateTicketSchema),
+    updateTicket
 );
 router.delete(
     "/:id",
     requireAuth,
     requireRole("ADMIN"),
-    deleteTask
+    deleteTicket
 );
 
 export default router;

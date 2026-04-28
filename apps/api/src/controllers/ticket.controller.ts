@@ -5,18 +5,18 @@ import { AuthRequest } from "../middlewares/requireAuth";
 
 const CLOSED = ['DONE', 'CANCELLED', 'REJECTED'] as const;
 
-//? get:/tasks
-export async function getTasks(req: Request, res: Response) {
+//? get:/tickets
+export async function getTickets(req: Request, res: Response) {
     try {
         const page = Number(req.query.page ?? 1)
         const take = Number(req.query.amount ?? 20)
         const skip = (page - 1) * take;
 
-        const tasks = await prisma.task.findMany({
+        const tickets = await prisma.ticket.findMany({
             skip,
             take
         });
-        res.status(200).json(tasks);
+        res.status(200).json(tickets);
     } catch (error) {
         console.error(error)
         res.status(500).json({
@@ -25,24 +25,24 @@ export async function getTasks(req: Request, res: Response) {
     }
 }
 
-//? get:/tasks/:id
-export async function getTaskById(req: Request, res: Response) {
+//? get:/tickets/:id
+export async function getTicketById(req: Request, res: Response) {
     try {
-        const taskId = BigInt(req.params.id as string);
-        const task = await prisma.task.findUnique({
-            where: { id: taskId }
+        const ticketId = BigInt(req.params.id as string);
+        const ticket = await prisma.ticket.findUnique({
+            where: { id: ticketId }
         });
 
-        if (!task) {
-            return res.status(404).json({ message: "Task not found" });
+        if (!ticket) {
+            return res.status(404).json({ message: "Ticket not found" });
         }
 
-        res.status(200).json(task);
+        res.status(200).json(ticket);
     } catch (error) {
         console.error(error)
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
             if (error.code === "P2025") {
-                return res.status(404).json({ message: "Task not found" });
+                return res.status(404).json({ message: "Ticket not found" });
             }
         }
         res.status(500).json({
@@ -51,23 +51,23 @@ export async function getTaskById(req: Request, res: Response) {
     }
 }
 
-//? post:/tasks
-export async function createTask(req: Request, res: Response) {
+//? post:/tickets
+export async function createTicket(req: Request, res: Response) {
     try {
         const {
-            taskCode,
-            taskName,
-            taskDescription,
+            ticketCode,
+            ticketName,
+            ticketDescription,
             startDate,
             endDate,
             status,
             projectId
         } = req.body;
-        const task = await prisma.task.create({
+        const ticket = await prisma.ticket.create({
             data: {
-                taskCode,
-                taskName,
-                taskDescription,
+                ticketCode,
+                ticketName,
+                ticketDescription,
                 startDate,
                 endDate,
                 status,
@@ -75,7 +75,7 @@ export async function createTask(req: Request, res: Response) {
             }
         });
 
-        res.status(201).json(task);
+        res.status(201).json(ticket);
     } catch (error) {
         console.error(error)
         res.status(500).json({
@@ -84,14 +84,14 @@ export async function createTask(req: Request, res: Response) {
     }
 }
 
-//? patch:/tasks/:id
-export async function updateTask(req: Request, res: Response) {
+//? patch:/tickets/:id
+export async function updateTicket(req: Request, res: Response) {
     try {
-        const taskId = BigInt(req.params.id as string)
+        const ticketId = BigInt(req.params.id as string)
         const {
-            taskCode,
-            taskName,
-            taskDescription,
+            ticketCode,
+            ticketName,
+            ticketDescription,
             startDate,
             endDate,
             status,
@@ -99,9 +99,9 @@ export async function updateTask(req: Request, res: Response) {
         } = req.body;
 
         const data: any = {};
-        if (taskCode !== undefined) data.taskCode = taskCode;
-        if (taskName !== undefined) data.taskName = taskName;
-        if (taskDescription !== undefined) data.taskDescription = taskDescription;
+        if (ticketCode !== undefined) data.ticketCode = ticketCode;
+        if (ticketName !== undefined) data.ticketName = ticketName;
+        if (ticketDescription !== undefined) data.ticketDescription = ticketDescription;
         if (startDate !== undefined) data.startDate = startDate;
         if (endDate !== undefined) data.endDate = endDate;
         if (status !== undefined) {
@@ -111,19 +111,19 @@ export async function updateTask(req: Request, res: Response) {
         }
         if (projectId !== undefined) data.projectId = projectId;
 
-        const task = await prisma.task.update({
+        const ticket = await prisma.ticket.update({
             where: {
-                id: taskId
+                id: ticketId
             },
             data
         });
 
-        res.status(200).json(task);
+        res.status(200).json(ticket);
     } catch (error) {
         console.error(error)
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
             if (error.code === "P2025") {
-                return res.status(404).json({ message: "Task not found" });
+                return res.status(404).json({ message: "Ticket not found" });
             }
         }
         res.status(500).json({
@@ -132,13 +132,13 @@ export async function updateTask(req: Request, res: Response) {
     }
 }
 
-//? delete:/tasks/:id
-export async function deleteTask(req: Request, res: Response) {
+//? delete:/tickets/:id
+export async function deleteTicket(req: Request, res: Response) {
     try {
-        const taskId = BigInt(req.params.id as string)
-        await prisma.task.delete({
+        const ticketId = BigInt(req.params.id as string)
+        await prisma.ticket.delete({
             where: {
-                id: taskId
+                id: ticketId
             }
         });
 
@@ -147,7 +147,7 @@ export async function deleteTask(req: Request, res: Response) {
         console.error(error)
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
             if (error.code === "P2025") {
-                return res.status(404).json({ message: "Task not found" });
+                return res.status(404).json({ message: "Ticket not found" });
             }
         }
         res.status(500).json({
@@ -164,7 +164,7 @@ export async function getMyQueue(req: AuthRequest, res: Response) {
         const skip = (page - 1) * take;
 
         const [data, total] = await Promise.all([
-            prisma.task.findMany({
+            prisma.ticket.findMany({
                 where: {
                     assigneeId: userId,
                     status: { notIn: [...CLOSED] },
@@ -181,7 +181,7 @@ export async function getMyQueue(req: AuthRequest, res: Response) {
                 skip,
                 take,
             }),
-            prisma.task.count({
+            prisma.ticket.count({
                 where: {
                     assigneeId: userId,
                     status: { notIn: [...CLOSED] },
@@ -204,7 +204,7 @@ export async function getMyTickets(req: AuthRequest, res: Response) {
         const skip = (page - 1) * take;
 
         const [data, total] = await Promise.all([
-            prisma.task.findMany({
+            prisma.ticket.findMany({
                 where: { reporterId: userId },
                 include: {
                     project: { select: { id: true, projectName: true } },
@@ -214,7 +214,7 @@ export async function getMyTickets(req: AuthRequest, res: Response) {
                 skip,
                 take,
             }),
-            prisma.task.count({ where: { reporterId: userId } }),
+            prisma.ticket.count({ where: { reporterId: userId } }),
         ]);
 
         res.status(200).json({ data, total, page });

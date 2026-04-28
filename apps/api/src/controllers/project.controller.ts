@@ -59,7 +59,7 @@ export async function createProject(req: Request, res: Response) {
             status,
             company,
             users,
-            tasks
+            tickets
         } = req.body;
         const project = await prisma.project.create({
             data: {
@@ -70,7 +70,7 @@ export async function createProject(req: Request, res: Response) {
                 status,
                 company,
                 users,
-                tasks
+                tickets
             }
         });
 
@@ -95,7 +95,7 @@ export async function updateProject(req: Request, res: Response) {
             status,
             company,
             users,
-            tasks
+            tickets
         } = req.body;
 
         const data: any = {};
@@ -106,7 +106,7 @@ export async function updateProject(req: Request, res: Response) {
         if (status !== undefined) data.status = status;
         if (company !== undefined) data.company = company;
         if (users !== undefined) data.users = users;
-        if (tasks !== undefined) data.tasks = tasks;
+        if (tickets !== undefined) data.tickets = tickets;
 
         const project = await prisma.project.update({
             where: {
@@ -147,7 +147,7 @@ export async function deleteProject(req: Request, res: Response) {
                 return res.status(404).json({ message: "Project not found" });
             }
             if (error.code === "P2003") {
-                return res.status(409).json({ message: "Cannot delete project with existing tasks" });
+                return res.status(409).json({ message: "Cannot delete project with existing tickets" });
             }
         }
         res.status(500).json({

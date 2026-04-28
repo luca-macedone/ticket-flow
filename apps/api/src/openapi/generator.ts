@@ -5,7 +5,7 @@ import './routes/auth.openapi';
 import './routes/user.openapi';
 import './routes/project.openapi';
 import './routes/company.openapi';
-import './routes/task.openapi';
+import './routes/ticket.openapi';
 
 export function generateOpenApiDoc() {
     return new OpenApiGeneratorV3(registry.definitions).generateDocument({

@@ -47,12 +47,12 @@
             </button>
         </footer>
     </aside>
-    <section class="grid grid-cols-5 grid-flow-row col-span-5 p-3 h-fit">
-        <div class="col-span-5 p-3 flex flex-col gap-2.5 backdrop-blur-xl bg-text/10 rounded-2xl">
+    <section class="col-span-5 p-3 h-screen overflow-hidden flex flex-col gap-3">
+        <div class="p-3 flex flex-col gap-2.5 backdrop-blur-xl bg-text/10 rounded-2xl shrink-0">
             <app-breadcrump />
         </div>
         @if (isPending()) {
-        <div class="col-span-5 m-5 p-4 rounded-lg border-2 flex items-center gap-3">
+        <div class="m-5 p-4 rounded-lg border-2 flex items-center gap-3">
             <span class="text-xl">⏳</span>
             <div>
                 <p class="font-semibold">Account on approval phase</p>
@@ -60,7 +60,7 @@
             </div>
         </div>
         } @else if (isRejected()) {
-        <div class="col-span-5 m-5 p-4 rounded-lg border-2 border-red-500/40 flex items-center gap-3">
+        <div class="m-5 p-4 rounded-lg border-2 border-red-500/40 flex items-center gap-3">
             <span class="text-xl">✗</span>
             <div>
                 <p class="font-semibold">Account rifiutato</p>
@@ -69,11 +69,12 @@
             </div>
         </div>
         } @else {
-        <div class="col-span-5 flex flex-col gap-3">
+        <div class="flex-1 min-h-0 overflow-y-scroll flex flex-col gap-3 pe-3">
             <router-outlet />
         </div>
         }
     </section>
+
     @if (reason && reason.length > 0) {
     <div
         class="absolute top-3 right-0 left-0 z-50 mx-auto p-4 rounded-4xl border-2 border-primary/40 bg-primary/30 rounded-full text-base text-background dark:text-text min-w-[300px] w-fit px-6 text-center backdrop-blur-xl">

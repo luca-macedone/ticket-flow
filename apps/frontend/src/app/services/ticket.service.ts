@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 
-export interface Task {
+export interface Ticket {
   id: string,
-  taskCode: string,
-  taskName: string,
+  ticketCode: string,
+  ticketName: string,
   status: string,
   priority: string,
   category: string,
@@ -17,17 +17,17 @@ export interface Task {
 @Injectable({
   providedIn: 'root',
 })
-export class TaskService {
+export class TicketService {
   private http = inject(HttpClient);
 
   getMyQueue(page: number = 1, amount: number = 20) {
-    return this.http.get<{ data: Task[], total: number, page: number }>('/api/tasks/my-queue', {
+    return this.http.get<{ data: Ticket[], total: number, page: number }>('/api/tickets/my-queue', {
       params: { page, amount },
       withCredentials: true,
     });
   }
   getMyTickets(page: number = 1, amount: number = 20) {
-    return this.http.get<{ data: Task[], total: number, page: number }>('/api/tasks/my-tickets', {
+    return this.http.get<{ data: Ticket[], total: number, page: number }>('/api/tickets/my-tickets', {
       params: { page, amount },
       withCredentials: true,
     });
