@@ -5,6 +5,7 @@ import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../auth/j
 import { requireAuth } from "../middlewares/requireAuth";
 import { zodValidate } from "../middlewares/zodValidate";
 import { LoginSchema } from "@packages/shared";
+import { loginRateLimit } from "../middlewares/rateLimiters";
 
 const router = Router();
 
@@ -23,7 +24,7 @@ const REFRESH_COOKIE_OPTIONS = {
     path: '/api/auth/refresh',          // cookie inviato solo su questo path
 };
 
-router.post("/login", zodValidate(LoginSchema), async (req: Request, res: Response) => {
+router.post("/login", loginRateLimit, zodValidate(LoginSchema), async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     const user = await prisma.user.findUnique({
@@ -81,8 +82,17 @@ router.post("/refresh", async (req: Request, res: Response) => {
 });
 
 router.post("/logout", (_req: Request, res: Response) => {
-    res.clearCookie('accessToken');
-    res.clearCookie('refreshToken', { path: '/api/auth/refresh' });
+    res.clearCookie('accessToken', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+    });
+    res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        path: '/api/auth/refresh'
+    });
     res.sendStatus(204);
 });
 

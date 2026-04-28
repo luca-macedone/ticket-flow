@@ -146,6 +146,9 @@ export async function deleteProject(req: Request, res: Response) {
             if (error.code === "P2025") {
                 return res.status(404).json({ message: "Project not found" });
             }
+            if (error.code === "P2003") {
+                return res.status(409).json({ message: "Cannot delete project with existing tasks" });
+            }
         }
         res.status(500).json({
             message: "Internal Server Error"
