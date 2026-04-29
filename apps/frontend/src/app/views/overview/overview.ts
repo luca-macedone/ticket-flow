@@ -1,10 +1,10 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { Ticket, TicketService } from '../../services/ticket.service';
-import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { BaseCard } from '../../components/overview-cards/base-card/base-card';
 import { DataTable, TableColumn } from '../../components/tables/ticket-table/data-table';
+import { AdminService, OverviewData } from '../../services/admin.service';
 
 interface AdminOverview {
   tickets: { open: number; resolved: number; avgResolutionHours: number };
@@ -63,7 +63,7 @@ const CUSTOMER_COLUMNS: TableColumn<Ticket>[] = [
 export class Overview {
   private auth = inject(AuthService);
   private ticketService = inject(TicketService);
-  private http = inject(HttpClient);
+  private adminService = inject(AdminService);
 
   user = this.auth.user;
   isAdmin = computed(() => this.auth.user()?.role === 'admin');
@@ -103,9 +103,7 @@ export class Overview {
   async ngOnInit() {
     if (this.auth.user()?.role === 'admin') {
       try {
-        const data = await firstValueFrom(
-          this.http.get<AdminOverview>('/api/admin/overview', { withCredentials: true })
-        );
+        const data: OverviewData = await firstValueFrom(this.adminService.getOverview());
         this.adminOverview.set(data);
       } catch {
         this.error.set('Failed to load overview.');

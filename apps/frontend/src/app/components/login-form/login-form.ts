@@ -16,6 +16,7 @@ export class LoginForm {
 	loginForm = new FormGroup({
 		email: new FormControl("", [Validators.required, Validators.email]),
 		password: new FormControl("", [Validators.required, Validators.minLength(8)]),
+		rememberMe: new FormControl(false),
 	})
 	errors: Record<string, string[]> = {};
 	private auth = inject(AuthService)
@@ -41,7 +42,7 @@ export class LoginForm {
 		this.errors = {};
 
 		try {
-			await firstValueFrom(this.auth.login(result.data.email, result.data.password));
+			await firstValueFrom(this.auth.login(result.data.email, result.data.password, result.data.rememberMe));
 			this.router.navigate(['/dashboard']);
 		} catch (err: any) {
 			this.errors = { auth: [err.error?.message ?? 'Login failed'] };

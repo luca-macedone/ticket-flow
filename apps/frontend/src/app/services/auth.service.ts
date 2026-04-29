@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { tap } from 'rxjs';
+import { finalize, Observable, shareReplay, tap } from 'rxjs';
 import { Router } from '@angular/router';
 
 export interface AuthUser {
@@ -15,9 +15,10 @@ export class AuthService {
   private router = inject(Router);
 
   readonly user = signal<AuthUser | null>(null);
+  private refreshInProgress$: Observable<void> | null = null;
 
-  login(email: string, password: string) {
-    return this.http.post<AuthUser>('/api/auth/login', { email, password },
+  login(email: string, password: string, rememberMe: boolean = false) {
+    return this.http.post<AuthUser>('/api/auth/login', { email, password, rememberMe },
       { withCredentials: true }
     ).pipe(tap(u => this.user.set(u)));
   }
@@ -27,9 +28,15 @@ export class AuthService {
   }
 
   refresh() {
-    return this.http.post<{ ok: boolean }>('/api/auth/refresh', {},
-      { withCredentials: true }
-    );
+    if (!this.refreshInProgress$) {
+      this.refreshInProgress$ = this.http.post<void>('/api/auth/refresh', {},
+        { withCredentials: true }
+      ).pipe(
+        finalize(() => { this.refreshInProgress$ = null; }),
+        shareReplay(1)
+      );
+    }
+    return this.refreshInProgress$;
   }
 
   me() {
@@ -38,12 +45,15 @@ export class AuthService {
     ).pipe(tap(u => this.user.set(u)));
   }
 
-  logout() {
-    return this.http.post('/api/auth/logout', {},
-      { withCredentials: true }
-    ).pipe(tap(() => {
-      this.user.set(null);
-      this.router.navigate(['/']);
-    }));
+  logout(reason?: string) {
+    return this.http.post('/api/auth/logout', {}, { withCredentials: true }).pipe(
+      tap(() => {
+        this.user.set(null);
+        const onHome = this.router.url === '/' || this.router.url.startsWith('/?');
+        if (!onHome) {
+          this.router.navigate(['/'], reason ? { queryParams: { reason } } : {});
+        }
+      })
+    );
   }
 }

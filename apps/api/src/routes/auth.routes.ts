@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import { Request, Response, Router } from "express";
 import { prisma } from "../db";
-import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../auth/jwt";
+import { JwtPayload, signAccessToken, signRefreshToken, verifyRefreshToken } from "../auth/jwt";
 import { requireAuth } from "../middlewares/requireAuth";
 import { zodValidate } from "../middlewares/zodValidate";
 import { LoginSchema } from "@packages/shared";
@@ -9,23 +9,21 @@ import { loginRateLimit } from "../middlewares/rateLimiters";
 
 const router = Router();
 
-const ACCESS_COOKIE_OPTIONS = {
+const SECURE = process.env.NODE_ENV === 'production';
+
+const BASE_COOKIE = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: SECURE,
     sameSite: 'strict' as const,
-    maxAge: 15 * 60 * 1000,            // 15m
 };
 
-const REFRESH_COOKIE_OPTIONS = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict' as const,
-    maxAge: 7 * 24 * 60 * 60 * 1000,  // 7d
-    path: '/api/auth/refresh',          // cookie inviato solo su questo path
-};
+const ACCESS_COOKIE_OPTIONS = { ...BASE_COOKIE, maxAge: 15 * 60 * 1000 };
+const REFRESH_COOKIE_OPTIONS = { ...BASE_COOKIE, maxAge: 7 * 24 * 60 * 60 * 1000, path: '/api/auth/refresh' };
+const ACCESS_SESSION_OPTIONS = BASE_COOKIE;
+const REFRESH_SESSION_OPTIONS = { ...BASE_COOKIE, path: '/api/auth/refresh' };
 
 router.post("/login", loginRateLimit, zodValidate(LoginSchema), async (req: Request, res: Response) => {
-    const { email, password } = req.body;
+    const { email, password, rememberMe } = req.body;
 
     const user = await prisma.user.findUnique({
         where: { email },
@@ -40,10 +38,14 @@ router.post("/login", loginRateLimit, zodValidate(LoginSchema), async (req: Requ
         return res.status(403).json({ message: "User not approved yet", name: user.name });
     }
 
-    const payload = { userId: user.id.toString(), role: user.role.toLowerCase() };
+    const payload: JwtPayload = {
+        userId: user.id.toString(),
+        role: user.role.toLowerCase(),
+        persist: !!rememberMe
+    };
 
-    res.cookie('accessToken', signAccessToken(payload), ACCESS_COOKIE_OPTIONS);
-    res.cookie('refreshToken', signRefreshToken(payload), REFRESH_COOKIE_OPTIONS);
+    res.cookie('accessToken', signAccessToken(payload), rememberMe ? ACCESS_COOKIE_OPTIONS : ACCESS_SESSION_OPTIONS);
+    res.cookie('refreshToken', signRefreshToken(payload), rememberMe ? REFRESH_COOKIE_OPTIONS : REFRESH_SESSION_OPTIONS);
     res.json({ name: user.name, role: user.role.toLowerCase(), status: user.status });
 });
 
@@ -70,11 +72,10 @@ router.post("/refresh", async (req: Request, res: Response) => {
             return res.status(401).json({ message: "Invalid session" });
         }
 
-        const newPayload = { userId: user.id.toString(), role: user.role.toLowerCase() };
+        const newPayload: JwtPayload = { userId: user.id.toString(), role: user.role.toLowerCase(), persist: payload.persist };
+        res.cookie('accessToken', signAccessToken(newPayload), payload.persist ? ACCESS_COOKIE_OPTIONS : ACCESS_SESSION_OPTIONS);
+        res.cookie('refreshToken', signRefreshToken(newPayload), payload.persist ? REFRESH_COOKIE_OPTIONS : REFRESH_SESSION_OPTIONS);
 
-        // rotation: emetti nuovi access + refresh
-        res.cookie('accessToken', signAccessToken(newPayload), ACCESS_COOKIE_OPTIONS);
-        res.cookie('refreshToken', signRefreshToken(newPayload), REFRESH_COOKIE_OPTIONS);
         res.sendStatus(200);
     } catch {
         res.status(401).json({ message: "Invalid or expired refresh token" });

@@ -1,9 +1,10 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { LoginForm } from "../../components/login-form/login-form";
 import { RegisterForm } from "../../components/register-form/register-form";
 import { NgIcon } from "@ng-icons/core";
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -15,10 +16,19 @@ export class Home {
   isFormVisible = signal<boolean>(false)
   formType = signal<"register" | "login" | "pending">("login")
 
-  constructor(private route: ActivatedRoute) { }
+  private route = inject(ActivatedRoute);
+  private auth = inject(AuthService);
+  private router = inject(Router);
 
   ngOnInit() {
     this.reason = this.route.snapshot.queryParams['reason']
+
+    if (!this.reason) {
+      this.auth.me().subscribe({
+        next: () => this.router.navigate(['/dashboard']),
+        error: () => { }
+      });
+    }
   }
 
   toggleForm() {

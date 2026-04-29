@@ -11,6 +11,15 @@ export interface Company {
   updatedAt: string;
 }
 
+export interface CreateCompanyPayload {
+  companyName: string;
+  nationality: string;
+  referralEmail: string;
+  description?: string;
+}
+
+export type UpdateCompanyPayload = Partial<CreateCompanyPayload>;
+
 @Injectable({ providedIn: 'root' })
 export class CompanyService {
   private http = inject(HttpClient);
@@ -24,6 +33,24 @@ export class CompanyService {
 
   getCompanyById(id: string) {
     return this.http.get<Company>(`/api/companies/${id}`, {
+      withCredentials: true,
+    });
+  }
+
+  createCompany(payload: CreateCompanyPayload) {
+    return this.http.post<Company>('/api/companies', payload, {
+      withCredentials: true,
+    });
+  }
+
+  updateCompany(id: string, payload: UpdateCompanyPayload) {
+    return this.http.patch<Company>(`/api/companies/${id}`, payload, {
+      withCredentials: true,
+    });
+  }
+
+  deleteCompany(id: string) {
+    return this.http.delete<void>(`/api/companies/${id}`, {
       withCredentials: true,
     });
   }

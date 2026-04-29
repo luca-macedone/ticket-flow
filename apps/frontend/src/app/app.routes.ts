@@ -9,6 +9,7 @@ import { ProjectView } from './views/projects/project-view/project-view';
 import { Overview } from './views/overview/overview';
 import { UserList } from './views/users/user-list/user-list';
 import { CompaniesList } from './views/companies/companies-list/companies-list';
+import { CompanyView } from './views/companies/company-view/company-view';
 
 export const routes: Routes = [
     {
@@ -75,7 +76,7 @@ export const routes: Routes = [
                     },
                     {
                         path: ':id',
-                        component: ProjectView,
+                        component: CompanyView,
                         canActivate: [roleGuard],
                         data: {
                             roles: ['admin'],

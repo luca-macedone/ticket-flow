@@ -2,7 +2,7 @@
     @if(reason && reason.length > 0) {
     <div
         class="absolute top-3 mx-auto p-4 rounded-4xl border-2 border-primary/40 bg-primary/30 rounded-full text-base text-background dark:text-text min-w-[300px] w-fit px-6 text-center backdrop-blur-xl">
-        <strong class="font-mono capitalize">Error:</strong> {{reason}}
+        {{reason}}
     </div>
     }
     <section class="flex flex-col items-center gap-6 min-w-[740px]">
@@ -26,7 +26,7 @@
     </section>
     @if (isFormVisible()) {
     <section
-        class="border rounded-4xl p-4  absolute top-auto left-auto right-auto z-50 bg-background/60 border-secondary/40 backdrop-blur-3xl rounded-3xl w-fit flex flex-col gap-3 min-w-[400px] bg-text/10">
+        class="border rounded-4xl p-4  absolute top-auto left-auto right-auto z-50 border-secondary/40 backdrop-blur-3xl rounded-3xl w-fit flex flex-col gap-3 min-w-[400px] bg-text/10">
         <header class="flex justify-between items-center gap-6 border-b border-secondary/40 pb-3">
             <h2 class="text-xl font-heading">
                 @if (formType() == "login") {

@@ -8,6 +8,7 @@ const REFRESH_EXPIRES = process.env.JWT_REFRESH_EXPIRES!;
 export interface JwtPayload {
     userId: string;
     role: string;
+    persist?: boolean;
 }
 
 export function signAccessToken(payload: JwtPayload): string {
@@ -29,5 +30,5 @@ export function verifyAccessToken(token: string): JwtPayload {
 
 export function verifyRefreshToken(token: string): JwtPayload {
     const decoded = jwt.verify(token, REFRESH_SECRET) as JwtPayload;
-    return { userId: decoded.userId, role: String(decoded.role) };
+    return { userId: decoded.userId, role: String(decoded.role), persist: decoded.persist };
 }
