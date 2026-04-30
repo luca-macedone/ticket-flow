@@ -1,40 +1,152 @@
 <div class="flex flex-col gap-2">
-    <table class="w-full border-separate border-spacing-y-1 p-2 bg-text/10 rounded-xl">
-        <thead>
-            <tr class="text-left text-text/50 text-xs uppercase tracking-wide">
-                @for (col of columns(); track col.key) {
-                <th class="px-4 py-2">{{ col.label }}</th>
+
+    <!-- Toolbar: bottone "Columns" visibile solo se hideable=true -->
+    @if (hideable()) {
+    <div class="flex justify-end">
+        <div class="relative">
+            <button (click)="showColumnPanel.set(!showColumnPanel())"
+                class="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg bg-text/10 hover:bg-text/20 transition-colors">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="18" rx="1" />
+                    <rect x="14" y="3" width="7" height="18" rx="1" />
+                </svg>
+                Columns
+            </button>
+            @if (showColumnPanel()) {
+            <!-- backdrop trasparente per chiudere il panel cliccando fuori -->
+            <div class="fixed inset-0 z-10" (click)="showColumnPanel.set(false)"></div>
+            <div
+                class="absolute right-0 z-20 mt-1 w-48 bg-background border border-text/20 rounded-xl shadow-lg p-1.5 flex flex-col gap-0.5">
+                @for (col of columnOrder(); track col.key) {
+                <label
+                    class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-text/10 cursor-pointer text-sm select-none">
+                    <input type="checkbox" [checked]="!isHidden(col.key)" (change)="toggleColumn(col.key)">
+                    {{ col.label }}
+                </label>
                 }
-            </tr>
-        </thead>
-        <tbody>
-            @for (row of rows(); track row.id) {
-            <tr class="bg-text/5 hover:bg-text/10 cursor-pointer" (click)="rowClick.emit(row)">
-                @for (col of columns(); track col.key; let first = $first; let last = $last) {
-                <td class="px-4 py-3" [class.rounded-l-xl]="first" [class.rounded-r-xl]="last"
-                    [ngClass]="col.cellClass ?? ''">
-                    @if (col.badgeClass; as badge) {
-                    <span class="text-xs px-2 py-0.5 rounded-full" [ngClass]="badge(cellValue(row, col))">
-                        {{ cellValue(row, col) }}
-                    </span>
-                    } @else {
-                    {{ cellValue(row, col) }}
-                    }
-                </td>
-                }
-            </tr>
-            } @empty {
-            <tr>
-                <td [attr.colspan]="columns().length" class="px-4 py-6 text-center text-text/50">
-                    {{ emptyMessage() }}
-                </td>
-            </tr>
+            </div>
             }
-        </tbody>
-    </table>
+        </div>
+    </div>
+    }
+
+    <!-- Mobile cards -->
+    <div class="lg:hidden flex flex-col gap-2">
+        @for (row of rows(); track row.id) {
+        <div class="bg-text/5 hover:bg-text/10 rounded-xl p-3 cursor-pointer flex flex-col gap-1.5"
+            (click)="rowClick.emit(row)">
+            @for (col of visibleColumns(); track col.key; let first = $first) {
+            @if (first) {
+            <div class="font-semibold pb-1.5 border-b border-text/10">
+                @if (col.cellTemplate; as tmpl) {
+                <ng-container [ngTemplateOutlet]="tmpl"
+                    [ngTemplateOutletContext]="{ $implicit: row, value: cellValue(row, col) }">
+                </ng-container>
+                } @else if (col.badgeClass; as badge) {
+                <span class="text-xs px-2 py-0.5 rounded-full" [ngClass]="badge(cellValue(row, col))">
+                    {{ cellValue(row, col) }}
+                </span>
+                } @else {
+                {{ cellValue(row, col) }}
+                }
+            </div>
+            } @else {
+            <div class="flex justify-between items-center gap-2">
+                <span class="text-text/50 text-xs uppercase tracking-wide shrink-0">{{ col.label }}</span>
+                @if (col.cellTemplate; as tmpl) {
+                <ng-container [ngTemplateOutlet]="tmpl"
+                    [ngTemplateOutletContext]="{ $implicit: row, value: cellValue(row, col) }">
+                </ng-container>
+                } @else if (col.badgeClass; as badge) {
+                <span class="text-xs px-2 py-0.5 rounded-full" [ngClass]="badge(cellValue(row, col))">
+                    {{ cellValue(row, col) }}
+                </span>
+                } @else {
+                <span class="text-sm text-right">{{ cellValue(row, col) }}</span>
+                }
+            </div>
+            }
+            }
+        </div>
+        } @empty {
+        <div class="px-4 py-6 text-center text-text/50 bg-text/10 rounded-xl">
+            {{ emptyMessage() }}
+        </div>
+        }
+    </div>
+
+    <!-- Desktop table -->
+    <div class="hidden lg:block overflow-x-auto">
+        <table class="w-full border-separate border-spacing-y-1 p-2 bg-text/10 rounded-xl">
+            <thead>
+                <tr class="text-left text-text/50 text-xs uppercase tracking-wide">
+                    @for (col of visibleColumns(); track col.key; let i = $index) {
+                    <th class="px-4 py-2" [class.cursor-pointer]="col.sortable"
+                        [class.select-none]="col.sortable || reorderable()"
+                        [attr.draggable]="reorderable() ? 'true' : null" (click)="toggleSort(col)"
+                        (dragover)="$event.preventDefault()" (dragstart)="onDragStart(i)" (dragenter)="onDragEnter(i)"
+                        (dragend)="onDragEnd()">
+                        <div class="flex items-center gap-1.5">
+                            @if (reorderable()) {
+                            <!-- drag handle: 6 punti -->
+                            <svg class="w-3 h-3 opacity-30 cursor-grab shrink-0" viewBox="0 0 10 16"
+                                fill="currentColor">
+                                <circle cx="2" cy="2" r="1.5" />
+                                <circle cx="8" cy="2" r="1.5" />
+                                <circle cx="2" cy="8" r="1.5" />
+                                <circle cx="8" cy="8" r="1.5" />
+                                <circle cx="2" cy="14" r="1.5" />
+                                <circle cx="8" cy="14" r="1.5" />
+                            </svg>
+                            }
+                            {{ col.label }}
+                            @if (col.sortable) {
+                            <span class="text-text/40 ml-0.5">
+                                {{ sortState()?.key === col.key
+                                ? (sortState()?.dir === 'asc' ? '↑' : '↓')
+                                : '↕' }}
+                            </span>
+                            }
+                        </div>
+                    </th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @for (row of rows(); track row.id) {
+                <tr class="bg-text/5 hover:bg-text/10 cursor-pointer" (click)="rowClick.emit(row)">
+                    @for (col of visibleColumns(); track col.key; let first = $first; let last = $last) {
+                    <td class="px-4 py-3" [class.rounded-l-xl]="first" [class.rounded-r-xl]="last"
+                        [ngClass]="col.cellClass ?? ''">
+                        @if (col.cellTemplate; as tmpl) {
+                        <ng-container [ngTemplateOutlet]="tmpl"
+                            [ngTemplateOutletContext]="{ $implicit: row, value: cellValue(row, col) }">
+                        </ng-container>
+                        } @else if (col.badgeClass; as badge) {
+                        <span class="text-xs px-2 py-0.5 rounded-full" [ngClass]="badge(cellValue(row, col))">
+                            {{ cellValue(row, col) }}
+                        </span>
+                        } @else {
+                        {{ cellValue(row, col) }}
+                        }
+                    </td>
+                    }
+                </tr>
+                } @empty {
+                <tr>
+                    <td [attr.colspan]="visibleColumns().length" class="px-4 py-6 text-center text-text/50">
+                        {{ emptyMessage() }}
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
     @if (total() > 0) {
-    <div class="flex items-center justify-between px-2 text-sm text-text/60">
-        <span>{{ rangeStart() }}–{{ rangeEnd() }} of {{ total() }}</span>
+    <div class="flex flex-col lg:flex-row items-center justify-between gap-2 px-2 text-sm text-text/60">
+        <span class="text-xs">{{ rangeStart() }}–{{ rangeEnd() }} of {{ total() }}</span>
         <div class="flex gap-2 items-center">
             <button (click)="pageChange.emit(page() - 1)" [disabled]="page() === 1"
                 class="px-3 py-1 rounded-lg bg-text/10 hover:bg-text/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">

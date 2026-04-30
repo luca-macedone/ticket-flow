@@ -1,39 +1,18 @@
 <form [formGroup]="registerForm" (ngSubmit)="submitRegistration()" class="flex flex-col gap-6 font-body">
     <main class="flex flex-col gap-6">
-        <label class="flex flex-col" for="user-name">
-            Name
-            <input
-                class="px-6 py-2 bg-background/10 border border-secondary/40 rounded-xl focus-visible:border-accent/40 ring-0 outline-none transition-all ease-in font-body"
-                id="user-name" type="text" formControlName="name">
-        </label>
-        <label class="flex flex-col" for="user-email">
-            Email
-            <input
-                class="px-6 py-2 bg-background/10 border border-secondary/40 rounded-xl focus-visible:border-accent/40 ring-0 outline-none transition-all ease-in font-body"
-                id="user-email" type="email" formControlName="email">
-        </label>
-        <label class="flex flex-col" for="user-password">
-            Password
-            <input
-                class="px-6 py-2 bg-background/10 border border-secondary/40 rounded-xl focus-visible:border-accent/40 ring-0 outline-none transition-all ease-in font-body"
-                id="user-password" type="password" formControlName="password">
-        </label>
-        <label class="flex flex-col" for="user-confirm-password">
-            Confirm Password
-            <input
-                class="px-6 py-2 bg-background/10 border border-secondary/40 rounded-xl focus-visible:border-accent/40 ring-0 outline-none transition-all ease-in font-body"
-                id="user-confirm-password" type="password" formControlName="confirmPassword">
-        </label>
-        <label class="flex flex-col" for="user-role">
-            Role
-            <select
-                class="px-6 py-2 bg-background/10 border border-secondary/40 rounded-xl focus-visible:border-accent/40 ring-0 outline-none transition-all ease-in font-body"
-                id="user-role" formControlName="role">
-                <option value="" disabled>Select a role...</option>
-                <option value="CUSTOMER">Customer</option>
-                <option value="AGENT">Agent</option>
-            </select>
-        </label>
+        <div class="grid grid-cols-2 gap-3">
+            <app-input-field label="Name" id="user-name" type="text" [control]="registerForm.controls.name"
+                [error]="errors['name']?.[0] ?? null" />
+            <app-input-field label="Email" id="user-email" type="email" [control]="registerForm.controls.email"
+                [error]="errors['email']?.[0] ?? null" />
+            <app-input-field label="Password" id="user-password" type="password"
+                [control]="registerForm.controls.password" [error]="errors['password']?.[0] ?? null" />
+            <app-input-field label="Confirm Password" id="user-confirm-password" type="password"
+                [control]="registerForm.controls.confirmPassword" [error]="errors['confirmPassword']?.[0] ?? null" />
+            <app-select-field label="Role" id="user-role" [control]="registerForm.controls.role"
+                [options]="[{value: 'CUSTOMER', label: 'Customer'}, {value: 'AGENT', label: 'Agent'}]"
+                [error]="errors['role']?.[0] ?? null" class="col-span-2" />
+        </div>
 
         @if(hasErrors){
         <div class="px-3 py-2 bg-background/20 border-primary/40 border rounded-xl">

@@ -40,3 +40,35 @@
         --accent: 82.77% -0.193 0.16;
     }
 }
+
+/* Aggiungere in styles.css dopo le direttive @tailwind */
+
+/* WebKit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: oklab(var(--background) / 0.4);
+    border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: oklab(var(--primary) / 0.3);
+    border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: oklab(var(--primary) / 0.55);
+}
+
+::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+/* Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: oklab(var(--primary) / 0.3) transparent;
+}

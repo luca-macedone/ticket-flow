@@ -6,11 +6,13 @@ import { AuthService } from '../../services/auth.service';
 import { firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { InputField } from "../fields/input-field/input-field";
+import { CheckboxField } from "../fields/checkbox-field/checkbox-field";
 
 @Component({
 	selector: 'app-login-form',
 	templateUrl: './login-form.html',
-	imports: [ReactiveFormsModule, KeyValuePipe]
+	imports: [ReactiveFormsModule, KeyValuePipe, InputField, CheckboxField]
 })
 export class LoginForm {
 	loginForm = new FormGroup({

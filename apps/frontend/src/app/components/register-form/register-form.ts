@@ -5,10 +5,12 @@ import { CreateUserSchema } from '@packages/shared';
 import { firstValueFrom } from 'rxjs';
 import { KeyValuePipe } from '@angular/common';
 import { Router } from '@angular/router';
+import { InputField } from "../fields/input-field/input-field";
+import { SelectField } from "../fields/select-field/select-field";
 
 @Component({
 	selector: 'app-register-form',
-	imports: [ReactiveFormsModule, KeyValuePipe],
+	imports: [ReactiveFormsModule, KeyValuePipe, InputField, SelectField],
 	templateUrl: './register-form.html',
 })
 export class RegisterForm {

@@ -4,10 +4,11 @@ import { Breadcrump } from "../../components/breadcrump/breadcrump";
 import { AuthService } from '../../services/auth.service';
 import { firstValueFrom } from 'rxjs';
 import { NgIcon } from "@ng-icons/core";
+import { TooltipBase } from "../../components/tooltip-base/tooltip-base";
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterOutlet, Breadcrump, RouterLinkWithHref, NgIcon, RouterLinkActive],
+  imports: [RouterOutlet, Breadcrump, RouterLinkWithHref, NgIcon, RouterLinkActive, TooltipBase],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })

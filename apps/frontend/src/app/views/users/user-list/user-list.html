@@ -6,67 +6,28 @@
     } @else if (error()) {
     <p class="text-red-400">{{ error() }}</p>
     } @else {
-    <table class="w-full border-separate bg-text/10 p-2 border-spacing-y-1">
-        <thead>
-            <tr class="text-left text-text/50 text-xs uppercase tracking-wide">
-                <th class="px-4 py-2">Name</th>
-                <th class="px-4 py-2">Email</th>
-                <th class="px-4 py-2">Role</th>
-                <th class="px-4 py-2">Status</th>
-                <th class="px-4 py-2">Registered</th>
-                <th class="px-4 py-2">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @for (user of users(); track user.id) {
-            <tr class="bg-text/5 rounded-xl">
-                <td class="px-4 py-3 font-medium">{{ user.name }}</td>
-                <td class="px-4 py-3 text-text/70">{{ user.email }}</td>
-                <td class="px-4 py-3 capitalize">
-                    <span class="border px-2 py-1 rounded-full border-secondary">
-                        {{ user.role.toLowerCase() }}
-                    </span>
-                </td>
-                <td class="px-4 py-3">
-                    <span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ statusClass(user.status) }}">
-                        {{ statusLabel(user.status) }}
-                    </span>
-                </td>
-                <td class="px-4 py-3 text-text/50">{{ user.createdAt | date:'dd/MM/yyyy' }}</td>
-                <td class="px-4 py-3">
-                    @if (user.status === 'PENDING_APPROVAL') {
-                    @if (approvingId() === user.id) {
-                    <div class="flex items-center gap-2">
-                        <select class="px-2 py-1 bg-background border border-secondary/40 rounded-lg text-xs"
-                            [value]="selectedRole()" (change)="selectedRole.set($any($event.target).value)">
-                            <option value="CUSTOMER">Customer</option>
-                            <option value="AGENT">Agent</option>
-                        </select>
-                        <button
-                            class="px-3 py-1 bg-green-500/30 border border-green-500/40 rounded-full text-xs hover:opacity-90"
-                            (click)="confirmApprove(user.id)">
-                            Confirm
-                        </button>
-                        <button class="px-3 py-1 bg-text/10 rounded-full text-xs hover:opacity-90"
-                            (click)="cancelApprove()">
-                            Cancel
-                        </button>
-                    </div>
-                    } @else {
-                    <button class="px-3 py-1 bg-accent/30 border border-accent/40 rounded-full text-xs hover:opacity-90"
-                        (click)="startApprove(user.id)">
-                        Approve
-                    </button>
-                    }
-                    }
-                </td>
-            </tr>
-            } @empty {
-            <tr>
-                <td colspan="6" class="px-4 py-6 text-center text-text/50">No user found.</td>
-            </tr>
-            }
-        </tbody>
-    </table>
+    <app-data-table [columns]="columns()" [rows]="users()" emptyMessage="No user found.">
+    </app-data-table>
     }
+
+    <ng-template #actionsCell let-user>
+        @if (user.status === 'PENDING_APPROVAL') {
+        @if (approvingId() === user.id) {
+        <div class="flex items-center gap-2 flex-wrap">
+            <select class="px-2 py-1 bg-background border border-secondary/40 rounded-lg text-xs"
+                [value]="selectedRole()" (change)="selectedRole.set($any($event.target).value)">
+                <option value="CUSTOMER">Customer</option>
+                <option value="AGENT">Agent</option>
+            </select>
+            <button class="px-3 py-1 bg-green-500/30 border border-green-500/40 rounded-full text-xs hover:opacity-90"
+                (click)="confirmApprove(user.id)">Confirm</button>
+            <button class="px-3 py-1 bg-text/10 rounded-full text-xs hover:opacity-90"
+                (click)="cancelApprove()">Cancel</button>
+        </div>
+        } @else {
+        <button class="px-3 py-1 bg-accent/30 border border-accent/40 rounded-full text-xs hover:opacity-90"
+            (click)="startApprove(user.id)">Approve</button>
+        }
+        }
+    </ng-template>
 </div>

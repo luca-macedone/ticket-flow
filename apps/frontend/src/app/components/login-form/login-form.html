@@ -1,28 +1,17 @@
 <form [formGroup]="loginForm" (ngSubmit)="submitLogin()" class="flex flex-col gap-6 font-body">
     <main class="flex flex-col gap-6">
-        <label class="flex flex-col" for="user-email">
-            Email
-            <input
-                class="px-6 py-2 bg-background/10 border border-secondary/40 rounded-xl focus-visible:border-accent/40 ring-0 outline-none transition-all ease-in font-body"
-                id="user-email" type="email" formControlName="email">
-        </label>
-        <label class="flex flex-col" for="user-password">
-            Password
-            <input
-                class="px-6 py-2 bg-background/10 border border-secondary/40 rounded-xl focus-visible:border-accent/40 ring-0 outline-none transition-all ease-in font-body"
-                id="user-password" type="password" formControlName="password">
-        </label>
-        <label class="flex items-center self-end w-fit gap-2 cursor-pointer font-body px-2">
-            <input type="checkbox" formControlName="rememberMe"
-                class="accent-accent w-4 h-4 rounded-xl cursor-pointer border-0" />
-            Remember me
-        </label>
+        <app-input-field type="email" label="Email" id="user-email" [control]="loginForm.controls.email"
+            [error]="errors['email']?.[0] ?? null" />
+        <app-input-field type="password" label="Password" id="user-password" [control]="loginForm.controls.password"
+            [error]="errors['password']?.[0] ?? null" />
+        <app-checkbox-field label="Remember me" [control]="loginForm.controls.rememberMe" />
 
         @if(hasErrors){
         <div class="px-3 py-2 bg-background/20 border-primary/40 border rounded-xl">
             <strong class="text-primary text-lg">ERROR</strong>
             @for (entry of errors | keyvalue; track entry.key) {
-            <p class="text-md"><em class="text-primary font-semibold capitalize">{{ entry.key }}:</em> {{ entry.value[0]
+            <p class="text-md"><em class="text-primary font-semibold capitalize">{{ entry.key }}:</em> {{
+                entry.value[0]
                 }}</p>
             }
         </div>

@@ -1,55 +1,90 @@
-<div class="h-screen w-full grid grid-cols-6 overflow-hidden bg-background text-text font-body relative">
-    <aside class="flex flex-col gap-3 col-span-1 justify-between p-3 border-e-2 border-text/10">
-        <header class="flex flex-col gap-3 bg-text/10 p-3 rounded-2xl">
-            <a routerLink="/dashboard" class="font-heading text-2xl">Ticket<em class="text-primary">Flow</em></a>
+<div
+    class="min-h-screen w-full flex flex-col md:grid md:grid-cols-[4rem_1fr] md:h-screen md:overflow-hidden lg:grid-cols-6 bg-background text-text font-body relative">
+    <aside
+        class="hidden md:flex flex-col gap-3 col-span-1 w-16 lg:w-auto justify-between p-2 lg:p-3 border-e-2 border-text/10">
+
+        <header class="flex items-center justify-center lg:justify-start bg-text/10 p-2 lg:p-3 rounded-2xl">
+            <a routerLink="/dashboard" class="font-heading text-xl leading-none">
+                <span class="hidden lg:inline">Ticket<em class="text-primary">Flow</em></span>
+                <span class="text-primary lg:hidden">TF</span>
+            </a>
         </header>
-        <nav class="h-full p-6 bg-text/10 rounded-2xl">
+        <nav class="h-full py-3 px-1 lg:p-6 bg-text/10 rounded-2xl">
             <ul class="w-full flex flex-col gap-3">
-                <li class="w-full px-6 py-2 cursor-pointer hover:bg-primary/20 rounded-full default:bg-transparent transition-colors ease-in"
-                    routerLinkActive="bg-primary/60 hover:bg-primary/60 font-semibold">
-                    <a routerLink="/dashboard/overview" class="w-full h-full flex items-center gap-3">
+                <li class="w-full py-2 lg:px-6 justify-center lg:justify-start cursor-pointer
+     hover:bg-primary/20 rounded-full transition-colors ease-in"
+                    routerLinkActive="bg-primary/60 hover:bg-primary/60 font-semibold" routerLink="/dashboard/overview">
+                    <app-tooltip-base content="Overview" position="right"
+                        wrapperClass="relative flex w-full items-center justify-center gap-3">
                         <ng-icon name="heroHome" size="20" />
-                        Overview
-                    </a>
+                        <span class="hidden lg:inline">Overview</span>
+                    </app-tooltip-base>
                 </li>
-                <li class="w-full px-6 py-2 cursor-pointer hover:bg-primary/20 rounded-full default:bg-transparent transition-colors ease-in"
-                    routerLinkActive="bg-primary/60 hover:bg-primary/60 font-semibold">
-                    <a routerLink="/dashboard/projects" class="w-full h-full flex items-center gap-3">
+                <li class="w-full py-2 lg:px-6 justify-center lg:justify-start cursor-pointer
+     hover:bg-primary/20 rounded-full transition-colors ease-in"
+                    routerLinkActive="bg-primary/60 hover:bg-primary/60 font-semibold" routerLink="/dashboard/projects">
+                    <app-tooltip-base content="Projects" position="right"
+                        wrapperClass="relative flex w-full items-center justify-center gap-3">
                         <ng-icon name="heroCube" size="20" />
-                        Projects
-                    </a>
+                        <span class="hidden lg:inline">Projects</span>
+                    </app-tooltip-base>
                 </li>
                 @if (isAdmin()) {
-                <li class="w-full px-6 py-2 cursor-pointer hover:bg-primary/20 rounded-full default:bg-transparent transition-colors ease-in"
-                    routerLinkActive="bg-primary/60 hover:bg-primary/60 font-semibold">
-                    <a routerLink="/dashboard/companies" class="w-full h-full flex items-center gap-3">
+                <li class="w-full py-2 lg:px-6 justify-center lg:justify-start cursor-pointer
+     hover:bg-primary/20 rounded-full transition-colors ease-in"
+                    routerLinkActive="bg-primary/60 hover:bg-primary/60 font-semibold"
+                    routerLink="/dashboard/companies">
+                    <app-tooltip-base content="Companies" position="right"
+                        wrapperClass="relative flex w-full items-center justify-center gap-3">
                         <ng-icon name="heroBuildingOffice2" size="20" />
-                        Companies
-                    </a>
+                        <span class="hidden lg:inline">Companies</span>
+                    </app-tooltip-base>
                 </li>
-                <li class="w-full px-6 py-2 cursor-pointer hover:bg-primary/20 rounded-full default:bg-transparent transition-colors ease-in"
-                    routerLinkActive="bg-primary/60 hover:bg-primary/60 font-semibold">
-                    <a routerLink="/dashboard/users" class="w-full h-full flex items-center gap-3">
+                <li class="w-full py-2 lg:px-6 justify-center lg:justify-start cursor-pointer
+     hover:bg-primary/20 rounded-full transition-colors ease-in"
+                    routerLinkActive="bg-primary/60 hover:bg-primary/60 font-semibold" routerLink="/dashboard/users">
+                    <app-tooltip-base content="Users" position="right"
+                        wrapperClass="relative flex w-full items-center justify-center gap-3">
                         <ng-icon name="heroUsers" size="20" />
-                        Users
-                    </a>
+                        <span class="hidden lg:inline">Users</span>
+                    </app-tooltip-base>
                 </li>
                 }
             </ul>
         </nav>
-        <footer class="flex justify-between items-center bg-text/10 p-3 rounded-2xl">
-            <div class="capitalize text-primary font-bold px-3 py-1.5 rounded-full bg-background/60">{{ user()?.name ??
-                'user' }}</div>
-            <button (click)="logout()"
-                class="px-3 py-1.5 rounded-full hover:cursor-pointer hover:opacity-95 flex items-center gap-3 bg-background/60">
-                Log Out
-                <ng-icon name="heroArrowRightOnRectangle" size="20" />
+        <footer class="flex flex-col lg:flex-row justify-center lg:justify-between items-center
+               bg-text/10 p-2 lg:p-3 rounded-2xl gap-2">
+
+            <!-- Avatar iniziale: solo su tablet -->
+            <div class="lg:hidden w-8 h-8 flex items-center justify-center rounded-full
+              bg-background/60 text-primary font-bold text-base uppercase shrink-0">
+                {{ (user()?.name ?? 'U')[0] }}
+            </div>
+
+            <!-- Nome completo: solo su desktop -->
+            <div class="hidden lg:block capitalize text-primary font-bold px-3 py-1.5
+              rounded-full bg-background/60 truncate max-w-[8rem]">
+                {{ user()?.name ?? 'user' }}
+            </div>
+
+            <button type="button" (click)="logout()"
+                class="p-1.5 rounded-full hover:cursor-pointer hover:opacity-95 flex items-center gap-2 bg-background/60">
+                <app-tooltip-base content="Logout" position="right"
+                    wrapperClass="relative flex w-full items-center justify-center gap-3">
+                    <ng-icon name="heroArrowRightOnRectangle" size="18" />
+                    <span class="hidden lg:inline text-sm">Log Out</span>
+                </app-tooltip-base>
             </button>
+
         </footer>
+
     </aside>
-    <section class="col-span-5 p-3 h-screen overflow-hidden flex flex-col gap-3">
-        <div class="p-3 flex flex-col gap-2.5 backdrop-blur-xl bg-text/10 rounded-2xl shrink-0">
+
+    <section class="flex-1 flex flex-col col-span-1 lg:col-span-5 p-3 md:h-screen md:overflow-hidden gap-3 relative">
+        <div
+            class="p-3 flex md:flex-col justify-between md:justify-start gap-2.5 backdrop-blur-xl bg-text/10 rounded-2xl shrink-0 sticky top-3 z-50">
             <app-breadcrump />
+            <span class="md:hidden">Ticket<em class="text-primary">Flow</em></span>
         </div>
         @if (isPending()) {
         <div class="m-5 p-4 rounded-lg border-2 flex items-center gap-3">
@@ -69,12 +104,40 @@
             </div>
         </div>
         } @else {
-        <div class="flex-1 min-h-0 overflow-y-scroll flex flex-col gap-3 pe-3">
+        <div class="md:min-h-0 md:overflow-y-scroll flex flex-col gap-3 pe-3">
             <router-outlet />
         </div>
         }
     </section>
-
+    <nav
+        class="md:hidden sticky bottom-0 left-0 right-0 z-40 bg-background border-t-2 border-text/10 flex items-center justify-around px-4 py-2">
+        <a routerLink="/dashboard/overview" routerLinkActive="text-primary"
+            class="flex flex-col items-center gap-0.5 text-xs text-text/60">
+            <ng-icon name="heroHome" size="22" />
+            <span>Overview</span>
+        </a>
+        <a routerLink="/dashboard/projects" routerLinkActive="text-primary"
+            class="flex flex-col items-center gap-0.5 text-xs text-text/60">
+            <ng-icon name="heroCube" size="22" />
+            <span>Projects</span>
+        </a>
+        @if (isAdmin()) {
+        <a routerLink="/dashboard/companies" routerLinkActive="text-primary"
+            class="flex flex-col items-center gap-0.5 text-xs text-text/60">
+            <ng-icon name="heroBuildingOffice2" size="22" />
+            <span>Companies</span>
+        </a>
+        <a routerLink="/dashboard/users" routerLinkActive="text-primary"
+            class="flex flex-col items-center gap-0.5 text-xs text-text/60">
+            <ng-icon name="heroUsers" size="22" />
+            <span>Users</span>
+        </a>
+        }
+        <button (click)="logout()" class="flex flex-col items-center gap-0.5 text-xs text-text/60">
+            <ng-icon name="heroArrowRightOnRectangle" size="22" />
+            <span>Logout</span>
+        </button>
+    </nav>
     @if (reason && reason.length > 0) {
     <div
         class="absolute top-3 right-0 left-0 z-50 mx-auto p-4 rounded-4xl border-2 border-primary/40 bg-primary/30 rounded-full text-base text-background dark:text-text min-w-[300px] w-fit px-6 text-center backdrop-blur-xl">

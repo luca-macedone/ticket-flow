@@ -1,0 +1,7 @@
+<div [class]="wrapperClass()" (mouseenter)="show()" (mouseleave)="hide()" (focusin)="show()" (focusout)="hide()">
+    <ng-content />
+    <div [class]="tooltipClass()" [style.max-width]="maxWidth()">
+        <div [class]="arrowClass()"></div>
+        {{content()}}
+    </div>
+</div>

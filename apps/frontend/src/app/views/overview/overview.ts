@@ -3,7 +3,7 @@ import { AuthService } from '../../services/auth.service';
 import { Ticket, TicketService } from '../../services/ticket.service';
 import { firstValueFrom } from 'rxjs';
 import { BaseCard } from '../../components/overview-cards/base-card/base-card';
-import { DataTable, TableColumn } from '../../components/tables/ticket-table/data-table';
+import { DataTable, SortState, TableColumn } from '../../components/tables/ticket-table/data-table';
 import { AdminService, OverviewData } from '../../services/admin.service';
 
 interface AdminOverview {
@@ -37,12 +37,12 @@ const priorityBadge = (v: string) => PRIORITY[v] ?? 'bg-slate-200 text-slate-700
 const statusBadge = (v: string) => STATUS[v] ?? 'bg-slate-200 text-slate-700';
 
 const AGENT_COLUMNS: TableColumn<Ticket>[] = [
-  { key: 'ticketCode', label: 'Code', getValue: (t) => t.ticketCode, cellClass: 'font-mono text-xs text-text/50' },
-  { key: 'ticketName', label: 'Title', getValue: (t) => t.ticketName, cellClass: 'font-medium' },
-  { key: 'project', label: 'Project', getValue: (t) => t.project?.projectName ?? '—', cellClass: 'text-text/70' },
-  { key: 'priority', label: 'Priority', getValue: (t) => t.priority, badgeClass: priorityBadge },
-  { key: 'status', label: 'Status', getValue: (t) => t.status, badgeClass: statusBadge },
-  { key: 'createdAt', label: 'Created', getValue: (t) => new Date(t.createdAt).toLocaleDateString('it-IT'), cellClass: 'text-text/50' },
+  { key: 'ticketCode', label: 'Code', getValue: t => t.ticketCode, cellClass: 'font-mono text-xs text-text/50' },
+  { key: 'ticketName', label: 'Title', getValue: t => t.ticketName, cellClass: 'font-medium', sortable: true },
+  { key: 'project', label: 'Project', getValue: t => t.project?.projectName ?? '—', cellClass: 'text-text/70' },
+  { key: 'priority', label: 'Priority', getValue: t => t.priority, badgeClass: priorityBadge, sortable: true },
+  { key: 'status', label: 'Status', getValue: t => t.status, badgeClass: statusBadge, sortable: true },
+  { key: 'createdAt', label: 'Created', getValue: t => new Date(t.createdAt).toLocaleDateString('it-IT'), cellClass: 'text-text/50', sortable: true },
 ];
 
 const CUSTOMER_COLUMNS: TableColumn<Ticket>[] = [
@@ -73,6 +73,7 @@ export class Overview {
   rows = signal<Ticket[]>([]);
   loading = signal(true);
   error = signal<string | null>(null);
+  sortParams = signal<SortState | null>(null);
 
   readonly pageSize = 10;
   currentPage = signal(1);
@@ -85,6 +86,7 @@ export class Overview {
     this.loading.set(true);
     this.error.set(null);
     try {
+      const sort = this.sortParams();
       const role = this.auth.user()?.role;
       const obs = role === 'agent'
         ? this.ticketService.getMyQueue(page, this.pageSize)
@@ -113,5 +115,10 @@ export class Overview {
     } else {
       await this.goToPage(1);
     }
+  }
+
+  onSort(state: SortState | null) {
+    this.sortParams.set(state);
+    this.goToPage(1);
   }
 }

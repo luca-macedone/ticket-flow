@@ -44,6 +44,7 @@ router.post("/login", loginRateLimit, zodValidate(LoginSchema), async (req: Requ
         persist: !!rememberMe
     };
 
+    res.clearCookie('refreshToken', BASE_COOKIE);
     res.cookie('accessToken', signAccessToken(payload), rememberMe ? ACCESS_COOKIE_OPTIONS : ACCESS_SESSION_OPTIONS);
     res.cookie('refreshToken', signRefreshToken(payload), rememberMe ? REFRESH_COOKIE_OPTIONS : REFRESH_SESSION_OPTIONS);
     res.json({ name: user.name, role: user.role.toLowerCase(), status: user.status });
@@ -73,6 +74,8 @@ router.post("/refresh", async (req: Request, res: Response) => {
         }
 
         const newPayload: JwtPayload = { userId: user.id.toString(), role: user.role.toLowerCase(), persist: payload.persist };
+
+        res.clearCookie('refreshToken', BASE_COOKIE);
         res.cookie('accessToken', signAccessToken(newPayload), payload.persist ? ACCESS_COOKIE_OPTIONS : ACCESS_SESSION_OPTIONS);
         res.cookie('refreshToken', signRefreshToken(newPayload), payload.persist ? REFRESH_COOKIE_OPTIONS : REFRESH_SESSION_OPTIONS);
 
@@ -83,17 +86,9 @@ router.post("/refresh", async (req: Request, res: Response) => {
 });
 
 router.post("/logout", (_req: Request, res: Response) => {
-    res.clearCookie('accessToken', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-    });
-    res.clearCookie('refreshToken', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        path: '/api/auth/refresh'
-    });
+    res.clearCookie('accessToken', BASE_COOKIE);
+    res.clearCookie('refreshToken', BASE_COOKIE);
+    res.clearCookie('refreshToken', { ...BASE_COOKIE, path: '/api/auth/refresh' });
     res.sendStatus(204);
 });
 
