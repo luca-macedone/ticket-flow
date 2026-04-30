@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css?family=LINE%20Seed%20JP:100,400,700|Urbanist:100,200,300,400,500,600,700');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ? old
+@layer base {
+    :root {
+        --text: 17.80% 0.006 0.00;
+        --background: 96.87% 0.002 0.00;
+        --primary: 40.29% 0.133 0.07;
+        --secondary: 80.78% 0.041 0.11;
+        --accent: 76.81% 0.025 0.15;
+    }
+
+    .dark {
+        --text: 94.32% 0.004 0.00;
+        --background: 14.24% 0.003 0.00;
+        --primary: 72.22% 0.133 0.06;
+        --secondary: 53.42% 0.054 0.10;
+        --accent: 78.32% 0.024 0.16;
+    }
+}
+*/
+@layer base {
+    :root {
+        --text: 14.95% 0.032 -0.05;
+        --background: 94.50% 0.018 -0.02;
+        --primary: 32.49% 0.077 -0.14;
+        --secondary: 92.60% -0.053 0.15;
+        --accent: 73.87% -0.185 0.15;
+    }
+
+    .dark {
+        --text: 92.00% 0.024 -0.03;
+        --background: 12.88% 0.030 -0.04;
+        --primary: 71.72% 0.095 -0.13;
+        --secondary: 67.72% -0.049 0.14;
+        --accent: 82.77% -0.193 0.16;
+    }
+}
+
+/* Aggiungere in styles.css dopo le direttive @tailwind */
+
+/* WebKit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: oklab(var(--background) / 0.4);
+    border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: oklab(var(--primary) / 0.3);
+    border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: oklab(var(--primary) / 0.55);
+}
+
+::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+/* Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: oklab(var(--primary) / 0.3) transparent;
+}

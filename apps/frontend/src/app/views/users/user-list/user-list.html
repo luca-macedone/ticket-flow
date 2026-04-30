@@ -1,0 +1,33 @@
+<div class="flex flex-col gap-4 p-4 border border-text/10 rounded-2xl">
+    <h2 class="text-xl font-semibold font-heading text-primary">Users management</h2>
+
+    @if (loading()) {
+    <p class="text-text/60">Loading...</p>
+    } @else if (error()) {
+    <p class="text-red-400">{{ error() }}</p>
+    } @else {
+    <app-data-table [columns]="columns()" [rows]="users()" emptyMessage="No user found.">
+    </app-data-table>
+    }
+
+    <ng-template #actionsCell let-user>
+        @if (user.status === 'PENDING_APPROVAL') {
+        @if (approvingId() === user.id) {
+        <div class="flex items-center gap-2 flex-wrap">
+            <select class="px-2 py-1 bg-background border border-secondary/40 rounded-lg text-xs"
+                [value]="selectedRole()" (change)="selectedRole.set($any($event.target).value)">
+                <option value="CUSTOMER">Customer</option>
+                <option value="AGENT">Agent</option>
+            </select>
+            <button class="px-3 py-1 bg-green-500/30 border border-green-500/40 rounded-full text-xs hover:opacity-90"
+                (click)="confirmApprove(user.id)">Confirm</button>
+            <button class="px-3 py-1 bg-text/10 rounded-full text-xs hover:opacity-90"
+                (click)="cancelApprove()">Cancel</button>
+        </div>
+        } @else {
+        <button class="px-3 py-1 bg-accent/30 border border-accent/40 rounded-full text-xs hover:opacity-90"
+            (click)="startApprove(user.id)">Approve</button>
+        }
+        }
+    </ng-template>
+</div>

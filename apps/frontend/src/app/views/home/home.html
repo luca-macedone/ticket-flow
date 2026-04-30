@@ -1,0 +1,60 @@
+<div class="min-h-screen w-full flex items-center justify-center relative bg-background text-text">
+    @if(reason && reason.length > 0) {
+    <div
+        class="absolute top-3 mx-auto p-4 rounded-4xl border-2 border-primary/40 bg-primary/30 rounded-full text-base text-background dark:text-text min-w-[300px] w-fit px-6 text-center backdrop-blur-xl">
+        {{reason}}
+    </div>
+    }
+    <section class="flex flex-col items-center gap-6 min-w-[740px]">
+        <div class="flex flex-col gap-0">
+            <h1 class="font-heading text-5xl">
+                Ticket<em class="text-primary">Flow</em>
+            </h1>
+            <p class="font-heading text-xl self-end">Yours IT issues, our mission.</p>
+        </div>
+
+        <footer class="mt-[100px] grid grid-cols-3 gap-6">
+            <button
+                class="border border-secondary/40 bg-secondary/40 text-text px-[40px] py-2 rounded-full font-body text-base hover:opacity-90 transition-all ease-in backdrop-blur-xl">About
+                us</button>
+            <button (click)="toggleForm()"
+                class="border border-accent/40 bg-accent/40 text-text px-[40px] py-2 rounded-full font-body text-base hover:opacity-90 transition-all ease-in col-span-2 backdrop-blur-xl flex gap-3 items-center justify-center">
+                Get Started
+                <ng-icon name="heroRocketLaunch" size="20" />
+            </button>
+        </footer>
+    </section>
+    @if (isFormVisible()) {
+    <section
+        class="border rounded-4xl p-4  absolute top-auto left-auto right-auto z-50 border-secondary/40 backdrop-blur-3xl rounded-3xl w-fit flex flex-col gap-3 min-w-[400px] bg-text/10">
+        <header class="flex justify-between items-center gap-6 border-b border-secondary/40 pb-3">
+            <h2 class="text-xl font-heading">
+                @if (formType() == "login") {
+                Welcome Back
+                } @else if(formType() == "register") {
+                Create Account
+                } @else if(formType() == "pending") {
+                Under Approval
+                }
+            </h2>
+            <button (click)="toggleForm()"
+                class="border border-secondary/40 bg-background/10 text-secondary p-5 rounded-full font-body text-base hover:text-accent/40 hover:border-accent/40 relative transition-all ease-in">
+                <span class="absolute top-1/4 left-0 right-0">
+                    <ng-icon name="heroXMark" size="20" />
+                </span>
+            </button>
+        </header>
+        @if(formType() == "login") {
+        <app-login-form (changeView)="changeForm($event)" />
+        } @else if(formType() == "register"){
+        <app-register-form (changeView)="changeForm($event)" />
+        } @else if(formType() == "pending") {
+        <div class="flex flex-col items-center gap-4 py-4 text-center">
+            <p class="text-lg">Your account is under approval.</p>
+            <p class="text-sm opacity-70">You will receive a notification whit the approval response.</p>
+        </div>
+        }
+    </section>
+    }
+
+</div>

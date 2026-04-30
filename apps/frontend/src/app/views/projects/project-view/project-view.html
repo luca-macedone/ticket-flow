@@ -1,0 +1,42 @@
+<section class="">
+    @if (loading()) {
+    <p class="text-text/60">Caricamento...</p>
+    } @else if (error()) {
+    <p class="text-red-400">{{ error() }}</p>
+    } @else if (project()) {
+    <app-base-card [title]="project()!.projectName" [description]="project()?.description ?? undefined">
+        <section class="grid grid-cols-2 gap-3">
+            <app-base-card title="project details">
+                <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
+                    <strong class="not-italic text-base font-body">Start date:</strong>
+                    {{project()?.startDate | date:'dd/MM/yyyy'}}
+                </span>
+                <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
+                    <strong class="not-italic text-base font-body">End date:</strong>
+                    {{(project()?.endDate | date:'dd/MM/yyyy') ?? 'not endend yet'}}
+                </span>
+            </app-base-card>
+            <app-base-card title="company info">
+                <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
+                    <strong class="not-italic text-base font-body">Company:</strong>
+                    {{company()?.companyName}}
+                </span>
+                <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
+                    <strong class="not-italic text-base font-body">Referral:</strong>
+                    {{company()?.referralEmail}}
+                </span>
+            </app-base-card>
+        </section>
+    </app-base-card>
+    <!-- <header class="border-b-2 border-amber-600 pb-5 mb-5">
+        <h3 class="text-2xl font-black uppercase">{{ project()!.projectName }}</h3>
+        <p class="text-text/50 text-sm mt-1">
+            {{ project()!.startDate | date:'dd/MM/yyyy' }}
+            @if (project()!.endDate) { → {{ project()!.endDate | date:'dd/MM/yyyy' }} }
+        </p>
+    </header>
+    <main>
+        <p class="text-text/70">{{ project()!.description ?? 'Nessuna descrizione.' }}</p>
+    </main> -->
+    }
+</section>

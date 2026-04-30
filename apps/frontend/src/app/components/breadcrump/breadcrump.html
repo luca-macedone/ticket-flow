@@ -1,0 +1,16 @@
+@if (breadcrumbService.breadcrumbs && breadcrumbService.breadcrumbs.length > 0) {
+<nav aria-label="breadcrumb" class="px-6 bg-secondary/20 border border-secondary rounded-full w-fit">
+    <ol class="flex align-baseline">
+        @for (breadcrumb of breadcrumbService.breadcrumbs!; track breadcrumb.label; let index = $index) {
+        <li class="hover:text-primary font-body transition-colors ease-in">
+            <a [routerLink]="breadcrumb.url">
+                {{ breadcrumb.label }}
+            </a>
+            @if (index < breadcrumbService.breadcrumbs.length -1 ) { <span class="px-3">/</span>}
+        </li>
+        } @empty {
+        <li>Nessun elemento</li>
+        }
+    </ol>
+</nav>
+}

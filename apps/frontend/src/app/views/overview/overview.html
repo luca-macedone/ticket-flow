@@ -1,0 +1,85 @@
+<section class="flex flex-col gap-4 p-4 border border-text/10 rounded-2xl">
+    <h2 class="text-2xl font-heading font-bold">
+        Good morning, <em class="text-primary">{{ user()?.name }}</em>
+        <span class="text-lg text-secondary ml-2">[{{ user()?.role }}]</span>
+    </h2>
+    @if (loading()) {
+    <p class="text-text/60">Loading...</p>
+    } @else if (error()) {
+    <p class="text-red-400">{{ error() }}</p>
+    } @else {
+    @if (isAdmin()) {
+    @let ov = adminOverview();
+    @if (ov) {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 overflow-auto">
+        <app-base-card title="open tickets" description="total tickets still open" class="row-span-2 lg:row-span-1">
+            <div class="flex items-end h-full">
+                <div class="flex items-baseline gap-3">
+                    <span class="text-3xl font-bold text-secondary">{{ ov.tickets.open }}</span>
+                    <span class="text-text/50">tickets</span>
+                </div>
+            </div>
+        </app-base-card>
+        <app-base-card title="resolved" description="total tickets resolved">
+            <div class="flex items-end h-full">
+                <div class="flex items-baseline gap-3">
+                    <span class="text-3xl font-bold text-accent">{{ ov.tickets.resolved }}</span>
+                    <span class="text-text/50">tickets</span>
+                </div>
+            </div>
+        </app-base-card>
+        <app-base-card title="avg resolution (hours)">
+            <span class="font-bold text-3xl">
+                {{ ov.tickets.avgResolutionHours }}<small class="text-xl ml-1 font-normal text-text/50">h</small>
+            </span>
+        </app-base-card>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <app-base-card title="agent workload" description="amount of tickets divided by agent">
+            <div class="h-full">
+                @for (a of ov.agentWorkload; track a.agentId) {
+                <div class="flex justify-between items-center py-1">
+                    <span>{{ a.agentName }}</span>
+                    <span
+                        [class]="`font-mono font-bold ${a.open > 100 ? 'text-primary' : a.open > 50 ? 'text-secondary' : 'text-text'}`">{{
+                        a.open }}</span>
+                </div>
+                } @empty {
+                <p class="text-text/40">No active agents.</p>
+                }
+            </div>
+        </app-base-card>
+        <app-base-card title="by Category">
+            <div class="h-full">
+                @for (c of ov.byCategory; track c.category) {
+                <div class="flex justify-between items-center py-1">
+                    <span class="capitalize">{{ c.category.toLowerCase() }}</span>
+                    <span class="font-mono font-bold">{{ c.count }}</span>
+                </div>
+                }
+            </div>
+        </app-base-card>
+    </div>
+    }
+    }
+    @if (isAgent()) {
+    <div class="flex flex-col gap-3 border border-text/10 rounded-2xl p-3">
+        <h3 class="text-xl font-semibold font-heading text-primary">
+            My Queue <span class="text-text/50 font-normal text-base">({{ totalItems() }} open)</span>
+        </h3>
+        <app-data-table [columns]="agentColumns" [rows]="rows()" [total]="totalItems()" [page]="currentPage()"
+            [pageSize]="pageSize" [hideable]="true" emptyMessage="Queue is empty." (pageChange)="goToPage($event)"
+            (sortChange)="onSort($event)" />
+    </div>
+    }
+    @if (!isAdmin() && !isAgent()) {
+    <div class="flex flex-col gap-3 border border-text/10 rounded-2xl p-3">
+        <h3 class="text-xl font-semibold font-heading text-primary">
+            My Tickets <span class="text-text/50 font-normal text-base">({{ totalItems() }})</span>
+        </h3>
+        <app-data-table [columns]="customerColumns" [rows]="rows()" [total]="totalItems()" [page]="currentPage()"
+            [pageSize]="pageSize" emptyMessage="No tickets submitted yet." (pageChange)="goToPage($event)" />
+    </div>
+    }
+    }
+</section>

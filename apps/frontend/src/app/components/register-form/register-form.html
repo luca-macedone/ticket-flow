@@ -1,0 +1,40 @@
+<form [formGroup]="registerForm" (ngSubmit)="submitRegistration()" class="flex flex-col gap-6 font-body">
+    <main class="flex flex-col gap-6">
+        <div class="grid grid-cols-2 gap-3">
+            <app-input-field label="Name" id="user-name" type="text" [control]="registerForm.controls.name"
+                [error]="errors['name']?.[0] ?? null" />
+            <app-input-field label="Email" id="user-email" type="email" [control]="registerForm.controls.email"
+                [error]="errors['email']?.[0] ?? null" />
+            <app-input-field label="Password" id="user-password" type="password"
+                [control]="registerForm.controls.password" [error]="errors['password']?.[0] ?? null" />
+            <app-input-field label="Confirm Password" id="user-confirm-password" type="password"
+                [control]="registerForm.controls.confirmPassword" [error]="errors['confirmPassword']?.[0] ?? null" />
+            <app-select-field label="Role" id="user-role" [control]="registerForm.controls.role"
+                [options]="[{value: 'CUSTOMER', label: 'Customer'}, {value: 'AGENT', label: 'Agent'}]"
+                [error]="errors['role']?.[0] ?? null" class="col-span-2" />
+        </div>
+
+        @if(hasErrors){
+        <div class="px-3 py-2 bg-background/20 border-primary/40 border rounded-xl">
+            <strong class="text-primary text-lg">ERROR</strong>
+            @for (entry of errors | keyvalue; track entry.key) {
+            <p class="text-md"><em class="text-primary font-semibold capitalize">{{ entry.key }}:</em> {{ entry.value[0]
+                }}</p>
+            }
+        </div>
+        }
+        <div class="flex gap-3">
+            <button
+                class="border border-secondary/40 bg-secondary/30 text-text px-[40px] py-2 rounded-full font-body text-base hover:opacity-90 transition-all ease-in capitalize backdrop-blur-xl"
+                type="button" (click)="resetForm()">reset</button>
+            <button
+                class="border border-accent/40 bg-accent/30 text-text px-[40px] py-2 rounded-full font-body text-base hover:opacity-90 transition-all ease-in capitalize w-full cursor-pointer backdrop-blur-xl"
+                type="submit">Register</button>
+        </div>
+    </main>
+    <footer class="border-t border-secondary/40 pt-4 flex flex-col items-center gap-3">
+        <small>You have already an account?</small>
+        <button (click)="changeForm()" type="button"
+            class="border border-accent/40 bg-accent/30 text-text px-[40px] py-2 rounded-full font-body text-base font-thin hover:opacity-90 transition-all ease-in capitalize">login</button>
+    </footer>
+</form>

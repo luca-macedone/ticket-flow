@@ -1,0 +1,5 @@
+<label class="flex items-center gap-2 cursor-pointer font-body w-fit">
+    <input type="checkbox" [attr.id]="id() || null" [formControl]="control()"
+        class="accent-accent w-4 h-4 rounded cursor-pointer" />
+    <span class="text-text/70">{{ label() }}</span>
+</label>

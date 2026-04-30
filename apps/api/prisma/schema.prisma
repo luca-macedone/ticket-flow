@@ -1,0 +1,106 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mysql"
+}
+
+model User {
+    id            BigInt     @id @unique @default(autoincrement())
+    email         String     @unique
+    pswHash       String // argon2
+    name          String
+    createdAt     DateTime   @default(now())
+    updatedAt     DateTime   @updatedAt
+    role          Role       @default(CUSTOMER)
+    status        UserStatus @default(PENDING_APPROVAL)
+    projects      Project[]
+    assignedTasks Ticket[]   @relation("assignedTickets")
+    reportedTasks Ticket[]   @relation("reportedTickets")
+}
+
+model Project {
+    id          BigInt    @id @unique @default(autoincrement())
+    projectName String
+    description String?
+    startDate   DateTime
+    endDate     DateTime?
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+    company     Company   @relation(fields: [companyId], references: [id])
+    users       User[]
+    tasks       Ticket[]
+    companyId   BigInt
+}
+
+model Company {
+    id            BigInt    @id @unique @default(autoincrement())
+    companyName   String
+    nationality   String
+    description   String?
+    referralEmail String    @unique
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
+    projects      Project[]
+}
+
+model Ticket {
+    id                BigInt         @id @unique @default(autoincrement())
+    ticketCode        String         @unique
+    ticketName        String
+    ticketDescription String?
+    startDate         DateTime?
+    endDate           DateTime?
+    status            Status         @default(ON_QUEUE)
+    category          TicketCategory @default(GENERAL)
+    priority          Priority       @default(MEDIUM)
+    createdAt         DateTime       @default(now())
+    updatedAt         DateTime       @updatedAt
+    resolvedAt        DateTime?
+    project           Project?       @relation(fields: [projectId], references: [id], onDelete: Restrict)
+    projectId         BigInt?
+    assignee          User?          @relation("assignedTickets", fields: [assigneeId], references: [id])
+    assigneeId        BigInt?
+    reporter          User?          @relation("reportedTickets", fields: [reporterId], references: [id])
+    reporterId        BigInt?
+}
+
+enum Role {
+    CUSTOMER
+    AGENT
+    ADMIN
+}
+
+enum TicketCategory {
+    GENERAL
+    BUG
+    FEATURE
+    SUPPORT
+    MAINTENANCE
+}
+
+enum Priority {
+    LOW
+    MEDIUM
+    HIGH
+    URGENT
+}
+
+enum UserStatus {
+    PENDING_APPROVAL
+    APPROVED
+    REJECTED
+    SUSPENDED
+}
+
+enum Status {
+    ON_HOLD
+    ON_APPROVAL
+    ON_QUEUE
+    FULFILLMENT
+    APPROVED
+    REJECTED
+    DONE
+    CANCELLED
+}

@@ -1,0 +1,11 @@
+<div class="flex flex-col gap-4 p-4 border border-text/10 rounded-2xl">
+    <h2 class="text-xl font-semibold font-heading text-primary">Companies management</h2>
+    @if (loading()) {
+    <p class="text-text/60">Loading...</p>
+    } @else if (error()) {
+    <p class="text-red-400">{{ error() }}</p>
+    } @else {
+    <app-data-table [columns]="columns" [rows]="companies()" emptyMessage="No company found."
+        (rowClick)="navigate($event)" />
+    }
+</div>
