@@ -5,7 +5,7 @@
     <p class="text-red-400">{{ error() }}</p>
     } @else if (project()) {
     <app-base-card [title]="project()!.projectName" [description]="project()?.description ?? undefined">
-        <section class="grid grid-cols-2 gap-3">
+        <main class="grid grid-cols-2 gap-3">
             <app-base-card title="project details">
                 <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
                     <strong class="not-italic text-base font-body">Start date:</strong>
@@ -19,24 +19,31 @@
             <app-base-card title="company info">
                 <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
                     <strong class="not-italic text-base font-body">Company:</strong>
-                    {{company()?.companyName}}
+                    {{project()?.company?.companyName}}
                 </span>
                 <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
                     <strong class="not-italic text-base font-body">Referral:</strong>
-                    {{company()?.referralEmail}}
+                    {{project()?.company?.referralEmail}}
                 </span>
             </app-base-card>
-        </section>
+            <app-base-card title="tickets">
+                <app-data-table [columns]="ticketColumns" [rows]="pagedTickets()"
+                    [total]="(project()!.tickets?.length ?? 0)" [page]="ticketPage()" [pageSize]="pageSize"
+                    emptyMessage="No tickets." (rowClick)="viewTicket($event)" (pageChange)="ticketPage.set($event)">
+                </app-data-table>
+            </app-base-card>
+            <app-base-card title="users">
+                <app-data-table [columns]="userColumns" [rows]="pagedUsers()" [total]="(project()!.users?.length ?? 0)"
+                    [page]="userPage()" [pageSize]="pageSize" emptyMessage="No users assigned."
+                    (pageChange)="userPage.set($event)">
+                </app-data-table>
+            </app-base-card>
+        </main>
+        <footer class="col-span-2 flex justify-end">
+            <button
+                class="border border-secondary/40 bg-secondary/30 text-text px-[40px] py-2 rounded-full font-body text-base hover:opacity-90 transition-all ease-in capitalize backdrop-blur-xl"
+                (click)="editProject()">Edit Project</button>
+        </footer>
     </app-base-card>
-    <!-- <header class="border-b-2 border-amber-600 pb-5 mb-5">
-        <h3 class="text-2xl font-black uppercase">{{ project()!.projectName }}</h3>
-        <p class="text-text/50 text-sm mt-1">
-            {{ project()!.startDate | date:'dd/MM/yyyy' }}
-            @if (project()!.endDate) { → {{ project()!.endDate | date:'dd/MM/yyyy' }} }
-        </p>
-    </header>
-    <main>
-        <p class="text-text/70">{{ project()!.description ?? 'Nessuna descrizione.' }}</p>
-    </main> -->
     }
 </section>

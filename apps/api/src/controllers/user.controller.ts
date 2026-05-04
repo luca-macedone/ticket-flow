@@ -31,7 +31,29 @@ export async function getUserById(req: Request, res: Response) {
         const userId = BigInt(req.params.id as string);
         const user = await prisma.user.findUnique({
             where: { id: userId },
-            omit: { pswHash: true }
+            omit: { pswHash: true },
+            include: {
+                projects: {
+                    select: {
+                        id: true,
+                        projectName: true,
+                    }
+                },
+                assignedTickets: {
+                    select: {
+                        id: true,
+                        ticketName: true,
+                        status: true,
+                    }
+                },
+                reportedTickets: {
+                    select: {
+                        id: true,
+                        ticketName: true,
+                        status: true,
+                    }
+                }
+            }
         });
 
         if (!user) {

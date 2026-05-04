@@ -10,6 +10,21 @@ export interface Project {
   companyId: string;
   createdAt: string;
   updatedAt: string;
+  company?: {
+    id: string;
+    companyName: string;
+    referralEmail: string;
+  };
+  users?: {
+    id: string;
+    name: string;
+    email: string;
+  }[];
+  tickets?: {
+    id: string;
+    ticketName: string;
+    status: string;
+  }[];
 }
 
 export interface CreateProjectPayload {

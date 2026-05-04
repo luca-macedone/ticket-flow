@@ -34,7 +34,11 @@ export class ProjectsList {
     }
   }
 
-  navigate(project: Project) {
+  viewProject(project: Project) {
     this.router.navigate(['/dashboard/projects', project.id]);
+  }
+
+  newProject() {
+    this.router.navigate(['/dashboard/projects/new']);
   }
 }

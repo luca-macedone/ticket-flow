@@ -27,7 +27,30 @@ export async function getProjectById(req: Request, res: Response) {
     try {
         const projectId = BigInt(req.params.id as string);
         const project = await prisma.project.findUnique({
-            where: { id: projectId }
+            where: { id: projectId },
+            include: {
+                company: {
+                    select: {
+                        id: true,
+                        companyName: true,
+                        referralEmail: true
+                    }
+                },
+                tickets: {
+                    select: {
+                        id: true,
+                        ticketName: true,
+                        status: true
+                    }
+                },
+                users: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true
+                    }
+                }
+            }
         });
 
         if (!project) {
@@ -57,7 +80,7 @@ export async function createProject(req: Request, res: Response) {
             startDate,
             endDate,
             status,
-            company,
+            companyId,
             users,
             tickets
         } = req.body;
@@ -68,7 +91,7 @@ export async function createProject(req: Request, res: Response) {
                 startDate,
                 endDate,
                 status,
-                company,
+                companyId: BigInt(companyId),
                 users,
                 tickets
             }
@@ -93,7 +116,7 @@ export async function updateProject(req: Request, res: Response) {
             startDate,
             endDate,
             status,
-            company,
+            companyId,
             users,
             tickets
         } = req.body;
@@ -104,7 +127,7 @@ export async function updateProject(req: Request, res: Response) {
         if (startDate !== undefined) data.startDate = startDate;
         if (endDate !== undefined) data.endDate = endDate;
         if (status !== undefined) data.status = status;
-        if (company !== undefined) data.company = company;
+        if (companyId !== undefined) data.companyId = BigInt(companyId);
         if (users !== undefined) data.users = users;
         if (tickets !== undefined) data.tickets = tickets;
 
@@ -136,7 +159,7 @@ export async function deleteProject(req: Request, res: Response) {
         await prisma.project.delete({
             where: {
                 id: projectId
-            }
+            },
         });
 
         res.status(204).send();

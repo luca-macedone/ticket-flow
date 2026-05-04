@@ -1,11 +1,16 @@
 <section class="flex flex-col gap-4 p-4 border border-text/10 rounded-2xl">
-    <h2 class="text-xl font-semibold font-heading text-primary">Project list</h2>
+    <div class="flex justify-between items-center">
+        <h2 class="text-xl font-semibold font-heading text-primary">Projects management</h2>
+        <button
+            class="border border-accent/40 bg-accent/30 text-text px-[40px] py-2 rounded-full font-body text-base hover:opacity-90 transition-all ease-in capitalize backdrop-blur-xl"
+            (click)="newProject()">Create New Project</button>
+    </div>
     @if (loading()) {
     <p class="text-text/60">Loading...</p>
     } @else if (error()) {
     <p class="text-red-400">{{ error() }}</p>
     } @else {
     <app-data-table [columns]="columns" [rows]="projects()" emptyMessage="No project found."
-        (rowClick)="navigate($event)" />
+        (rowClick)="viewProject($event)" />
     }
 </section>

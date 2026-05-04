@@ -1,0 +1,38 @@
+<section>
+    <app-base-card title="New User" description="Create a new user account.">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-3">
+            <div class="grid grid-cols-2 gap-3">
+                <app-input-field label="Name" [control]="form.controls.name"
+                    [error]="errors['name']?.[0] ?? null"></app-input-field>
+                <app-input-field label="Email" type="email" [control]="form.controls.email"
+                    [error]="errors['email']?.[0] ?? null"></app-input-field>
+                <app-input-field label="Password" type="password" [control]="form.controls.password"
+                    [error]="errors['password']?.[0] ?? null"></app-input-field>
+                <app-select-field label="Role" [control]="form.controls.role" [options]="roleOptions"
+                    [error]="errors['role']?.[0] ?? null"></app-select-field>
+            </div>
+            @if (hasErrors) {
+            <div class="px-3 py-2 bg-background/20 border-primary/40 border rounded-xl">
+                <strong class="text-primary text-lg">Error</strong>
+                @for (entry of errors | keyvalue; track entry.key) {
+                <p class="text-md"><em class="text-primary font-semibold capitalize">{{entry.key}}:</em>
+                    {{entry.value[0]}}</p>
+                }
+            </div>
+            }
+            <div class="flex gap-3 justify-between">
+                <button type="button"
+                    class="border border-secondary/40 bg-secondary/30 text-text px-[40px] py-2 rounded-full font-body text-base hover:opacity-90 transition-all ease-in capitalize backdrop-blur-xl"
+                    (click)="cancel()">Cancel</button>
+                <div class="flex gap-3">
+                    <button type="button"
+                        class="border border-secondary/40 bg-secondary/30 text-text px-[40px] py-2 rounded-full font-body text-base hover:opacity-90 transition-all ease-in capitalize backdrop-blur-xl"
+                        (click)="reset()">Reset</button>
+                    <button type="submit"
+                        class="border border-accent/40 bg-accent/30 text-text px-[40px] py-2 rounded-full font-body text-base hover:opacity-90 transition-all ease-in capitalize backdrop-blur-xl">Create
+                        User</button>
+                </div>
+            </div>
+        </form>
+    </app-base-card>
+</section>

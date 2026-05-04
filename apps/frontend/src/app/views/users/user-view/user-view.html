@@ -1,0 +1,57 @@
+<section class="">
+    @if (loading()) {
+    <p class="text-text/60">Caricamento...</p>
+    } @else if (error()) {
+    <p class="text-red-400">{{ error() }}</p>
+    } @else if (user()) {
+    <app-base-card [title]="user()!.name">
+        <main class="grid grid-cols-2 gap-3">
+            <app-base-card title="user details">
+                <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
+                    <strong class="not-italic text-base font-body">Email:</strong>
+                    {{user()?.email}}
+                </span>
+                <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
+                    <strong class="not-italic text-base font-body">Name:</strong>
+                    {{user()?.name}}
+                </span>
+                <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading flex items-center gap-2">
+                    <strong class="not-italic text-base font-body">Role:</strong>
+                    <span class="border border-secondary capitalize px-2 py-1 rounded-full text-xs">
+                        {{user()?.role}}
+                    </span>
+                </span>
+                <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
+                    <strong class="not-italic text-base font-body">Created At:</strong>
+                    {{user()?.createdAt | date:'dd/MM/yyyy' }}
+                </span>
+            </app-base-card>
+            <app-base-card title="Projects">
+                <app-data-table [columns]="projectColumns" [rows]="pagedProjects()"
+                    [total]="(user()!.projects?.length ?? 0)" [page]="projectPage()" [pageSize]="pageSize"
+                    emptyMessage="No tickets." (rowClick)="viewProject($event)" (pageChange)="projectPage.set($event)">
+                </app-data-table>
+            </app-base-card>
+            <app-base-card title="Assigned Tickets">
+                <app-data-table [columns]="assignedTicketColumns" [rows]="pagedAssignedTickets()"
+                    [total]="(user()!.assignedTickets?.length ?? 0)" [page]="assignedTicketPage()" [pageSize]="pageSize"
+                    emptyMessage="No tickets assigned." (pageChange)="assignedTicketPage.set($event)"
+                    (rowClick)="viewTicket($event)">
+                </app-data-table>
+            </app-base-card>
+            <app-base-card title="Reported Tickets">
+                <app-data-table [columns]="reportedTicketColumns" [rows]="pagedReportedTickets()"
+                    [total]="(user()!.reportedTickets?.length ?? 0)" [page]="reportedTicketPage()" [pageSize]="pageSize"
+                    emptyMessage="No tickets reported." (pageChange)="reportedTicketPage.set($event)"
+                    (rowClick)="viewTicket($event)">
+                </app-data-table>
+            </app-base-card>
+        </main>
+        <footer class="col-span-2 flex justify-end">
+            <button
+                class="border border-secondary/40 bg-secondary/30 text-text px-[40px] py-2 rounded-full font-body text-base hover:opacity-90 transition-all ease-in capitalize backdrop-blur-xl"
+                (click)="editUser()">Edit User</button>
+        </footer>
+    </app-base-card>
+    }
+</section>

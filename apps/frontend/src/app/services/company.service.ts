@@ -9,6 +9,12 @@ export interface Company {
   referralEmail: string;
   createdAt: string;
   updatedAt: string;
+  projects?: {
+    id: string;
+    projectName: string;
+    startDate: string;
+    endDate: string | null;
+  }[];
 }
 
 export interface CreateCompanyPayload {

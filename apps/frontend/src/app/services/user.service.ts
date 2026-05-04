@@ -12,6 +12,9 @@ export interface AdminUser {
   status: UserStatus;
   createdAt: string;
   updatedAt: string;
+  projects?: { id: string; projectName: string }[];
+  assignedTickets?: { id: string; ticketName: string; status: string }[];
+  reportedTickets?: { id: string; ticketName: string; status: string }[];
 }
 
 export interface CreateUserPayload {

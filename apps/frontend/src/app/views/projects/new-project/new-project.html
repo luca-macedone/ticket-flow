@@ -1,0 +1,47 @@
+<section>
+    <app-base-card title="New Project" description="Create a new project.">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-3">
+            <div class="grid grid-cols-2 gap-3">
+                <app-input-field label="Project Name" type="text" [control]="form.controls.projectName"
+                    [error]="errors['projectName']?.[0] ?? null" class="col-span-2"></app-input-field>
+                <app-date-field label="Start Date" [control]="form.controls.startDate"
+                    [error]="errors['startDate']?.[0] ?? null">
+                </app-date-field>
+                <app-date-field label="End Date" [control]="form.controls.endDate"
+                    [error]="errors['endDate']?.[0] ?? null">
+                </app-date-field>
+                <app-textarea-field label="Description" [control]="form.controls.description"
+                    [error]="errors['description']?.[0] ?? null" class="col-span-2"></app-textarea-field>
+                <app-select-field label="Company" [control]="form.controls.companyId" [options]="companies()"
+                    [error]="errors['companyId']?.[0] ?? null" class="col-span-2">
+                </app-select-field>
+
+            </div>
+
+            @if (hasErrors) {
+            <div class="px-3 py-2 bg-background/20 border-primary/40 border rounded-xl">
+                <strong class="text-primary text-lg">Error</strong>
+                @for (entry of errors | keyvalue; track entry.key) {
+                <p class="text-md"><em class="text-primary font-semibold capitalize">{{entry.key}}:</em>
+                    {{entry.value[0]}}
+                </p>
+                }
+            </div>
+            }
+
+            <div class="flex gap-3 justify-between">
+                <button type="button"
+                    class="border border-secondary/40 bg-secondary/30 text-text px-[40px] py-2 rounded-full font-body text-base hover:opacity-90 transition-all ease-in capitalize backdrop-blur-xl"
+                    (click)="cancel()">Cancel</button>
+                <div class="flex gap-3">
+                    <button type="button"
+                        class="border border-secondary/40 bg-secondary/30 text-text px-[40px] py-2 rounded-full font-body text-base hover:opacity-90 transition-all ease-in capitalize backdrop-blur-xl"
+                        (click)="reset()">Reset</button>
+                    <button type="submit"
+                        class="border border-accent/40 bg-accent/30 text-text px-[40px] py-2 rounded-full font-body text-base hover:opacity-90 transition-all ease-in capitalize backdrop-blur-xl">Create
+                        Project</button>
+                </div>
+            </div>
+        </form>
+    </app-base-card>
+</section>

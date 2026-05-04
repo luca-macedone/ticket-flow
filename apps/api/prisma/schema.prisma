@@ -7,17 +7,17 @@ datasource db {
 }
 
 model User {
-    id            BigInt     @id @unique @default(autoincrement())
-    email         String     @unique
-    pswHash       String // argon2
-    name          String
-    createdAt     DateTime   @default(now())
-    updatedAt     DateTime   @updatedAt
-    role          Role       @default(CUSTOMER)
-    status        UserStatus @default(PENDING_APPROVAL)
-    projects      Project[]
-    assignedTasks Ticket[]   @relation("assignedTickets")
-    reportedTasks Ticket[]   @relation("reportedTickets")
+    id              BigInt     @id @unique @default(autoincrement())
+    email           String     @unique
+    pswHash         String // argon2
+    name            String
+    createdAt       DateTime   @default(now())
+    updatedAt       DateTime   @updatedAt
+    role            Role       @default(CUSTOMER)
+    status          UserStatus @default(PENDING_APPROVAL)
+    projects        Project[]
+    assignedTickets Ticket[]   @relation("assignedTickets")
+    reportedTickets Ticket[]   @relation("reportedTickets")
 }
 
 model Project {
@@ -30,7 +30,7 @@ model Project {
     updatedAt   DateTime  @updatedAt
     company     Company   @relation(fields: [companyId], references: [id])
     users       User[]
-    tasks       Ticket[]
+    tickets     Ticket[]
     companyId   BigInt
 }
 

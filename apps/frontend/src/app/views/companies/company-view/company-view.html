@@ -20,12 +20,15 @@
                     {{company()?.nationality}}
                 </span>
             </app-base-card>
-            <!-- <app-base-card title="company info">
-                <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
-                    <strong class="not-italic text-base font-body">Projects:</strong>
-                    {{company()?.projects}}
-                </span>
-            </app-base-card> -->
+            <app-base-card title="Projects">
+                <app-data-table [columns]="projectColumns" [rows]="pagedProjects()"
+                    [total]="(company()!.projects?.length ?? 0)" [page]="projectPage()" [pageSize]="projectPageSize"
+                    emptyMessage="No projects yet." (rowClick)="viewProject($event)"
+                    (pageChange)="projectPage.set($event)">
+                </app-data-table>
+            </app-base-card>
+
+
             <footer class="col-span-2 flex justify-end">
                 <button
                     class="border border-secondary/40 bg-secondary/30 text-text px-[40px] py-2 rounded-full font-body text-base hover:opacity-90 transition-all ease-in capitalize backdrop-blur-xl"

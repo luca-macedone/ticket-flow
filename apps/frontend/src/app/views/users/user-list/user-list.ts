@@ -2,6 +2,7 @@ import { Component, inject, signal, ViewChild, TemplateRef, AfterViewInit } from
 import { AdminUser, UserService } from '../../../services/user.service';
 import { firstValueFrom } from 'rxjs';
 import { DataTable, TableColumn } from '../../../components/tables/ticket-table/data-table';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-list',
@@ -11,6 +12,7 @@ import { DataTable, TableColumn } from '../../../components/tables/ticket-table/
 })
 export class UserList implements AfterViewInit {
   private userService = inject(UserService);
+  private router = inject(Router);
 
   @ViewChild('actionsCell') actionsCellTemplate!: TemplateRef<{ $implicit: AdminUser }>;
 
@@ -85,5 +87,13 @@ export class UserList implements AfterViewInit {
       REJECTED: 'Refused',
     };
     return map[status] ?? status;
+  }
+
+  viewUser(user: AdminUser) {
+    this.router.navigate(['/dashboard/users', user.id]);
+  }
+
+  newUser() {
+    this.router.navigate(['/dashboard/users/new']);
   }
 }

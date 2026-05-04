@@ -12,6 +12,11 @@ import { CompaniesList } from './views/companies/companies-list/companies-list';
 import { CompanyView } from './views/companies/company-view/company-view';
 import { NewCompany } from './views/companies/new-company/new-company';
 import { EditCompany } from './views/companies/edit-company/edit-company';
+import { NewProject } from './views/projects/new-project/new-project';
+import { EditProject } from './views/projects/edit-project/edit-project';
+import { UserView } from './views/users/user-view/user-view';
+import { EditUser } from './views/users/edit-user/edit-user';
+import { NewUser } from './views/users/new-user/new-user';
 
 export const routes: Routes = [
     {
@@ -54,14 +59,32 @@ export const routes: Routes = [
                         },
                     },
                     {
+                        path: 'new',
+                        component: NewProject,
+                        canActivate: [roleGuard],
+                        data: {
+                            roles: ['admin', 'agent', 'customer'],
+                            breadcrumb: 'New Project'
+                        }
+                    },
+                    {
                         path: ':id',
                         component: ProjectView,
                         canActivate: [roleGuard],
                         data: {
                             roles: ['admin', 'agent', 'customer'],
-                            breadcrumb: 'Project'
+                            breadcrumb: 'Project Details'
                         }
-                    }
+                    },
+                    {
+                        path: ':id/edit',
+                        component: EditProject,
+                        canActivate: [roleGuard],
+                        data: {
+                            roles: ['admin', 'agent', 'customer'],
+                            breadcrumb: 'Edit Project'
+                        }
+                    },
                 ],
             },
             {
@@ -117,15 +140,33 @@ export const routes: Routes = [
                             roles: ['admin'],
                         },
                     },
-                    // {
-                    //     path: ':id',
-                    //     component: ProjectView,
-                    //     canActivate: [roleGuard],
-                    //     data: {
-                    //         roles: ['admin'],
-                    //         breadcrumb: 'User'
-                    //     }
-                    // }
+                    {
+                        path: 'new',
+                        component: NewUser,
+                        canActivate: [roleGuard],
+                        data: {
+                            roles: ['admin'],
+                            breadcrumb: 'New User'
+                        }
+                    },
+                    {
+                        path: ':id',
+                        component: UserView,
+                        canActivate: [roleGuard],
+                        data: {
+                            roles: ['admin'],
+                            breadcrumb: 'User Details'
+                        }
+                    },
+                    {
+                        path: ':id/edit',
+                        component: EditUser,
+                        canActivate: [roleGuard],
+                        data: {
+                            roles: ['admin'],
+                            breadcrumb: 'Edit User'
+                        }
+                    },
                 ],
             },
         ]

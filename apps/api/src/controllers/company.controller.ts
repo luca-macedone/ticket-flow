@@ -27,7 +27,17 @@ export async function getCompanyById(req: Request, res: Response) {
     try {
         const companyId = BigInt(req.params.id as string);
         const company = await prisma.company.findUnique({
-            where: { id: companyId }
+            where: { id: companyId },
+            include: {
+                projects: {
+                    select: {
+                        id: true,
+                        projectName: true,
+                        startDate: true,
+                        endDate: true,
+                    }
+                },
+            }
         });
 
         if (!company) {
