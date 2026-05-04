@@ -1,86 +1,136 @@
-<div
-    class="min-h-screen w-full flex flex-col md:grid md:grid-cols-[4rem_1fr] md:h-screen md:overflow-hidden lg:grid-cols-6 bg-background text-text font-body relative">
-    <aside
-        class="hidden md:flex flex-col gap-3 col-span-1 w-16 lg:w-auto justify-between p-2 lg:p-3 border-e-2 border-text/10">
-
-        <header class="flex items-center justify-center lg:justify-start bg-text/10 p-2 lg:p-3 rounded-2xl">
+<div class="min-h-screen w-full flex flex-col md:grid md:h-screen md:overflow-hidden lg:grid-cols-6 bg-background text-text font-body relative"
+    [style.gridTemplateColumns]="sidebarExpanded() ? '14rem 1fr' : '4rem 1fr'">
+    <aside class="hidden md:flex flex-col gap-3 col-span-1 w-full justify-between p-2 border-e-2 border-text/10">
+        <header class="flex items-center bg-text/10 p-2 rounded-2xl" [class.justify-center]="!sidebarExpanded()"
+            [class.justify-between]="sidebarExpanded()">
             <a routerLink="/dashboard" class="font-heading text-xl leading-none">
-                <span class="hidden lg:inline">Ticket<em class="text-primary">Flow</em></span>
-                <span class="text-primary lg:hidden">TF</span>
+                @if (sidebarExpanded()) {
+                <span>Ticket<em class="text-primary">Flow</em></span>
+                } @else {
+                <span class="text-text">T<em class="text-primary left-[-4px] relative">F</em></span>
+                }
             </a>
+            @if (sidebarExpanded()) {
+            <button type="button" (click)="toggleSidebar()"
+                class="p-1 rounded-full hover:bg-primary/20 transition-colors flex items-center justify-center">
+                <ng-icon name="heroChevronLeft" size="16" />
+            </button>
+            }
         </header>
-        <nav class="h-full py-3 px-1 lg:p-6 bg-text/10 rounded-2xl">
+        @if (!sidebarExpanded()) {
+        <button type="button" (click)="toggleSidebar()"
+            class="flex items-center justify-center p-1.5 rounded-xl bg-text/10 hover:bg-primary/20 transition-colors">
+            <ng-icon name="heroChevronRight" size="16" />
+        </button>
+        }
+        <nav class="h-full py-3 px-1 bg-text/10 rounded-2xl" [class.p-6]="sidebarExpanded()"
+            [class.py-3]="!sidebarExpanded()" [class.px-1]="!sidebarExpanded()">
             <ul class="w-full flex flex-col gap-3">
-                <li class="w-full py-2 lg:px-6 justify-center lg:justify-start cursor-pointer
-     hover:bg-primary/20 rounded-full transition-colors ease-in"
-                    routerLinkActive="bg-primary/60 hover:bg-primary/60 font-semibold" routerLink="/dashboard/overview">
+
+                <li class="w-full py-2 flex cursor-pointer hover:bg-primary/20 rounded-full transition-colors ease-in"
+                    [class.justify-center]="!sidebarExpanded()" [class.justify-start]="sidebarExpanded()"
+                    [class.px-6]="sidebarExpanded()" routerLinkActive="bg-primary/60 hover:bg-primary/60 font-semibold"
+                    routerLink="/dashboard/overview">
+                    @if (sidebarExpanded()) {
+                    <span class="flex items-center gap-3">
+                        <ng-icon name="heroHome" size="20" />
+                        <span>Overview</span>
+                    </span>
+                    } @else {
                     <app-tooltip-base content="Overview" position="right"
                         wrapperClass="relative flex w-full items-center justify-center gap-3">
                         <ng-icon name="heroHome" size="20" />
-                        <span class="hidden lg:inline">Overview</span>
                     </app-tooltip-base>
+                    }
                 </li>
-                <li class="w-full py-2 lg:px-6 justify-center lg:justify-start cursor-pointer
-     hover:bg-primary/20 rounded-full transition-colors ease-in"
-                    routerLinkActive="bg-primary/60 hover:bg-primary/60 font-semibold" routerLink="/dashboard/projects">
+
+                <li class="w-full py-2 flex cursor-pointer hover:bg-primary/20 rounded-full transition-colors ease-in"
+                    [class.justify-center]="!sidebarExpanded()" [class.justify-start]="sidebarExpanded()"
+                    [class.px-6]="sidebarExpanded()" routerLinkActive="bg-primary/60 hover:bg-primary/60 font-semibold"
+                    routerLink="/dashboard/projects">
+                    @if (sidebarExpanded()) {
+                    <span class="flex items-center gap-3">
+                        <ng-icon name="heroCube" size="20" />
+                        <span>Projects</span>
+                    </span>
+                    } @else {
                     <app-tooltip-base content="Projects" position="right"
                         wrapperClass="relative flex w-full items-center justify-center gap-3">
                         <ng-icon name="heroCube" size="20" />
-                        <span class="hidden lg:inline">Projects</span>
                     </app-tooltip-base>
+                    }
                 </li>
+
                 @if (isAdmin()) {
-                <li class="w-full py-2 lg:px-6 justify-center lg:justify-start cursor-pointer
-     hover:bg-primary/20 rounded-full transition-colors ease-in"
-                    routerLinkActive="bg-primary/60 hover:bg-primary/60 font-semibold"
+                <li class="w-full py-2 flex cursor-pointer hover:bg-primary/20 rounded-full transition-colors ease-in"
+                    [class.justify-center]="!sidebarExpanded()" [class.justify-start]="sidebarExpanded()"
+                    [class.px-6]="sidebarExpanded()" routerLinkActive="bg-primary/60 hover:bg-primary/60 font-semibold"
                     routerLink="/dashboard/companies">
+                    @if (sidebarExpanded()) {
+                    <span class="flex items-center gap-3">
+                        <ng-icon name="heroBuildingOffice2" size="20" />
+                        <span>Companies</span>
+                    </span>
+                    } @else {
                     <app-tooltip-base content="Companies" position="right"
                         wrapperClass="relative flex w-full items-center justify-center gap-3">
                         <ng-icon name="heroBuildingOffice2" size="20" />
-                        <span class="hidden lg:inline">Companies</span>
                     </app-tooltip-base>
+                    }
                 </li>
-                <li class="w-full py-2 lg:px-6 justify-center lg:justify-start cursor-pointer
-     hover:bg-primary/20 rounded-full transition-colors ease-in"
-                    routerLinkActive="bg-primary/60 hover:bg-primary/60 font-semibold" routerLink="/dashboard/users">
+
+                <li class="w-full py-2 flex cursor-pointer hover:bg-primary/20 rounded-full transition-colors ease-in"
+                    [class.justify-center]="!sidebarExpanded()" [class.justify-start]="sidebarExpanded()"
+                    [class.px-6]="sidebarExpanded()" routerLinkActive="bg-primary/60 hover:bg-primary/60 font-semibold"
+                    routerLink="/dashboard/users">
+                    @if (sidebarExpanded()) {
+                    <span class="flex items-center gap-3">
+                        <ng-icon name="heroUsers" size="20" />
+                        <span>Users</span>
+                    </span>
+                    } @else {
                     <app-tooltip-base content="Users" position="right"
                         wrapperClass="relative flex w-full items-center justify-center gap-3">
                         <ng-icon name="heroUsers" size="20" />
-                        <span class="hidden lg:inline">Users</span>
                     </app-tooltip-base>
+                    }
                 </li>
                 }
+
             </ul>
         </nav>
-        <footer class="flex flex-col lg:flex-row justify-center lg:justify-between items-center
-               bg-text/10 p-2 lg:p-3 rounded-2xl gap-2">
 
-            <!-- Avatar iniziale: solo su tablet -->
-            <div class="lg:hidden w-8 h-8 flex items-center justify-center rounded-full
-              bg-background/60 text-primary font-bold text-base uppercase shrink-0">
+        <footer class="flex items-center bg-text/10 p-2 rounded-2xl gap-2" [class.flex-col]="!sidebarExpanded()"
+            [class.flex-row]="sidebarExpanded()" [class.justify-center]="!sidebarExpanded()"
+            [class.justify-between]="sidebarExpanded()" [class.p-3]="sidebarExpanded()">
+
+            @if (!sidebarExpanded()) {
+            <div class="w-8 h-8 flex items-center justify-center rounded-full
+                    bg-background/60 text-primary font-bold text-base uppercase shrink-0">
                 {{ (user()?.name ?? 'U')[0] }}
             </div>
-
-            <!-- Nome completo: solo su desktop -->
-            <div class="hidden lg:block capitalize text-primary font-bold px-3 py-1.5
-              rounded-full bg-background/60 truncate max-w-[8rem]">
+            } @else {
+            <div class="capitalize text-primary font-bold px-3 py-1.5
+                    rounded-full bg-background/60 truncate max-w-[8rem]">
                 {{ user()?.name ?? 'user' }}
             </div>
+            }
 
             <button type="button" (click)="logout()"
                 class="p-1.5 rounded-full hover:cursor-pointer hover:opacity-95 flex items-center gap-2 bg-background/60">
                 <app-tooltip-base content="Logout" position="right"
                     wrapperClass="relative flex w-full items-center justify-center gap-3">
                     <ng-icon name="heroArrowRightOnRectangle" size="18" />
-                    <span class="hidden lg:inline text-sm">Log Out</span>
+                    @if (sidebarExpanded()) {
+                    <span class="text-sm">Log Out</span>
+                    }
                 </app-tooltip-base>
             </button>
-
         </footer>
 
     </aside>
 
-    <section class="flex-1 flex flex-col col-span-1 lg:col-span-5 p-3 md:h-screen md:overflow-hidden gap-3 relative">
+    <section class="flex-1 flex flex-col col-span-1  p-3 md:h-screen md:overflow-hidden gap-3 relative">
         <div
             class="p-3 flex md:flex-col justify-between md:justify-start gap-2.5 backdrop-blur-xl bg-text/10 rounded-2xl shrink-0 sticky top-3 z-50">
             <app-breadcrump />

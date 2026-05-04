@@ -20,6 +20,7 @@ export class Dashboard {
   isAdmin = computed(() => this.auth.user()?.role === 'admin');
   isPending = computed(() => this.auth.user()?.status === 'PENDING_APPROVAL');
   isRejected = computed(() => this.auth.user()?.status === 'REJECTED');
+  sidebarExpanded = signal(false);
 
   reason: string | null = null;
 
@@ -27,6 +28,10 @@ export class Dashboard {
     this.route.queryParamMap.subscribe(params => {
       this.reason = params.get('reason');
     });
+  }
+
+  toggleSidebar() {
+    this.sidebarExpanded.update(v => !v);
   }
 
   logout() {

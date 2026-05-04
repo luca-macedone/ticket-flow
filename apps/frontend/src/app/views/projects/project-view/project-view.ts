@@ -34,7 +34,7 @@ export class ProjectView {
         const companyData: Company = await firstValueFrom(this.companyService.getCompanyById(companyId));
         this.company.set(companyData);
       } catch {
-        this.error.set('Progetto non trovato.');
+        this.error.set('Project not found.');
       } finally {
         this.loading.set(false);
       }
