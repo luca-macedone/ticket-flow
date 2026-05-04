@@ -1,8 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Project, ProjectService } from '../../../services/project.service';
 import { firstValueFrom } from 'rxjs';
 import { DataTable, TableColumn } from '../../../components/tables/ticket-table/data-table';
+import { AuthService } from '../../../services/auth.service';
 
 const COLUMNS: TableColumn<Project>[] = [
   { key: 'projectName', label: 'Name', getValue: (p) => p.projectName, cellClass: 'font-medium' },
@@ -18,6 +19,11 @@ const COLUMNS: TableColumn<Project>[] = [
 export class ProjectsList {
   private projectService = inject(ProjectService);
   private router = inject(Router);
+
+  private auth = inject(AuthService);
+  isAdmin = computed(() => this.auth.user()?.role === 'admin');
+  isAgent = computed(() => this.auth.user()?.role === 'agent');
+
 
   readonly columns = COLUMNS;
   projects = signal<Project[]>([]);

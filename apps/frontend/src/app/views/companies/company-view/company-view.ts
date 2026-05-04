@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { BaseCard } from "../../../components/overview-cards/base-card/base-card";
 import { DataTable, TableColumn } from '../../../components/tables/ticket-table/data-table';
+import { AuthService } from '../../../services/auth.service';
 
 type ProjectRow = { id: string; projectName: string; startDate: string; endDate: string | null };
 
@@ -31,6 +32,11 @@ export class CompanyView implements OnInit {
   readonly projectColumns = PROJECT_COLUMNS;
   projectPage = signal(1);
   readonly projectPageSize = 5;
+
+  private auth = inject(AuthService);
+  isAdmin = computed(() => this.auth.user()?.role === 'admin');
+  isAgent = computed(() => this.auth.user()?.role === 'agent');
+
 
   ngOnInit() {
     this.route.paramMap.subscribe(async params => {

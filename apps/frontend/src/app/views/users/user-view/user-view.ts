@@ -5,6 +5,7 @@ import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
 import { TableColumn, DataTable } from '../../../components/tables/ticket-table/data-table';
 import { BaseCard } from "../../../components/overview-cards/base-card/base-card";
 import { DatePipe } from '@angular/common';
+import { AuthService } from '../../../services/auth.service';
 
 type TicketRow = { id: string; ticketName: string; status: string };
 type ProjectRow = { id: string; projectName: string };
@@ -40,6 +41,10 @@ export class UserView implements OnInit {
   reportedTicketPage = signal(1);
   projectPage = signal(1);
   readonly pageSize = 5;
+
+  private auth = inject(AuthService);
+  isAdmin = computed(() => this.auth.user()?.role === 'admin');
+  isAgent = computed(() => this.auth.user()?.role === 'agent');
 
   async ngOnInit() {
     this.route.paramMap.subscribe(async params => {

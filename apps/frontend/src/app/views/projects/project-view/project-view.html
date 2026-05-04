@@ -32,17 +32,22 @@
                     emptyMessage="No tickets." (rowClick)="viewTicket($event)" (pageChange)="ticketPage.set($event)">
                 </app-data-table>
             </app-base-card>
+            @if (isAdmin() || isAgent()) {
             <app-base-card title="users">
                 <app-data-table [columns]="userColumns" [rows]="pagedUsers()" [total]="(project()!.users?.length ?? 0)"
                     [page]="userPage()" [pageSize]="pageSize" emptyMessage="No users assigned."
                     (pageChange)="userPage.set($event)">
                 </app-data-table>
             </app-base-card>
+            }
         </main>
         <footer class="col-span-2 flex justify-end">
+
+            @if (isAdmin()) {
             <button
                 class="border border-secondary/40 bg-secondary/30 text-text px-[40px] py-2 rounded-full font-body text-base hover:opacity-90 transition-all ease-in capitalize backdrop-blur-xl"
                 (click)="editProject()">Edit Project</button>
+            }
         </footer>
     </app-base-card>
     }

@@ -48,9 +48,11 @@
             </app-base-card>
         </main>
         <footer class="col-span-2 flex justify-end">
+            @if (isAdmin()) {
             <button
                 class="border border-secondary/40 bg-secondary/30 text-text px-[40px] py-2 rounded-full font-body text-base hover:opacity-90 transition-all ease-in capitalize backdrop-blur-xl"
                 (click)="editUser()">Edit User</button>
+            }
         </footer>
     </app-base-card>
     }

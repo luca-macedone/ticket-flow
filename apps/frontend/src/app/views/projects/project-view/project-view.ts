@@ -5,6 +5,7 @@ import { Project, ProjectService } from '../../../services/project.service';
 import { DatePipe } from '@angular/common';
 import { BaseCard } from "../../../components/overview-cards/base-card/base-card";
 import { TableColumn, DataTable } from '../../../components/tables/ticket-table/data-table';
+import { AuthService } from '../../../services/auth.service';
 
 type TicketRow = { id: string; ticketName: string; status: string };
 type UserRow = { id: string; name: string; email: string };
@@ -39,6 +40,11 @@ export class ProjectView {
   ticketPage = signal(1);
   userPage = signal(1);
   readonly pageSize = 5;
+
+  private auth = inject(AuthService);
+  isAdmin = computed(() => this.auth.user()?.role === 'admin');
+  isAgent = computed(() => this.auth.user()?.role === 'agent');
+
 
   async ngOnInit() {
     this.route.paramMap.subscribe(async params => {
