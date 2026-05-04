@@ -89,8 +89,8 @@ export class Overview {
       const sort = this.sortParams();
       const role = this.auth.user()?.role;
       const obs = role === 'agent'
-        ? this.ticketService.getMyQueue(page, this.pageSize)
-        : this.ticketService.getMyTickets(page, this.pageSize);
+        ? this.ticketService.getMyQueue(page, this.pageSize, sort?.key, sort?.dir ?? undefined)
+        : this.ticketService.getMyTickets(page, this.pageSize, sort?.key, sort?.dir ?? undefined);
       const { data, total } = await firstValueFrom(obs);
       this.rows.set(data);
       this.totalItems.set(total);

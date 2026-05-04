@@ -10,7 +10,7 @@ const router = Router();
 router.get(
     "/",
     requireAuth,
-    requireRole("CUSTOMER"),
+    requireRole("AGENT"),
     getTickets
 );
 router.get(

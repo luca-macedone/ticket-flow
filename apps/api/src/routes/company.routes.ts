@@ -7,18 +7,8 @@ import { requireRole } from "../middlewares/requireRole";
 
 const router = Router();
 
-router.get(
-    "/",
-    requireAuth,
-    requireRole("CUSTOMER"),
-    getCompanies
-);
-router.get(
-    "/:id",
-    requireAuth,
-    requireRole("CUSTOMER"),
-    getCompanyById
-);
+router.get("/", requireAuth, requireRole("AGENT"), getCompanies);
+router.get("/:id", requireAuth, requireRole("AGENT"), getCompanyById);
 router.post(
     "/",
     requireAuth,

@@ -50,16 +50,22 @@ export interface PaginatedTickets {
 export class TicketService {
   private http = inject(HttpClient);
 
-  getMyQueue(page = 1, amount = 20) {
+  getMyQueue(page = 1, amount = 20, sortBy?: string, sortDir?: string) {
+    const params: any = { page, amount };
+    if (sortBy) { params['sortBy'] = sortBy; params['sortDir'] = sortDir ?? 'asc'; }
+
     return this.http.get<PaginatedTickets>('/api/tickets/my-queue', {
-      params: { page, amount },
+      params,
       withCredentials: true,
     });
   }
 
-  getMyTickets(page = 1, amount = 20) {
+  getMyTickets(page = 1, amount = 20, sortBy?: string, sortDir?: string) {
+    const params: any = { page, amount };
+    if (sortBy) { params['sortBy'] = sortBy; params['sortDir'] = sortDir ?? 'asc'; }
+
     return this.http.get<PaginatedTickets>('/api/tickets/my-tickets', {
-      params: { page, amount },
+      params,
       withCredentials: true,
     });
   }
