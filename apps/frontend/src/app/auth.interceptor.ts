@@ -11,7 +11,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
             // evita loop infinito sull'endpoint di refresh stesso
             if (err.status === 401 && !req.url.includes('/auth/refresh') && !req.url.includes('/auth/login')) {
                 return auth.refresh().pipe(
-                    catchError(() => auth.logout("session expired").pipe(switchMap(() => throwError(() => err)))),
+                    catchError((refreshErr) => {
+                        if (refreshErr instanceof HttpErrorResponse && refreshErr.status === 401) {
+                            return auth.logout("session expired").pipe(switchMap(() => throwError(() => err)));
+                        }
+                        return throwError(() => err);
+                    }),
                     switchMap(() => next(req)),
                 );
             }

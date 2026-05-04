@@ -35,7 +35,11 @@ export class CompaniesList {
     }
   }
 
-  navigate(company: Company) {
+  viewCompany(company: Company) {
     this.router.navigate(['/dashboard/companies', company.id]);
+  }
+
+  newCompany() {
+    this.router.navigate(['/dashboard/companies/new']);
   }
 }

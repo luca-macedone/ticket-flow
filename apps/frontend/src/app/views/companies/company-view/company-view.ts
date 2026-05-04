@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { Company, CompanyService } from '../../../services/company.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { BaseCard } from "../../../components/overview-cards/base-card/base-card";
 
@@ -12,6 +12,7 @@ import { BaseCard } from "../../../components/overview-cards/base-card/base-card
 })
 export class CompanyView {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private companyService = inject(CompanyService);
 
   company = signal<Company | null>(null);
@@ -32,5 +33,9 @@ export class CompanyView {
         this.loading.set(false);
       }
     });
+  }
+
+  editCompany() {
+    this.router.navigate(['/dashboard/companies/', this.company()!.id, 'edit']);
   }
 }

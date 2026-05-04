@@ -10,6 +10,8 @@ import { Overview } from './views/overview/overview';
 import { UserList } from './views/users/user-list/user-list';
 import { CompaniesList } from './views/companies/companies-list/companies-list';
 import { CompanyView } from './views/companies/company-view/company-view';
+import { NewCompany } from './views/companies/new-company/new-company';
+import { EditCompany } from './views/companies/edit-company/edit-company';
 
 export const routes: Routes = [
     {
@@ -75,6 +77,15 @@ export const routes: Routes = [
                         },
                     },
                     {
+                        path: 'new',
+                        component: NewCompany,
+                        canActivate: [roleGuard],
+                        data: {
+                            roles: ['admin'],
+                            breadcrumb: 'New Company'
+                        }
+                    },
+                    {
                         path: ':id',
                         component: CompanyView,
                         canActivate: [roleGuard],
@@ -82,7 +93,16 @@ export const routes: Routes = [
                             roles: ['admin'],
                             breadcrumb: 'Company'
                         }
-                    }
+                    },
+                    {
+                        path: ':id/edit',
+                        component: EditCompany,
+                        canActivate: [roleGuard],
+                        data: {
+                            roles: ['admin'],
+                            breadcrumb: 'Edit Company'
+                        }
+                    },
                 ],
             },
             {

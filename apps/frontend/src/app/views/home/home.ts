@@ -21,9 +21,10 @@ export class Home {
   private router = inject(Router);
 
   ngOnInit() {
-    this.reason = this.route.snapshot.queryParams['reason']
-
-    if (!this.reason) {
+    this.reason = this.route.snapshot.queryParams['reason'];
+    if (this.reason) {
+      this.isFormVisible.set(true);
+    } else {
       this.auth.me().subscribe({
         next: () => this.router.navigate(['/dashboard']),
         error: () => { }

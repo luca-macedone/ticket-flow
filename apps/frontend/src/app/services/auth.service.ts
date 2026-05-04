@@ -33,7 +33,7 @@ export class AuthService {
         { withCredentials: true }
       ).pipe(
         finalize(() => { this.refreshInProgress$ = null; }),
-        shareReplay(1)
+        shareReplay({ bufferSize: 1, refCount: true })
       );
     }
     return this.refreshInProgress$;
