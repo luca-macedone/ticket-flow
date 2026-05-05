@@ -1,5 +1,8 @@
-import { Component, computed, effect, input, output, signal, TemplateRef, untracked } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, input, output, signal, TemplateRef, untracked } from '@angular/core';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
+import { CheckboxField } from "../../fields/checkbox-field/checkbox-field";
+import { FormControl } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export interface TableColumn<T> {
   key: string;
@@ -18,7 +21,7 @@ export interface SortState {
 
 @Component({
   selector: 'app-data-table',
-  imports: [NgClass, NgTemplateOutlet],
+  imports: [NgClass, NgTemplateOutlet, CheckboxField],
   templateUrl: './data-table.html',
 })
 export class DataTable<T extends { id: string }> {
@@ -30,6 +33,7 @@ export class DataTable<T extends { id: string }> {
   emptyMessage = input('No data found.');
   hideable = input(false);
   reorderable = input(false);
+  variant = input<'default' | 'opposite'>('default');
 
   pageChange = output<number>();
   rowClick = output<T>();
@@ -39,6 +43,9 @@ export class DataTable<T extends { id: string }> {
   hiddenKeys = signal<Set<string>>(new Set());
   columnOrder = signal<TableColumn<T>[]>([]);
   showColumnPanel = signal(false);
+  private destroyRef = inject(DestroyRef);
+  columnControls = new Map<string, FormControl<boolean>>();
+
 
   visibleColumns = computed(() => {
     const hidden = this.hiddenKeys();
@@ -58,9 +65,23 @@ export class DataTable<T extends { id: string }> {
       if (newCols.map(c => c.key).join(',') !== currentKeys) {
         this.columnOrder.set([...newCols]);
         this.hiddenKeys.set(new Set());
+        newCols.forEach(col => {
+          if (!this.columnControls.has(col.key)) {
+            const ctrl = new FormControl<boolean>(true, { nonNullable: true });
+            ctrl.valueChanges
+              .pipe(takeUntilDestroyed(this.destroyRef))
+              .subscribe(visible => {
+                const hidden = new Set(untracked(() => this.hiddenKeys()));
+                visible ? hidden.delete(col.key) : hidden.add(col.key);
+                this.hiddenKeys.set(hidden);
+              });
+            this.columnControls.set(col.key, ctrl);
+          }
+        });
       }
-    }, { allowSignalWrites: true })
+    }, { allowSignalWrites: true });
   }
+
 
   cellValue(row: T, col: TableColumn<T>): string {
     return col.getValue ? col.getValue(row) : '';

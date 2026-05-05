@@ -2,9 +2,9 @@ import { Request, Response } from "express";
 import { prisma } from "../db";
 import { Prisma } from "@prisma/client";
 import { AuthRequest } from "../middlewares/requireAuth";
+import { parseSortParams, PRIORITY_SQL_ORDER, serializeOrmRow, serializeRawRow } from "../utils/ticket-sort";
 
 const CLOSED = ['DONE', 'CANCELLED', 'REJECTED'] as const;
-const SORTABLE_FIELDS = new Set(['ticketName', 'priority', 'status', 'createdAt']);
 
 //? get:/tickets
 export async function getTickets(req: Request, res: Response) {
@@ -12,23 +12,121 @@ export async function getTickets(req: Request, res: Response) {
         const page = Number(req.query.page ?? 1);
         const take = Number(req.query.amount ?? 20);
         const skip = (page - 1) * take;
-        const sortBy = SORTABLE_FIELDS.has(req.query.sortBy as string)
-            ? req.query.sortBy as string
-            : 'createdAt';
-        const sortDir = req.query.sortDir === 'asc' ? 'asc' : 'desc';
+        const { sortBy, sortDir, sqlDir } = parseSortParams(req.query as any);
 
-        const [data, total] = await Promise.all([
-            prisma.ticket.findMany({
-                skip,
-                take,
+        const total = await prisma.ticket.count();
+        let data: any[];
+
+        if (sortBy === 'priority') {
+            const rows = await prisma.$queryRaw<any[]>`
+                SELECT t.*,
+                       p.id AS proj_id, p.projectName AS proj_name,
+                       a.id AS asn_id,  a.name        AS asn_name
+                FROM   Ticket t
+                LEFT JOIN Project p ON t.projectId  = p.id
+                LEFT JOIN User    a ON t.assigneeId = a.id
+                ORDER BY ${PRIORITY_SQL_ORDER} ${sqlDir}
+                LIMIT ${take} OFFSET ${skip}
+            `;
+            data = rows.map(serializeRawRow);
+        } else {
+            const rows = await prisma.ticket.findMany({
+                skip, take,
                 include: {
                     project: { select: { id: true, projectName: true } },
                     assignee: { select: { id: true, name: true } },
                 },
                 orderBy: { [sortBy]: sortDir },
-            }),
-            prisma.ticket.count(),
-        ]);
+            });
+            data = rows.map(serializeOrmRow);
+        }
+
+        res.status(200).json({ data, total, page });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+
+export async function getMyQueue(req: AuthRequest, res: Response) {
+    try {
+        const userId = BigInt(req.user!.userId);
+        const page = Number(req.query.page ?? 1);
+        const take = Number(req.query.amount ?? 20);
+        const skip = (page - 1) * take;
+        const { sortBy, sortDir, sqlDir } = parseSortParams(req.query as any);
+
+        const where = { assigneeId: userId, status: { notIn: [...CLOSED] } };
+        const total = await prisma.ticket.count({ where });
+        let data: any[];
+
+        if (sortBy === 'priority') {
+            const rows = await prisma.$queryRaw<any[]>`
+                SELECT t.*,
+                       p.id AS proj_id, p.projectName AS proj_name
+                FROM   Ticket t
+                LEFT JOIN Project p ON t.projectId = p.id
+                WHERE  t.assigneeId = ${userId}
+                  AND  t.status NOT IN ('DONE', 'CANCELLED', 'REJECTED')
+                ORDER BY ${PRIORITY_SQL_ORDER} ${sqlDir}
+                LIMIT ${take} OFFSET ${skip}
+            `;
+            data = rows.map(serializeRawRow);
+        } else {
+            const rows = await prisma.ticket.findMany({
+                where, skip, take,
+                include: { project: { select: { id: true, projectName: true } } },
+                orderBy: { [sortBy]: sortDir },
+            });
+            data = rows.map(serializeOrmRow);
+        }
+
+        res.status(200).json({ data, total, page });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+
+
+export async function getMyTickets(req: AuthRequest, res: Response) {
+    try {
+        const userId = BigInt(req.user!.userId);
+        const page = Number(req.query.page ?? 1);
+        const take = Number(req.query.amount ?? 20);
+        const skip = (page - 1) * take;
+        const { sortBy, sortDir, sqlDir } = parseSortParams(req.query as any);
+
+        const total = await prisma.ticket.count({ where: { reporterId: userId } });
+        let data: any[];
+
+        if (sortBy === 'priority') {
+            const rows = await prisma.$queryRaw<any[]>`
+                SELECT t.*,
+                       p.id AS proj_id, p.projectName AS proj_name,
+                       a.id AS asn_id,  a.name        AS asn_name
+                FROM   Ticket t
+                LEFT JOIN Project p ON t.projectId  = p.id
+                LEFT JOIN User    a ON t.assigneeId = a.id
+                WHERE  t.reporterId = ${userId}
+                ORDER BY ${PRIORITY_SQL_ORDER} ${sqlDir}
+                LIMIT ${take} OFFSET ${skip}
+            `;
+            data = rows.map(serializeRawRow);
+        } else {
+            const rows = await prisma.ticket.findMany({
+                where: { reporterId: userId },
+                include: {
+                    project: { select: { id: true, projectName: true } },
+                    assignee: { select: { id: true, name: true } },
+                },
+                orderBy: { [sortBy]: sortDir },
+                skip, take,
+            });
+            data = rows.map(serializeOrmRow);
+        }
 
         res.status(200).json({ data, total, page });
     } catch (error) {
@@ -185,130 +283,5 @@ export async function deleteTicket(req: Request, res: Response) {
         res.status(500).json({
             message: "Internal Server Error"
         })
-    }
-}
-
-export async function getMyQueue(req: AuthRequest, res: Response) {
-    try {
-        const userId = BigInt(req.user!.userId);
-        const page = Number(req.query.page ?? 1);
-        const take = Number(req.query.amount ?? 20);
-        const skip = (page - 1) * take;
-        const sortBy = SORTABLE_FIELDS.has(req.query.sortBy as string)
-            ? req.query.sortBy as string
-            : 'createdAt';
-        const sortDir = req.query.sortDir === 'desc' ? 'desc' : 'asc';
-
-        const where = {
-            assigneeId: userId,
-            status: { notIn: [...CLOSED] },
-        };
-
-        const total = await prisma.ticket.count({ where });
-
-        let data: any[];
-
-        if (sortBy === 'priority') {
-            const dir = sortDir === 'desc' ? Prisma.sql`DESC` : Prisma.sql`ASC`;
-
-            const rows = await prisma.$queryRaw<any[]>`
-                SELECT
-                    t.id, t.ticketCode, t.ticketName, t.ticketDescription,
-                    t.status, t.category, t.priority,
-                    t.startDate, t.endDate, t.resolvedAt,
-                    t.createdAt, t.updatedAt,
-                    t.projectId, t.assigneeId, t.reporterId,
-                    p.id        AS projectRelId,
-                    p.projectName AS projectName
-                FROM   Ticket t
-                LEFT   JOIN Project p ON t.projectId = p.id
-                WHERE  t.assigneeId = ${userId}
-                  AND  t.status NOT IN ('DONE', 'CANCELLED', 'REJECTED')
-                ORDER BY CASE t.priority
-                    WHEN 'LOW'    THEN 1
-                    WHEN 'MEDIUM' THEN 2
-                    WHEN 'HIGH'   THEN 3
-                    WHEN 'URGENT' THEN 4
-                END ${dir}
-                LIMIT  ${take}
-                OFFSET ${skip}
-            `;
-
-            data = rows.map(r => ({
-                id: r.id.toString(),
-                ticketCode: r.ticketCode,
-                ticketName: r.ticketName,
-                ticketDescription: r.ticketDescription,
-                status: r.status,
-                category: r.category,
-                priority: r.priority,
-                startDate: r.startDate,
-                endDate: r.endDate,
-                resolvedAt: r.resolvedAt,
-                createdAt: r.createdAt,
-                updatedAt: r.updatedAt,
-                projectId: r.projectId?.toString() ?? null,
-                assigneeId: r.assigneeId?.toString() ?? null,
-                reporterId: r.reporterId?.toString() ?? null,
-                project: r.projectRelId
-                    ? { id: r.projectRelId.toString(), projectName: r.projectName }
-                    : null,
-            }));
-        } else {
-            const rows = await prisma.ticket.findMany({
-                where,
-                include: {
-                    project: { select: { id: true, projectName: true } },
-                },
-                orderBy: { [sortBy]: sortDir },
-                skip,
-                take,
-            });
-
-            data = rows.map(r => ({
-                ...r,
-                id: r.id.toString(),
-                projectId: r.projectId?.toString() ?? null,
-                assigneeId: r.assigneeId?.toString() ?? null,
-                reporterId: r.reporterId?.toString() ?? null,
-                project: r.project
-                    ? { id: r.project.id.toString(), projectName: r.project.projectName }
-                    : null,
-            }));
-        }
-
-        res.status(200).json({ data, total, page });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Internal Server Error" });
-    }
-}
-
-
-export async function getMyTickets(req: AuthRequest, res: Response) {
-    try {
-        const userId = BigInt(req.user!.userId);
-        const page = Number(req.query.page ?? 1);
-        const take = Number(req.query.amount ?? 20);
-        const skip = (page - 1) * take;
-
-        const [data, total] = await Promise.all([
-            prisma.ticket.findMany({
-                where: { reporterId: userId },
-                include: {
-                    project: { select: { id: true, projectName: true } },
-                    assignee: { select: { id: true, name: true } },
-                },
-                orderBy: { createdAt: 'desc' },
-                skip,
-                take,
-            }),
-            prisma.ticket.count({ where: { reporterId: userId } }),
-        ]);
-
-        res.status(200).json({ data, total, page });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Internal Server Error" });
     }
 }

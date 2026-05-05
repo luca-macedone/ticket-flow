@@ -85,8 +85,7 @@ export class Overview {
 
   async goToPage(page: number) {
     if (this.loading()) {
-      // If we're already loading, just update the page number and let the existing load finish
-
+      // If we're already loading... nothing to do
     } else {
       this.refreshing.set(true);
     }

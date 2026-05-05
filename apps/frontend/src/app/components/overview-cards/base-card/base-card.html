@@ -1,4 +1,8 @@
-<article class="bg-text/10 rounded-xl border border-text/10 flex flex-col justify-start gap-3 p-3 h-full">
+<article class="rounded-xl border border-text/10 flex flex-col justify-start gap-3 p-3 h-full" [ngClass]="{
+        'bg-text/10': variant() === 'default',
+        'bg-background/10': variant() === 'opposite',
+        'bg-red/20': variant() === 'negative'
+    }">
     <h5 class="font-display text-xl text-text/75 border-b border-text/10 pb-2 capitalize">{{title()}}</h5>
     @if(description()) {
     <p class="text-text/60 italic">{{description()}}</p>

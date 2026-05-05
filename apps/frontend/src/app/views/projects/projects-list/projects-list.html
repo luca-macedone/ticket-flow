@@ -13,6 +13,6 @@
     <p class="text-red-400">{{ error() }}</p>
     } @else {
     <app-data-table [columns]="columns" [rows]="projects()" emptyMessage="No project found."
-        (rowClick)="viewProject($event)" />
+        (rowClick)="viewProject($event)" [hideable]="true" />
     }
 </section>

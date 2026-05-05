@@ -4,7 +4,7 @@
     } @else if (error()) {
     <p class="text-red-400">{{ error() }}</p>
     } @else if (user()) {
-    <app-base-card [title]="user()!.name">
+    <app-base-card [title]="user()!.name" variant="opposite">
         <main class="grid grid-cols-2 gap-3">
             <app-base-card title="user details">
                 <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
@@ -29,21 +29,22 @@
             <app-base-card title="Projects">
                 <app-data-table [columns]="projectColumns" [rows]="pagedProjects()"
                     [total]="(user()!.projects?.length ?? 0)" [page]="projectPage()" [pageSize]="pageSize"
-                    emptyMessage="No tickets." (rowClick)="viewProject($event)" (pageChange)="projectPage.set($event)">
+                    emptyMessage="No tickets." (rowClick)="viewProject($event)" (pageChange)="projectPage.set($event)"
+                    variant="opposite">
                 </app-data-table>
             </app-base-card>
             <app-base-card title="Assigned Tickets">
                 <app-data-table [columns]="assignedTicketColumns" [rows]="pagedAssignedTickets()"
                     [total]="(user()!.assignedTickets?.length ?? 0)" [page]="assignedTicketPage()" [pageSize]="pageSize"
                     emptyMessage="No tickets assigned." (pageChange)="assignedTicketPage.set($event)"
-                    (rowClick)="viewTicket($event)">
+                    (rowClick)="viewTicket($event)" variant="opposite">
                 </app-data-table>
             </app-base-card>
             <app-base-card title="Reported Tickets">
                 <app-data-table [columns]="reportedTicketColumns" [rows]="pagedReportedTickets()"
                     [total]="(user()!.reportedTickets?.length ?? 0)" [page]="reportedTicketPage()" [pageSize]="pageSize"
                     emptyMessage="No tickets reported." (pageChange)="reportedTicketPage.set($event)"
-                    (rowClick)="viewTicket($event)">
+                    (rowClick)="viewTicket($event)" variant="opposite">
                 </app-data-table>
             </app-base-card>
         </main>

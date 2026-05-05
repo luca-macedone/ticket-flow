@@ -12,6 +12,6 @@
     } @else {
     <app-data-table [columns]="columns" [rows]="rows()" [total]="totalItems()" [page]="currentPage()"
         [pageSize]="pageSize" emptyMessage="No tickets found." (pageChange)="goToPage($event)"
-        (rowClick)="viewTicket($event)" (sortChange)="onSort($event)" />
+        (rowClick)="viewTicket($event)" (sortChange)="onSort($event)" [hideable]="true" />
     }
 </section>

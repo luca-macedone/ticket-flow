@@ -4,7 +4,8 @@
     } @else if (error()) {
     <p class="text-red-400">{{ error() }}</p>
     } @else if (project()) {
-    <app-base-card [title]="project()!.projectName" [description]="project()?.description ?? undefined">
+    <app-base-card [title]="project()!.projectName" [description]="project()?.description ?? undefined"
+        variant="opposite">
         <main class="grid grid-cols-2 gap-3">
             <app-base-card title="project details">
                 <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
@@ -29,14 +30,15 @@
             <app-base-card title="tickets">
                 <app-data-table [columns]="ticketColumns" [rows]="pagedTickets()"
                     [total]="(project()!.tickets?.length ?? 0)" [page]="ticketPage()" [pageSize]="pageSize"
-                    emptyMessage="No tickets." (rowClick)="viewTicket($event)" (pageChange)="ticketPage.set($event)">
+                    emptyMessage="No tickets." (rowClick)="viewTicket($event)" (pageChange)="ticketPage.set($event)"
+                    variant="opposite">
                 </app-data-table>
             </app-base-card>
             @if (isAdmin() || isAgent()) {
             <app-base-card title="users">
                 <app-data-table [columns]="userColumns" [rows]="pagedUsers()" [total]="(project()!.users?.length ?? 0)"
                     [page]="userPage()" [pageSize]="pageSize" emptyMessage="No users assigned."
-                    (pageChange)="userPage.set($event)">
+                    (pageChange)="userPage.set($event)" variant="opposite">
                 </app-data-table>
             </app-base-card>
             }

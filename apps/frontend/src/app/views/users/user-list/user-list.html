@@ -11,7 +11,8 @@
     } @else if (error()) {
     <p class="text-red-400">{{ error() }}</p>
     } @else {
-    <app-data-table [columns]="columns()" [rows]="users()" emptyMessage="No user found." (rowClick)="viewUser($event)">
+    <app-data-table [columns]="columns()" [rows]="users()" emptyMessage="No user found." (rowClick)="viewUser($event)"
+        [hideable]="true">
     </app-data-table>
     }
 

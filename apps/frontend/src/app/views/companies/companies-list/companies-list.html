@@ -11,6 +11,6 @@
     <p class="text-red-400">{{ error() }}</p>
     } @else {
     <app-data-table [columns]="columns" [rows]="companies()" emptyMessage="No company found."
-        (rowClick)="viewCompany($event)" />
+        (rowClick)="viewCompany($event)" [hideable]="true" />
     }
 </div>
