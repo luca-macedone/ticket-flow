@@ -72,6 +72,7 @@ export class Overview {
   adminOverview = signal<AdminOverview | null>(null);
   rows = signal<Ticket[]>([]);
   loading = signal(true);
+  refreshing = signal(false);
   error = signal<string | null>(null);
   sortParams = signal<SortState | null>(null);
 
@@ -83,7 +84,12 @@ export class Overview {
   readonly customerColumns = CUSTOMER_COLUMNS;
 
   async goToPage(page: number) {
-    this.loading.set(true);
+    if (this.loading()) {
+      // If we're already loading, just update the page number and let the existing load finish
+
+    } else {
+      this.refreshing.set(true);
+    }
     this.error.set(null);
     try {
       const sort = this.sortParams();
@@ -99,6 +105,7 @@ export class Overview {
       this.error.set('Failed to load overview.');
     } finally {
       this.loading.set(false);
+      this.refreshing.set(false);
     }
   }
 
