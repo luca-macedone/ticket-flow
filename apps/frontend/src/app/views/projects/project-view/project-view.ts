@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { Project, ProjectService } from '../../../services/project.service';
@@ -26,7 +26,7 @@ const USER_COLUMNS: TableColumn<UserRow>[] = [
   imports: [DatePipe, BaseCard, DataTable],
   templateUrl: './project-view.html',
 })
-export class ProjectView {
+export class ProjectView implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private projectService = inject(ProjectService);

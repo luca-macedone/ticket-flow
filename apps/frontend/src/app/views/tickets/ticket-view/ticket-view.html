@@ -1,0 +1,70 @@
+<section class="">
+    @if (loading()) {
+    <p class="text-text/60">Caricamento...</p>
+    } @else if (error()) {
+    <p class="text-red-400">{{ error() }}</p>
+    } @else if (ticket()) {
+    <app-base-card [title]="ticket()!.ticketName" [description]="ticket()?.ticketDescription ?? ''">
+        <main class="grid grid-cols-2 gap-3">
+            <app-base-card title="ticket details">
+                <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
+                    <strong class="not-italic text-base font-body">Code:</strong>
+                    {{ticket()!.ticketCode}}
+                </span>
+                <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
+                    <strong class="not-italic text-base font-body">Status:</strong>
+                    {{ticket()!.status}}
+                </span>
+                <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
+                    <strong class="not-italic text-base font-body">Category:</strong>
+                    {{ticket()!.category}}
+                </span>
+                <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading cursor-pointer"
+                    [routerLink]="'/dashboard/projects/' + ticket()?.project?.id">
+                    <strong class="not-italic text-base font-body">Project:</strong>
+                    {{ticket()!.project?.projectName ?? 'no project'}}
+                </span>
+                <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
+                    <strong class="not-italic text-base font-body">Start date:</strong>
+                    {{ticket()!.startDate | date:'dd/MM/yyyy'}}
+                </span>
+                <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
+                    <strong class="not-italic text-base font-body">End date:</strong>
+                    {{(ticket()!.endDate | date:'dd/MM/yyyy') ?? 'not endend yet'}}
+                </span>
+                <div class="px-6 py-2 border border-text/10 rounded-full italic font-heading cursor-pointer"
+                    [routerLink]="'/dashboard/users/' + ticket()?.reporter?.id">
+                    <strong class="not-italic text-base font-body">Reporter:</strong>
+                    {{ticket()!.reporter?.name ?? 'no reporter'}}
+                </div>
+                <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
+                    <strong class="not-italic text-base font-body">Assegnee:</strong>
+                    {{ticket()!.assignee?.name ?? 'no assignee'}}
+                </span>
+                <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
+                    <strong class="not-italic text-base font-body">Resolved at:</strong>
+                    {{(ticket()!.resolvedAt | date:'dd/MM/yyyy') ?? 'not resolved yet'}}
+                </span>
+            </app-base-card>
+            <!-- <app-base-card title="users info">
+                <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
+                    <strong class="not-italic text-base font-body">Company:</strong>
+                    {{ticket()?.assignee?.company?.companyName}}
+                </span>
+                <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
+                    <strong class="not-italic text-base font-body">Referral:</strong>
+                    {{ticket()?.assignee?.company?.referralEmail}}
+                </span>
+            </app-base-card> -->
+        </main>
+        <footer class="col-span-2 flex justify-end">
+
+            @if (isAdmin() || isAgent() || isOwnTicket()) {
+            <button
+                class="border border-secondary/40 bg-secondary/30 text-text px-[40px] py-2 rounded-full font-body text-base hover:opacity-90 transition-all ease-in capitalize backdrop-blur-xl"
+                (click)="editTicket()">Edit Ticket</button>
+            }
+        </footer>
+    </app-base-card>
+    }
+</section>

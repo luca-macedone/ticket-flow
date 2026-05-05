@@ -23,7 +23,7 @@ export interface Ticket {
   reporterId: string | null;
   project?: { id: string; projectName: string };
   assignee?: { id: string; name: string };
-  reporter?: { id: string; name: string };
+  reporter?: { id: string; name: string; email: string };
 }
 
 export interface CreateTicketPayload {
@@ -70,9 +70,11 @@ export class TicketService {
     });
   }
 
-  getAll(page = 1, amount = 20) {
+  getAll(page = 1, amount = 20, sortBy?: string, sortDir?: string) {
+    const params: any = { page, amount };
+    if (sortBy) { params['sortBy'] = sortBy; params['sortDir'] = sortDir ?? 'desc'; }
     return this.http.get<PaginatedTickets>('/api/tickets', {
-      params: { page, amount },
+      params,
       withCredentials: true,
     });
   }

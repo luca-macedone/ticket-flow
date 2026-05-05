@@ -4,6 +4,7 @@ import { finalize, Observable, shareReplay, tap } from 'rxjs';
 import { Router } from '@angular/router';
 
 export interface AuthUser {
+  email: string;
   name: string;
   role: string;
   status: 'PENDING_APPROVAL' | 'APPROVED' | 'REJECTED';

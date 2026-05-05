@@ -17,6 +17,10 @@ import { EditProject } from './views/projects/edit-project/edit-project';
 import { UserView } from './views/users/user-view/user-view';
 import { EditUser } from './views/users/edit-user/edit-user';
 import { NewUser } from './views/users/new-user/new-user';
+import { TicketsList } from './views/tickets/tickets-list/tickets-list';
+import { NewTicket } from './views/tickets/new-ticket/new-ticket';
+import { TicketView } from './views/tickets/ticket-view/ticket-view';
+import { EditTicket } from './views/tickets/edit-ticket/edit-ticket';
 
 export const routes: Routes = [
     {
@@ -45,6 +49,48 @@ export const routes: Routes = [
                     roles: ['admin', 'agent', 'customer']
                 },
                 component: Overview
+            },
+            {
+                path: "tickets",
+                data: { breadcrumb: 'Tickets' },
+                children: [
+                    {
+                        path: "",
+                        component: TicketsList,
+                        canActivate: [roleGuard],
+                        data: {
+                            roles: ['admin', 'agent', 'customer'],
+                            breadcrumb: 'Tickets'
+                        },
+                    },
+                    {
+                        path: 'new',
+                        component: NewTicket,
+                        canActivate: [roleGuard],
+                        data: {
+                            roles: ['admin', 'agent', 'customer'],
+                            breadcrumb: 'New Ticket'
+                        }
+                    },
+                    {
+                        path: ':id',
+                        component: TicketView,
+                        canActivate: [roleGuard],
+                        data: {
+                            roles: ['admin', 'agent', 'customer'],
+                            breadcrumb: 'Ticket Details'
+                        }
+                    },
+                    {
+                        path: ':id/edit',
+                        component: EditTicket,
+                        canActivate: [roleGuard],
+                        data: {
+                            roles: ['admin', 'agent', 'customer'],
+                            breadcrumb: 'Edit Ticket'
+                        }
+                    },
+                ]
             },
             {
                 path: "projects",

@@ -9,22 +9,34 @@ const SORTABLE_FIELDS = new Set(['ticketName', 'priority', 'status', 'createdAt'
 //? get:/tickets
 export async function getTickets(req: Request, res: Response) {
     try {
-        const page = Number(req.query.page ?? 1)
-        const take = Number(req.query.amount ?? 20)
+        const page = Number(req.query.page ?? 1);
+        const take = Number(req.query.amount ?? 20);
         const skip = (page - 1) * take;
+        const sortBy = SORTABLE_FIELDS.has(req.query.sortBy as string)
+            ? req.query.sortBy as string
+            : 'createdAt';
+        const sortDir = req.query.sortDir === 'asc' ? 'asc' : 'desc';
 
-        const tickets = await prisma.ticket.findMany({
-            skip,
-            take
-        });
-        res.status(200).json(tickets);
+        const [data, total] = await Promise.all([
+            prisma.ticket.findMany({
+                skip,
+                take,
+                include: {
+                    project: { select: { id: true, projectName: true } },
+                    assignee: { select: { id: true, name: true } },
+                },
+                orderBy: { [sortBy]: sortDir },
+            }),
+            prisma.ticket.count(),
+        ]);
+
+        res.status(200).json({ data, total, page });
     } catch (error) {
-        console.error(error)
-        res.status(500).json({
-            message: "Internal Server Error"
-        })
+        console.error(error);
+        res.status(500).json({ message: "Internal Server Error" });
     }
 }
+
 
 //? get:/tickets/:id
 export async function getTicketById(req: AuthRequest, res: Response) {
@@ -33,7 +45,12 @@ export async function getTicketById(req: AuthRequest, res: Response) {
         const role = req.user!.role.toUpperCase();
 
         const ticket = await prisma.ticket.findUnique({
-            where: { id: ticketId }
+            where: { id: ticketId },
+            include: {
+                project: { select: { id: true, projectName: true } },
+                assignee: { select: { id: true, name: true } },
+                reporter: { select: { id: true, name: true, email: true } },
+            }
         });
 
         if (!ticket) return res.status(404).json({ message: "Ticket not found" });
@@ -171,44 +188,6 @@ export async function deleteTicket(req: Request, res: Response) {
     }
 }
 
-// export async function getMyQueue(req: AuthRequest, res: Response) {
-//     try {
-//         const userId = BigInt(req.user!.userId);
-//         const page = Number(req.query.page ?? 1);
-//         const take = Number(req.query.amount ?? 20);
-//         const skip = (page - 1) * take;
-//         const sortBy = SORTABLE_FIELDS.has(req.query.sortBy as string)
-//             ? req.query.sortBy as string
-//             : 'createdAt';
-//         const sortDir = req.query.sortDir === 'desc' ? 'desc' : 'asc';
-
-//         const [data, total] = await Promise.all([
-//             prisma.ticket.findMany({
-//                 where: {
-//                     assigneeId: userId,
-//                     status: { notIn: [...CLOSED] },
-//                 },
-//                 include: {
-//                     project: { select: { id: true, projectName: true } },
-//                 },
-//                 orderBy: { [sortBy]: sortDir },
-//                 skip,
-//                 take,
-//             }),
-//             prisma.ticket.count({
-//                 where: {
-//                     assigneeId: userId,
-//                     status: { notIn: [...CLOSED] },
-//                 },
-//             }),
-//         ]);
-
-//         res.status(200).json({ data, total, page });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ message: "Internal Server Error" });
-//     }
-// }
 export async function getMyQueue(req: AuthRequest, res: Response) {
     try {
         const userId = BigInt(req.user!.userId);
