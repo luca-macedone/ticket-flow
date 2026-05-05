@@ -10,19 +10,12 @@
                 <span class="text-text">T<em class="text-primary left-[-4px] relative">F</em></span>
                 }
             </a>
-            @if (sidebarExpanded()) {
-            <button type="button" (click)="toggleSidebar()"
-                class="p-1 rounded-full hover:bg-primary/20 transition-colors flex items-center justify-center">
-                <ng-icon name="heroChevronLeft" size="16" />
-            </button>
-            }
         </header>
-        @if (!sidebarExpanded()) {
         <button type="button" (click)="toggleSidebar()"
             class="flex items-center justify-center p-1.5 rounded-xl bg-text/10 hover:bg-primary/20 transition-colors">
-            <ng-icon name="heroChevronRight" size="16" />
+            <ng-icon [name]="sidebarExpanded() ? 'heroChevronLeft' : 'heroChevronRight'" size="16" />
         </button>
-        }
+
         <nav class="h-full py-3 px-1 bg-text/10 rounded-2xl" [class.p-6]="sidebarExpanded()"
             [class.py-3]="!sidebarExpanded()" [class.px-1]="!sidebarExpanded()">
             <ul class="w-full flex flex-col gap-3">

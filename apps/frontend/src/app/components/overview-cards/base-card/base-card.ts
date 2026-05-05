@@ -8,7 +8,7 @@ import { Component, input } from '@angular/core';
   styleUrl: './base-card.css',
 })
 export class BaseCard {
-  title = input.required<string>();
+  title = input<string>();
   description = input<string>();
   variant = input<'default' | 'opposite' | 'negative'>('default');
 }

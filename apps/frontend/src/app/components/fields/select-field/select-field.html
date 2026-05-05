@@ -1,13 +1,35 @@
 <div class="flex flex-col gap-1">
-    <label class="flex flex-col gap-1.5" [attr.for]="id() || null">
+    <label class="flex flex-col gap-1.5">
         <span class="font-semibold text-text/70">{{ label() }}</span>
-        <select [attr.id]="id() || null" [formControl]="control()" [class]="selectClass">
-            <option value="" disabled>{{ placeholder() }}</option>
-            @for (opt of options(); track opt.value) {
-            <option [value]="opt.value">{{ opt.label }}</option>
-            }
-        </select>
     </label>
+
+    <div class="relative">
+        <button type="button" (click)="toggle()" [class]="triggerClass">
+            <span [class]="selectedLabel ? 'text-text' : 'text-text/40'">
+                {{ selectedLabel || placeholder() }}
+            </span>
+            <svg class="w-4 h-4 text-text/50 transition-transform duration-200" [class.rotate-180]="open" fill="none"
+                stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+        </button>
+
+        @if (open) {
+        <ul class="absolute z-50 w-full bg-background border border-secondary/40 rounded-xl shadow-lg overflow-y-auto"
+            [class.top-full]="dropdownPosition === 'down'" [class.mt-1]="dropdownPosition === 'down'"
+            [class.bottom-full]="dropdownPosition === 'up'" [class.mb-1]="dropdownPosition === 'up'"
+            [style.max-height.px]="dropdownMaxHeight">
+            <li class="px-4 py-2 text-text/40 cursor-default select-none" (click)="select('')">{{ placeholder()
+                }}</li>
+            @for (opt of options(); track opt.value) {
+            <li class="px-4 py-2 text-text cursor-pointer transition-colors hover:bg-secondary/20"
+                [class.bg-accent/10]="opt.value === control().value"
+                [class.font-semibold]="opt.value === control().value" (click)="select(opt.value)">{{ opt.label }}</li>
+            }
+        </ul>
+        }
+    </div>
+
     @if (errorMessage) {
     <p class="text-primary pl-1">{{ errorMessage }}</p>
     }

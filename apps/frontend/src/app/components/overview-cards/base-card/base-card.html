@@ -3,7 +3,9 @@
         'bg-background/10': variant() === 'opposite',
         'bg-red/20': variant() === 'negative'
     }">
+    @if(title()) {
     <h5 class="font-display text-xl text-text/75 border-b border-text/10 pb-2 capitalize">{{title()}}</h5>
+    }
     @if(description()) {
     <p class="text-text/60 italic">{{description()}}</p>
     }

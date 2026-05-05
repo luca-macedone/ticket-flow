@@ -5,10 +5,11 @@ import { firstValueFrom } from 'rxjs/internal/firstValueFrom';
 import { BaseCard } from "../../../components/overview-cards/base-card/base-card";
 import { AuthService } from '../../../services/auth.service';
 import { DatePipe } from '@angular/common';
+import { NgIcon } from "@ng-icons/core";
 
 @Component({
   selector: 'app-ticket-view',
-  imports: [BaseCard, DatePipe, RouterLink],
+  imports: [BaseCard, DatePipe, RouterLink, NgIcon],
   templateUrl: './ticket-view.html',
   styleUrl: './ticket-view.css',
 })
@@ -50,7 +51,7 @@ export class TicketView implements OnInit {
   editTicket() {
     const id = this.ticket()?.id;
     if (id) {
-      this.router.navigate(['/tickets', id, 'edit']);
+      this.router.navigate(['dashboard/tickets/', id, 'edit']);
     }
   }
 }
