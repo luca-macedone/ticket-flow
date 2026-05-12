@@ -7,15 +7,17 @@ import { BaseCard } from "../../../components/overview-cards/base-card/base-card
 import { TableColumn, DataTable } from '../../../components/tables/ticket-table/data-table';
 import { AuthService } from '../../../services/auth.service';
 
-type TicketRow = { id: string; ticketName: string; status: string };
-type UserRow = { id: string; name: string; email: string };
+type TicketRow = { id: string; ticketCode: string; ticketName: string; status: string };
+type UserRow = { id: string; userCode: string; name: string; email: string };
 
 const TICKET_COLUMNS: TableColumn<TicketRow>[] = [
+  { key: 'ticketCode', label: 'Code', getValue: (t) => t.ticketCode, cellClass: 'font-mono text-xs text-text/50' },
   { key: 'ticketName', label: 'Ticket', getValue: (t) => t.ticketName, cellClass: 'font-medium' },
   { key: 'status', label: 'Status', getValue: (t) => t.status, cellClass: 'text-text/70' },
 ];
 
 const USER_COLUMNS: TableColumn<UserRow>[] = [
+  { key: 'userCode', label: 'Code', getValue: (u) => u.userCode, cellClass: 'font-mono text-xs text-text/50' },
   { key: 'name', label: 'Name', getValue: (u) => u.name, cellClass: 'font-medium' },
   { key: 'email', label: 'Email', getValue: (u) => u.email, cellClass: 'text-text/70' },
 ];
@@ -48,11 +50,11 @@ export class ProjectView implements OnInit {
 
   async ngOnInit() {
     this.route.paramMap.subscribe(async params => {
-      const id = params.get('id');
-      if (!id) return;
+      const code = params.get('code');
+      if (!code) return;
       try {
         this.loading.set(true);
-        const data: Project = await firstValueFrom(this.projectService.getProjectById(id));
+        const data: Project = await firstValueFrom(this.projectService.getProjectByCode(code));
         this.project.set(data);
       } catch {
         this.error.set('Project not found.');
@@ -63,7 +65,7 @@ export class ProjectView implements OnInit {
   }
 
   editProject() {
-    this.router.navigate(['/dashboard/projects/', this.project()!.id, 'edit']);
+    this.router.navigate(['/dashboard/projects/', this.project()!.projectCode, 'edit']);
   }
 
   pagedTickets = computed(() => {
@@ -79,6 +81,10 @@ export class ProjectView implements OnInit {
   });
 
   viewTicket(t: TicketRow) {
-    this.router.navigate(['/dashboard/tickets', t.id]);
+    this.router.navigate(['/dashboard/tickets', t.ticketCode]);
+  }
+
+  viewUser(u: UserRow) {
+    this.router.navigate(['/dashboard/users', u.userCode]);
   }
 }

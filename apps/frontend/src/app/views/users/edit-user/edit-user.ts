@@ -18,9 +18,10 @@ export class EditUser implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
-  private id!: string;
+  private code!: string;
   loading = signal(true);
   errors: Record<string, string[]> = {};
+  displayCode = signal('');
 
   readonly roleOptions = [
     { value: 'CUSTOMER', label: 'Customer' },
@@ -37,10 +38,11 @@ export class EditUser implements OnInit {
   get hasErrors() { return Object.keys(this.errors).length > 0; }
 
   async ngOnInit() {
-    this.id = this.route.snapshot.paramMap.get('id')!;
+    this.code = this.route.snapshot.paramMap.get('code')!;
     try {
-      const user = await firstValueFrom(this.userService.getUserById(this.id));
+      const user = await firstValueFrom(this.userService.getUserByCode(this.code));
       this.form.patchValue({ name: user.name, email: user.email, role: user.role });
+      this.displayCode.set(user.userCode ?? '');
     } catch {
       this.errors = { api: ['User not found.'] };
     } finally {
@@ -52,13 +54,13 @@ export class EditUser implements OnInit {
     if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.errors = {};
     try {
-      await firstValueFrom(this.userService.updateUser(this.id, this.form.getRawValue() as any));
-      this.router.navigate(['/dashboard/users', this.id]);
+      await firstValueFrom(this.userService.updateUser(this.code, this.form.getRawValue() as any));
+      this.router.navigate(['/dashboard/users', this.code]);
     } catch (err: any) {
       this.errors = { api: [err.error?.message || 'Update failed.'] };
     }
   }
 
-  cancel() { this.router.navigate(['/dashboard/users', this.id]); }
+  cancel() { this.router.navigate(['/dashboard/users', this.code]); }
   reset() { this.form.reset(); this.errors = {}; }
 }

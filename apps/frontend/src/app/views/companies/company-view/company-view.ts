@@ -6,9 +6,10 @@ import { BaseCard } from "../../../components/overview-cards/base-card/base-card
 import { DataTable, TableColumn } from '../../../components/tables/ticket-table/data-table';
 import { AuthService } from '../../../services/auth.service';
 
-type ProjectRow = { id: string; projectName: string; startDate: string; endDate: string | null };
+type ProjectRow = { id: string; projectCode: string; projectName: string; startDate: string; endDate: string | null };
 
 const PROJECT_COLUMNS: TableColumn<ProjectRow>[] = [
+  { key: 'projectCode', label: 'Code', getValue: (p) => p.projectCode, cellClass: 'font-mono text-xs text-text/50' },
   { key: 'projectName', label: 'Name', getValue: (p) => p.projectName, cellClass: 'font-medium' },
   { key: 'startDate', label: 'Start', getValue: (p) => new Date(p.startDate).toLocaleDateString('it-IT') },
   { key: 'endDate', label: 'End', getValue: (p) => p.endDate ? new Date(p.endDate).toLocaleDateString('it-IT') : '—' },
@@ -40,10 +41,10 @@ export class CompanyView implements OnInit {
 
   ngOnInit() {
     this.route.paramMap.subscribe(async params => {
-      const id = params.get('id');
+      const code = params.get('code');
       try {
         this.loading.set(true);
-        const data = await firstValueFrom(this.companyService.getCompanyById(id!));
+        const data = await firstValueFrom(this.companyService.getCompanyByCode(code!));
         this.company.set(data);
 
       } catch (error) {
@@ -61,10 +62,10 @@ export class CompanyView implements OnInit {
   });
 
   viewProject(p: ProjectRow) {
-    this.router.navigate(['/dashboard/projects/', p.id]);
+    this.router.navigate(['/dashboard/projects/', p.projectCode]);
   }
 
   editCompany() {
-    this.router.navigate(['/dashboard/companies/', this.company()!.id, 'edit']);
+    this.router.navigate(['/dashboard/companies/', this.company()!.companyCode, 'edit']);
   }
 }

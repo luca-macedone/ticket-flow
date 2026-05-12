@@ -21,11 +21,12 @@ export class UserList implements AfterViewInit {
   error = signal<string | null>(null);
   columns = signal<TableColumn<AdminUser>[]>([]);
 
-  approvingId = signal<string | null>(null);
+  approvingCode = signal<string | null>(null);
   selectedRole = signal<'AGENT' | 'CUSTOMER'>('CUSTOMER');
 
   ngAfterViewInit() {
     this.columns.set([
+      { key: 'userCode', label: 'Code', getValue: u => u.userCode as string, cellClass: "font-mono text-xs text-text/50" },
       { key: 'name', label: 'Name', getValue: u => u.name },
       { key: 'email', label: 'Email', getValue: u => u.email },
       { key: 'role', label: 'Role', getValue: u => u.role.toLowerCase(), badgeClass: () => 'border border-secondary capitalize' },
@@ -51,23 +52,23 @@ export class UserList implements AfterViewInit {
     }
   }
 
-  startApprove(id: string) {
-    this.approvingId.set(id);
+  startApprove(code: string) {
+    this.approvingCode.set(code);
     this.selectedRole.set('CUSTOMER');
   }
 
   cancelApprove() {
-    this.approvingId.set(null);
+    this.approvingCode.set(null);
   }
 
-  async confirmApprove(id: string) {
+  async confirmApprove(code: string) {
     try {
-      const updated = await firstValueFrom(this.userService.approveUser(id, this.selectedRole()));
-      this.users.update(list => list.map(u => u.id === id ? { ...u, ...updated } : u));
+      const updated = await firstValueFrom(this.userService.approveUser(code, this.selectedRole()));
+      this.users.update(list => list.map(u => u.userCode === code ? { ...u, ...updated } : u));
     } catch {
       this.error.set('Approval failed. Retry.');
     } finally {
-      this.approvingId.set(null);
+      this.approvingCode.set(null);
     }
   }
 
@@ -90,7 +91,7 @@ export class UserList implements AfterViewInit {
   }
 
   viewUser(user: AdminUser) {
-    this.router.navigate(['/dashboard/users', user.id]);
+    this.router.navigate(['/dashboard/users', user.userCode]);
   }
 
   newUser() {

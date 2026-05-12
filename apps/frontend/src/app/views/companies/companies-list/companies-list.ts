@@ -5,6 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { DataTable, TableColumn } from '../../../components/tables/ticket-table/data-table';
 
 const COLUMNS: TableColumn<Company>[] = [
+  { key: 'companyCode', label: 'Code', getValue: (c) => c.companyCode as string, cellClass: 'font-mono text-xs text-text/50' },
   { key: 'companyName', label: 'Name', getValue: (c) => c.companyName, cellClass: 'font-medium' },
   { key: 'nationality', label: 'Nationality', getValue: (c) => c.nationality, cellClass: 'text-text/70' },
   { key: 'referralEmail', label: 'Email', getValue: (c) => c.referralEmail, cellClass: 'text-text/70' },
@@ -36,7 +37,7 @@ export class CompaniesList {
   }
 
   viewCompany(company: Company) {
-    this.router.navigate(['/dashboard/companies', company.id]);
+    this.router.navigate(['/dashboard/companies', company.companyCode]);
   }
 
   newCompany() {

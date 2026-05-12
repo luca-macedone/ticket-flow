@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createUser, deleteUser, getUserById, getUsers, registerUser, updateUser } from "../controllers/user.controller";
+import { createUser, deleteUser, getUserByCode, getUsers, registerUser, updateUser } from "../controllers/user.controller";
 import { zodValidate } from "../middlewares/zodValidate";
 import { RegisterApiSchema, UpdateUserSchema } from "@packages/shared";
 import { requireAuth } from "../middlewares/requireAuth";
@@ -14,10 +14,10 @@ router.get("/",
 );
 
 router.get(
-    "/:id",
+    "/:code",
     requireAuth,
     requireRole("ADMIN"),
-    getUserById
+    getUserByCode
 );
 router.post(
     "/register",
@@ -32,14 +32,14 @@ router.post(
     createUser
 );
 router.patch(
-    "/:id",
+    "/:code",
     requireAuth,
     requireRole("ADMIN"),
     zodValidate(UpdateUserSchema),
     updateUser
 );
 router.delete(
-    "/:id",
+    "/:code",
     requireAuth,
     requireRole("ADMIN"),
     deleteUser

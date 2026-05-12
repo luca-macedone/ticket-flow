@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { prisma } from "../db";
 import { Prisma } from "@prisma/client";
 import bcrypt from "bcrypt";
+import { randomUUID } from "crypto";
 
 //? get:/users
 export async function getUsers(req: Request, res: Response) {
@@ -25,23 +26,25 @@ export async function getUsers(req: Request, res: Response) {
     }
 }
 
-//? get:/users/:id
-export async function getUserById(req: Request, res: Response) {
+//? get:/users/:code
+export async function getUserByCode(req: Request, res: Response) {
     try {
-        const userId = BigInt(req.params.id as string);
+        const code = req.params.code as string;
         const user = await prisma.user.findUnique({
-            where: { id: userId },
+            where: { userCode: code },
             omit: { pswHash: true },
             include: {
                 projects: {
                     select: {
                         id: true,
+                        projectCode: true,
                         projectName: true,
                     }
                 },
                 assignedTickets: {
                     select: {
                         id: true,
+                        ticketCode: true,
                         ticketName: true,
                         status: true,
                     }
@@ -49,6 +52,7 @@ export async function getUserById(req: Request, res: Response) {
                 reportedTickets: {
                     select: {
                         id: true,
+                        ticketCode: true,
                         ticketName: true,
                         status: true,
                     }
@@ -86,15 +90,14 @@ export async function createUser(req: Request, res: Response) {
 
         const hashed = await bcrypt.hash(password, 12);
 
-        const user = await prisma.user.create({
-            data: {
-                email,
-                pswHash: hashed,
-                name,
-                role,
-                status: "APPROVED"
-            }
+        const user = await prisma.$transaction(async (tx) => {
+            const temp = await tx.user.create({
+                data: { email, pswHash: hashed, name, role, status: "APPROVED", userCode: randomUUID() }
+            });
+            const code = `USR-${temp.id.toString().padStart(8, '0')}`;
+            return tx.user.update({ where: { id: temp.id }, data: { userCode: code } });
         });
+
 
         res.status(201).json(user);
     } catch (error) {
@@ -118,16 +121,13 @@ export async function registerUser(req: Request, res: Response) {
 
         const pswHash = await bcrypt.hash(password, 12);
 
-        const user = await prisma.user.create({
-            data: {
-                email,
-                pswHash,
-                name,
-                role,
-                status: "PENDING_APPROVAL"
-            }
+        const user = await prisma.$transaction(async (tx) => {
+            const temp = await tx.user.create({
+                data: { email, pswHash, name, role, status: "PENDING_APPROVAL", userCode: randomUUID() }
+            });
+            const code = `USR-${temp.id.toString().padStart(8, '0')}`;
+            return tx.user.update({ where: { id: temp.id }, data: { userCode: code } });
         });
-
         const { pswHash: _, ...safeUser } = user;
         res.status(201).json(safeUser);
     } catch (error) {
@@ -143,7 +143,10 @@ export async function registerUser(req: Request, res: Response) {
 //? patch:/users/:id
 export async function updateUser(req: Request, res: Response) {
     try {
-        const userId = BigInt(req.params.id as string)
+        const code = req.params.code as string;
+        const existing = await prisma.user.findUnique({ where: { userCode: code } });
+        if (!existing) return res.status(404).json({ message: "User not found" });
+
         const {
             email,
             name,
@@ -159,7 +162,7 @@ export async function updateUser(req: Request, res: Response) {
 
         const user = await prisma.user.update({
             where: {
-                id: userId
+                id: existing.id
             },
             data
         });
@@ -178,18 +181,20 @@ export async function updateUser(req: Request, res: Response) {
     }
 }
 
-//? patch:/admin/users/:id/approve
+//? patch:/admin/users/:code/approve
 export async function approveUser(req: Request, res: Response) {
     try {
-        const userId = BigInt(req.params.id as string);
+        const code = req.params.code as string;
         const { role } = req.body;
+        const existing = await prisma.user.findUnique({ where: { userCode: code } });
+        if (!existing) return res.status(404).json({ message: "User not found" });
 
         const data: any = { status: "APPROVED" };
         if (role) data.role = role;
 
         const user = await prisma.user.update({
             where: {
-                id: userId
+                id: existing.id
             },
             data
         });
@@ -208,13 +213,12 @@ export async function approveUser(req: Request, res: Response) {
     }
 }
 
-//? delete:/users/:id
+//? delete:/users/:code
 export async function deleteUser(req: Request, res: Response) {
     try {
-        const userId = BigInt(req.params.id as string)
         await prisma.user.delete({
             where: {
-                id: userId
+                userCode: req.params.code as string
             }
         });
 

@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { prisma } from "../db";
 import { Prisma } from "@prisma/client";
 import { AuthRequest } from "../middlewares/requireAuth";
+import { randomUUID } from "crypto";
 
 //? get:/projects
 export async function getProjects(req: AuthRequest, res: Response) {
@@ -33,18 +34,18 @@ export async function getProjects(req: AuthRequest, res: Response) {
     }
 }
 
-//? get:/projects/:id
-export async function getProjectById(req: AuthRequest, res: Response) {
+//? get:/projects/:code
+export async function getProjectByCode(req: AuthRequest, res: Response) {
     try {
-        const projectId = BigInt(req.params.id as string);
+        const code = req.params.code as string;
         const role = req.user!.role.toUpperCase();
         const project = await prisma.project.findUnique({
-            where: { id: projectId },
+            where: { projectCode: code },
             include: {
-                company: { select: { id: true, companyName: true, referralEmail: true } },
-                tickets: { select: { id: true, ticketName: true, status: true } },
+                company: { select: { id: true, companyCode: true, companyName: true, referralEmail: true } },
+                tickets: { select: { id: true, ticketCode: true, ticketName: true, status: true } },
                 ...(role !== 'CUSTOMER' && {
-                    users: { select: { id: true, name: true, email: true } }
+                    users: { select: { id: true, userCode: true, name: true, email: true } }
                 }),
             }
         });
@@ -53,7 +54,7 @@ export async function getProjectById(req: AuthRequest, res: Response) {
 
         if (role === 'CUSTOMER') {
             const isMember = await prisma.project.count({
-                where: { id: projectId, users: { some: { id: BigInt(req.user!.userId) } } }
+                where: { projectCode: code, users: { some: { id: BigInt(req.user!.userId) } } }
             });
             if (!isMember) return res.status(403).json({ message: "Forbidden" });
         }
@@ -75,27 +76,17 @@ export async function getProjectById(req: AuthRequest, res: Response) {
 //? post:/projects
 export async function createProject(req: Request, res: Response) {
     try {
-        const {
-            projectName,
-            description,
-            startDate,
-            endDate,
-            status,
-            companyId,
-            users,
-            tickets
-        } = req.body;
-        const project = await prisma.project.create({
-            data: {
-                projectName,
-                description,
-                startDate,
-                endDate,
-                status,
-                companyId: BigInt(companyId),
-                users,
-                tickets
-            }
+        const { projectName, description, startDate, endDate, status, companyId, users, tickets } = req.body;
+
+        const project = await prisma.$transaction(async (tx) => {
+            const temp = await tx.project.create({
+                data: {
+                    projectName, description, startDate, endDate, status,
+                    companyId: BigInt(companyId), users, tickets, projectCode: randomUUID()
+                }
+            });
+            const code = `PRJ-${temp.id.toString().padStart(8, '0')}`;
+            return tx.project.update({ where: { id: temp.id }, data: { projectCode: code } });
         });
 
         res.status(201).json(project);
@@ -107,10 +98,14 @@ export async function createProject(req: Request, res: Response) {
     }
 }
 
-//? patch:/projects/:id
+//? patch:/projects/:code
 export async function updateProject(req: Request, res: Response) {
     try {
-        const projectId = BigInt(req.params.id as string)
+        const code = req.params.code as string;
+        const existing = await prisma.project.findUnique({ where: { projectCode: code } });
+
+        if (!existing) return res.status(404).json({ message: "Project not found" });
+
         const {
             projectName,
             description,
@@ -134,7 +129,7 @@ export async function updateProject(req: Request, res: Response) {
 
         const project = await prisma.project.update({
             where: {
-                id: projectId
+                id: existing.id
             },
             data
         });
@@ -153,13 +148,12 @@ export async function updateProject(req: Request, res: Response) {
     }
 }
 
-//? delete:/projects/:id
+//? delete:/projects/:code
 export async function deleteProject(req: Request, res: Response) {
     try {
-        const projectId = BigInt(req.params.id as string)
         await prisma.project.delete({
             where: {
-                id: projectId
+                projectCode: req.params.code as string
             },
         });
 

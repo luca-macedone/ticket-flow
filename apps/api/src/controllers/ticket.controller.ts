@@ -3,6 +3,7 @@ import { prisma } from "../db";
 import { Prisma } from "@prisma/client";
 import { AuthRequest } from "../middlewares/requireAuth";
 import { parseSortParams, PRIORITY_SQL_ORDER, serializeOrmRow, serializeRawRow } from "../utils/ticket-sort";
+import { randomUUID } from 'crypto';
 
 const CLOSED = ['DONE', 'CANCELLED', 'REJECTED'] as const;
 
@@ -136,18 +137,18 @@ export async function getMyTickets(req: AuthRequest, res: Response) {
 }
 
 
-//? get:/tickets/:id
-export async function getTicketById(req: AuthRequest, res: Response) {
+//? get:/tickets/:code
+export async function getTicketByCode(req: AuthRequest, res: Response) {
     try {
-        const ticketId = BigInt(req.params.id as string);
+        const code = req.params.code as string;
         const role = req.user!.role.toUpperCase();
 
         const ticket = await prisma.ticket.findUnique({
-            where: { id: ticketId },
+            where: { ticketCode: code },
             include: {
-                project: { select: { id: true, projectName: true } },
-                assignee: { select: { id: true, name: true } },
-                reporter: { select: { id: true, name: true, email: true } },
+                project: { select: { id: true, projectCode: true, projectName: true } },
+                assignee: { select: { id: true, userCode: true, name: true } },
+                reporter: { select: { id: true, userCode: true, name: true, email: true } },
             }
         });
 
@@ -174,52 +175,46 @@ export async function getTicketById(req: AuthRequest, res: Response) {
 //? post:/tickets
 export async function createTicket(req: AuthRequest, res: Response) {
     try {
-        const {
-            ticketCode,
-            ticketName,
-            ticketDescription,
-            startDate,
-            endDate,
-            status,
-            projectId,
-        } = req.body;
-        const ticket = await prisma.ticket.create({
-            data: {
-                ticketCode,
-                ticketName,
-                ticketDescription,
-                startDate,
-                endDate,
-                status,
-                projectId,
-                reporterId: BigInt(req.user!.userId)
-            }
+        const { ticketName, ticketDescription, startDate, endDate, status, projectId } = req.body;
+
+        const baseData = {
+            ticketName, ticketDescription, startDate, endDate, status, projectId,
+            reporterId: BigInt(req.user!.userId),
+        };
+
+        const ticket = await prisma.$transaction(async (tx) => {
+            const temp = await tx.ticket.create({
+                data: { ...baseData, ticketCode: randomUUID() },
+            });
+            const code = `TF-${temp.id.toString().padStart(8, '0')}`;
+            return tx.ticket.update({ where: { id: temp.id }, data: { ticketCode: code } });
         });
 
         res.status(201).json(ticket);
     } catch (error) {
-        console.error(error)
-        res.status(500).json({
-            message: "Internal Server Error"
-        })
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 }
 
-//? patch:/tickets/:id
+
+//? patch:/tickets/:code
 export async function updateTicket(req: AuthRequest, res: Response) {
     try {
+        const code = req.params.code as string;
         const role = req.user!.role.toUpperCase();
-        const ticketId = BigInt(req.params.id as string)
+        const existing = await prisma.ticket.findUnique({ where: { ticketCode: code } });
 
-        if (role === 'CUSTOMER') {
-            const ticket = await prisma.ticket.findUnique({ where: { id: ticketId }, select: { reporterId: true } });
+        if (!existing) return res.status(404).json({ message: "Ticket not found" });
+
+        if (role === 'CUSTOMER' && existing.reporterId?.toString() !== req.user!.userId) {
+            const ticket = await prisma.ticket.findUnique({ where: { ticketCode: code }, select: { reporterId: true, ticketCode: true } });
             if (!ticket || ticket.reporterId?.toString() !== req.user!.userId) {
                 return res.status(403).json({ message: "Forbidden" });
             }
         }
 
         const {
-            ticketCode,
             ticketName,
             ticketDescription,
             startDate,
@@ -229,21 +224,19 @@ export async function updateTicket(req: AuthRequest, res: Response) {
         } = req.body;
 
         const data: any = {};
-        if (ticketCode !== undefined) data.ticketCode = ticketCode;
         if (ticketName !== undefined) data.ticketName = ticketName;
         if (ticketDescription !== undefined) data.ticketDescription = ticketDescription;
         if (startDate !== undefined) data.startDate = startDate;
         if (endDate !== undefined) data.endDate = endDate;
+        if (projectId !== undefined) data.projectId = projectId;
         if (status !== undefined) {
             data.status = status;
-            if (status === "DONE") data.resolvedAt = new Date();
-            if (status !== "DONE") data.resolvedAt = null;
+            data.resolvedAt = status === "DONE" ? new Date() : null
         }
-        if (projectId !== undefined) data.projectId = projectId;
 
         const ticket = await prisma.ticket.update({
             where: {
-                id: ticketId
+                id: existing.id
             },
             data
         });
@@ -262,26 +255,17 @@ export async function updateTicket(req: AuthRequest, res: Response) {
     }
 }
 
-//? delete:/tickets/:id
+//? delete:/tickets/:code
 export async function deleteTicket(req: Request, res: Response) {
     try {
-        const ticketId = BigInt(req.params.id as string)
-        await prisma.ticket.delete({
-            where: {
-                id: ticketId
-            }
-        });
-
+        await prisma.ticket.delete({ where: { ticketCode: req.params.code as string } });
         res.status(204).send();
     } catch (error) {
-        console.error(error)
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            if (error.code === "P2025") {
-                return res.status(404).json({ message: "Ticket not found" });
-            }
+        console.error(error);
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+            return res.status(404).json({ message: 'Ticket not found' });
         }
-        res.status(500).json({
-            message: "Internal Server Error"
-        })
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 }
+

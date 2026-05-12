@@ -10,6 +10,8 @@ import { SelectField, SelectOption } from '../../../components/fields/select-fie
 import { DateField } from '../../../components/fields/date-field/date-field';
 import { TicketService } from '../../../services/ticket.service';
 import { ProjectService } from '../../../services/project.service';
+import { TICKET_CATEGORY_OPTIONS, TICKET_PRIORITY_OPTIONS, TICKET_STATUS_OPTIONS } from '../../../services/constants/ticket.constants';
+import { dateRangeValidator } from '../../../services/ticket.validator';
 
 @Component({
   selector: 'app-new-ticket',
@@ -23,7 +25,6 @@ export class NewTicket implements OnInit {
   private router = inject(Router);
 
   form = new FormGroup({
-    ticketCode: new FormControl('', [Validators.required, Validators.maxLength(20)]),
     ticketName: new FormControl('', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]),
     ticketDescription: new FormControl('', [Validators.maxLength(500)]),
     startDate: new FormControl(''),
@@ -32,38 +33,20 @@ export class NewTicket implements OnInit {
     category: new FormControl(''),
     priority: new FormControl(''),
     projectId: new FormControl(''),
-  });
+  }, { validators: dateRangeValidator });
 
   projects = signal<SelectOption[]>([]);
   errors: Record<string, string[]> = {};
+  isSubmitting = signal(false);
 
-  readonly statusOptions: SelectOption[] = [
-    { value: 'ON_HOLD', label: 'On Hold' },
-    { value: 'ON_APPROVAL', label: 'On Approval' },
-    { value: 'ON_QUEUE', label: 'On Queue' },
-    { value: 'FULFILLMENT', label: 'Fulfillment' },
-    { value: 'APPROVED', label: 'Approved' },
-    { value: 'REJECTED', label: 'Rejected' },
-    { value: 'DONE', label: 'Done' },
-    { value: 'CANCELLED', label: 'Cancelled' },
-  ];
+  readonly statusOptions = TICKET_STATUS_OPTIONS;
 
-  readonly categoryOptions: SelectOption[] = [
-    { value: 'GENERAL', label: 'General' },
-    { value: 'BUG', label: 'Bug' },
-    { value: 'FEATURE', label: 'Feature' },
-    { value: 'SUPPORT', label: 'Support' },
-    { value: 'MAINTENANCE', label: 'Maintenance' },
-  ];
+  readonly categoryOptions = TICKET_CATEGORY_OPTIONS;
 
-  readonly priorityOptions: SelectOption[] = [
-    { value: 'LOW', label: 'Low' },
-    { value: 'MEDIUM', label: 'Medium' },
-    { value: 'HIGH', label: 'High' },
-    { value: 'URGENT', label: 'Urgent' },
-  ];
+  readonly priorityOptions = TICKET_PRIORITY_OPTIONS;
 
   get hasErrors() { return Object.keys(this.errors).length > 0; }
+  get hasDateRangeError() { return this.form.hasError('dateRange'); }
 
   async ngOnInit() {
     try {
@@ -75,12 +58,12 @@ export class NewTicket implements OnInit {
   }
 
   async onSubmit() {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+    if (this.form.invalid || this.isSubmitting()) { this.form.markAllAsTouched(); return; }
+    this.isSubmitting.set(true);
     this.errors = {};
     try {
       const raw = this.form.getRawValue();
       const payload: any = {
-        ticketCode: raw.ticketCode!,
         ticketName: raw.ticketName!,
         ...(raw.ticketDescription && { ticketDescription: raw.ticketDescription }),
         ...(raw.startDate && { startDate: raw.startDate }),
@@ -94,6 +77,8 @@ export class NewTicket implements OnInit {
       this.router.navigate(['/dashboard/tickets', ticket.id]);
     } catch (err: any) {
       this.errors = { api: [err.error?.message || 'Creation failed.'] };
+    } finally {
+      this.isSubmitting.set(false);
     }
   }
 

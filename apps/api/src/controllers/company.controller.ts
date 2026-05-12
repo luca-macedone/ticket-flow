@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../db";
 import { Prisma } from "@prisma/client";
+import { randomUUID } from "crypto";
 
 //? get:/companies
 export async function getCompanies(req: Request, res: Response) {
@@ -22,16 +23,17 @@ export async function getCompanies(req: Request, res: Response) {
     }
 }
 
-//? get:/companies/:id
-export async function getCompanyById(req: Request, res: Response) {
+//? get:/companies/:code
+export async function getCompanyByCode(req: Request, res: Response) {
     try {
-        const companyId = BigInt(req.params.id as string);
+        const code = req.params.code as string;
         const company = await prisma.company.findUnique({
-            where: { id: companyId },
+            where: { companyCode: code },
             include: {
                 projects: {
                     select: {
                         id: true,
+                        projectCode: true,
                         projectName: true,
                         startDate: true,
                         endDate: true,
@@ -62,14 +64,14 @@ export async function getCompanyById(req: Request, res: Response) {
 export async function createCompany(req: Request, res: Response) {
     try {
         const { companyName, nationality, description, referralEmail } = req.body;
-        const company = await prisma.company.create({
-            data: {
-                companyName,
-                nationality,
-                description,
-                referralEmail
-            }
+        const company = await prisma.$transaction(async (tx) => {
+            const temp = await tx.company.create({
+                data: { companyName, nationality, description, referralEmail, companyCode: randomUUID() }
+            });
+            const code = `CMP-${temp.id.toString().padStart(8, '0')}`;
+            return tx.company.update({ where: { id: temp.id }, data: { companyCode: code } });
         });
+
 
         res.status(201).json(company);
     } catch (error) {
@@ -80,10 +82,13 @@ export async function createCompany(req: Request, res: Response) {
     }
 }
 
-//? patch:/companies/:id
+//? patch:/companies/:code
 export async function updateCompany(req: Request, res: Response) {
     try {
-        const companyId = BigInt(req.params.id as string)
+        const code = req.params.code as string;
+        const existing = await prisma.company.findUnique({ where: { companyCode: code } });
+        if (!existing) return res.status(404).json({ message: "Company not found" });
+
         const { companyName, nationality, description, referralEmail } = req.body;
 
         const data: any = {};
@@ -94,7 +99,7 @@ export async function updateCompany(req: Request, res: Response) {
 
         const company = await prisma.company.update({
             where: {
-                id: companyId
+                id: existing.id
             },
             data
         });
@@ -113,13 +118,12 @@ export async function updateCompany(req: Request, res: Response) {
     }
 }
 
-//? delete:/companies/:id
+//? delete:/companies/:code
 export async function deleteCompany(req: Request, res: Response) {
     try {
-        const companyId = BigInt(req.params.id as string)
         await prisma.company.delete({
             where: {
-                id: companyId
+                companyCode: req.params.code as string
             }
         });
 

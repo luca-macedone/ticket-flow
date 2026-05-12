@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createProject, deleteProject, getProjectById, getProjects, updateProject } from "../controllers/project.controller";
+import { createProject, deleteProject, getProjectByCode, getProjects, updateProject } from "../controllers/project.controller";
 import { zodValidate } from "../middlewares/zodValidate";
 import { CreateProjectSchema, UpdateProjectSchema } from "@packages/shared";
 import { requireAuth } from "../middlewares/requireAuth";
@@ -14,10 +14,10 @@ router.get(
     getProjects
 );
 router.get(
-    "/:id",
+    "/:code",
     requireAuth,
     requireRole("CUSTOMER"),
-    getProjectById
+    getProjectByCode
 );
 router.post(
     "/",
@@ -27,14 +27,14 @@ router.post(
     createProject
 );
 router.patch(
-    "/:id",
+    "/:code",
     requireAuth,
     requireRole("ADMIN"),
     zodValidate(UpdateProjectSchema),
     updateProject
 );
 router.delete(
-    "/:id",
+    "/:code",
     requireAuth,
     requireRole("ADMIN"),
     deleteProject

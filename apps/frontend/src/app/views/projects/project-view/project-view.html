@@ -38,7 +38,7 @@
             <app-base-card title="users">
                 <app-data-table [columns]="userColumns" [rows]="pagedUsers()" [total]="(project()!.users?.length ?? 0)"
                     [page]="userPage()" [pageSize]="pageSize" emptyMessage="No users assigned."
-                    (pageChange)="userPage.set($event)" variant="opposite">
+                    (pageChange)="userPage.set($event)" (rowClick)="viewUser($event)" variant="opposite">
                 </app-data-table>
             </app-base-card>
             }

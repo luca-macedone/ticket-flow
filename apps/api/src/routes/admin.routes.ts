@@ -7,7 +7,7 @@ import { getAdminOverview } from "../controllers/overview.controller";
 const router = Router();
 
 router.patch(
-    "/admin/users/:id/approve",
+    "/admin/users/:code/approve",
     requireAuth,
     requireRole("ADMIN"),
     approveUser

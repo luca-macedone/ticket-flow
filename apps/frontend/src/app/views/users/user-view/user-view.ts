@@ -7,14 +7,16 @@ import { BaseCard } from "../../../components/overview-cards/base-card/base-card
 import { DatePipe } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
 
-type TicketRow = { id: string; ticketName: string; status: string };
-type ProjectRow = { id: string; projectName: string };
+type TicketRow = { id: string; ticketCode: string; ticketName: string; status: string };
+type ProjectRow = { id: string; projectCode: string; projectName: string };
 
 const PROJECT_COLUMNS: TableColumn<ProjectRow>[] = [
+  { key: 'projectCode', label: 'Code', getValue: (p) => p.projectCode, cellClass: 'font-font-mono text-xs text-text/50' },
   { key: 'projectName', label: 'Name', getValue: (p) => p.projectName, cellClass: 'font-medium' },
 ];
 
 const TICKET_COLUMNS: TableColumn<TicketRow>[] = [
+  { key: 'ticketCode', label: 'Code', getValue: (t) => t.ticketCode, cellClass: 'font-font-mono text-xs text-text/50' },
   { key: 'ticketName', label: 'Ticket', getValue: (t) => t.ticketName, cellClass: 'font-medium' },
   { key: 'status', label: 'Status', getValue: (t) => t.status, cellClass: 'text-text/70' },
 ];
@@ -48,10 +50,10 @@ export class UserView implements OnInit {
 
   async ngOnInit() {
     this.route.paramMap.subscribe(async params => {
-      const id = params.get('id');
+      const code = params.get('code');
       try {
         this.loading.set(true);
-        const data = await firstValueFrom(this.userService.getUserById(id!));
+        const data = await firstValueFrom(this.userService.getUserByCode(code!));
         this.user.set(data);
       } catch (error) {
         this.error.set('User not found.');
@@ -62,7 +64,7 @@ export class UserView implements OnInit {
   }
 
   editUser() {
-    this.router.navigate(['/dashboard/users/', this.user()!.id, 'edit']);
+    this.router.navigate(['/dashboard/users/', this.user()!.userCode, 'edit']);
   }
 
   pagedProjects = computed(() => {
@@ -82,10 +84,10 @@ export class UserView implements OnInit {
   });
 
   viewProject(p: ProjectRow) {
-    this.router.navigate(['/dashboard/projects/', p.id]);
+    this.router.navigate(['/dashboard/projects/', p.projectCode]);
   }
 
   viewTicket(t: TicketRow) {
-    this.router.navigate(['/dashboard/tickets', t.id]);
+    this.router.navigate(['/dashboard/tickets', t.ticketCode]);
   }
 }

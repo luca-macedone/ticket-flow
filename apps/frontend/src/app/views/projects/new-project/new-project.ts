@@ -56,7 +56,7 @@ export class NewProject implements OnInit {
     this.errors = {};
     try {
       const project = await firstValueFrom(this.projectService.createProject(this.form.getRawValue() as any));
-      this.router.navigate(['/dashboard/projects', project.id]);
+      this.router.navigate(['/dashboard/projects', project.projectCode]);
     } catch (err: any) {
       this.errors = { api: [err.error?.message || 'Creation failed.'] };
     }

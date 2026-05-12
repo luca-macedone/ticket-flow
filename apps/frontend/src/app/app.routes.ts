@@ -73,7 +73,7 @@ export const routes: Routes = [
                         }
                     },
                     {
-                        path: ':id',
+                        path: ':code',
                         component: TicketView,
                         canActivate: [roleGuard],
                         data: {
@@ -82,7 +82,7 @@ export const routes: Routes = [
                         }
                     },
                     {
-                        path: ':id/edit',
+                        path: ':code/edit',
                         component: EditTicket,
                         canActivate: [roleGuard],
                         data: {
@@ -114,7 +114,7 @@ export const routes: Routes = [
                         }
                     },
                     {
-                        path: ':id',
+                        path: ':code',
                         component: ProjectView,
                         canActivate: [roleGuard],
                         data: {
@@ -123,7 +123,7 @@ export const routes: Routes = [
                         }
                     },
                     {
-                        path: ':id/edit',
+                        path: ':code/edit',
                         component: EditProject,
                         canActivate: [roleGuard],
                         data: {
@@ -155,7 +155,7 @@ export const routes: Routes = [
                         }
                     },
                     {
-                        path: ':id',
+                        path: ':code',
                         component: CompanyView,
                         canActivate: [roleGuard],
                         data: {
@@ -164,7 +164,7 @@ export const routes: Routes = [
                         }
                     },
                     {
-                        path: ':id/edit',
+                        path: ':code/edit',
                         component: EditCompany,
                         canActivate: [roleGuard],
                         data: {
@@ -196,7 +196,7 @@ export const routes: Routes = [
                         }
                     },
                     {
-                        path: ':id',
+                        path: ':code',
                         component: UserView,
                         canActivate: [roleGuard],
                         data: {
@@ -205,7 +205,7 @@ export const routes: Routes = [
                         }
                     },
                     {
-                        path: ':id/edit',
+                        path: ':code/edit',
                         component: EditUser,
                         canActivate: [roleGuard],
                         data: {

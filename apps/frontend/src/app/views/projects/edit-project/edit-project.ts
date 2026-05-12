@@ -23,7 +23,8 @@ export class EditProject implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
-  private id!: string;
+  private code!: string;
+  displayCode = signal("");
   companies = signal<SelectOption[]>([]);
   loading = signal(true);
   errors: Record<string, string[]> = {};
@@ -43,11 +44,11 @@ export class EditProject implements OnInit {
   }
 
   async ngOnInit() {
-    this.id = this.route.snapshot.paramMap.get('id')!;
+    this.code = this.route.snapshot.paramMap.get('code')!;
     try {
       const companyData = await firstValueFrom(this.companyService.getCompanies(1, 100));
       this.companies.set(companyData.map((c: any) => ({ value: c.id, label: c.companyName })));
-      const project = await firstValueFrom(this.projectService.getProjectById(this.id));
+      const project = await firstValueFrom(this.projectService.getProjectByCode(this.code));
       this.form.patchValue({
         projectName: project.projectName,
         description: project.description,
@@ -55,6 +56,7 @@ export class EditProject implements OnInit {
         endDate: this.toDateInput(project.endDate),
         companyId: project.companyId,
       });
+      this.displayCode.set(project.projectCode ?? '');
     } catch (err) {
       this.errors = { api: ['Project not found.'] };
     } finally {
@@ -69,15 +71,15 @@ export class EditProject implements OnInit {
     }
     this.errors = {};
     try {
-      await firstValueFrom(this.projectService.updateProject(this.id, this.form.getRawValue() as any));
-      this.router.navigate(['/dashboard/projects', this.id]);
+      await firstValueFrom(this.projectService.updateProject(this.code, this.form.getRawValue() as any));
+      this.router.navigate(['/dashboard/projects', this.code]);
     } catch (err: any) {
       this.errors = { api: [err.error?.message || 'Update failed.'] };
     }
   }
 
   cancel() {
-    this.router.navigate(['/dashboard/projects', this.id]);
+    this.router.navigate(['/dashboard/projects', this.code]);
   }
 
   reset() {

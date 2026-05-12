@@ -3,7 +3,7 @@ import { StatusEnum, TicketCategoryEnum, PriorityEnum } from "./enums.js";
 import { idSchema, isoDate } from "./common.schema.js";
 
 export const TicketShape = z.object({
-    ticketCode: z.string().trim().min(3).max(20),
+    ticketCode: z.string().trim().regex(/^TF-\d{8}$/, 'Invalid ticket code format'),
     ticketName: z.string().trim().min(2).max(100),
     ticketDescription: z.string().trim().max(500).optional().nullable(),
     startDate: isoDate.optional().nullable(),
@@ -15,12 +15,14 @@ export const TicketShape = z.object({
     assigneeId: idSchema.optional().nullable(),
 });
 
-export const CreateTicketSchema = TicketShape.refine(
+const TicketWriteShape = TicketShape.omit({ ticketCode: true });
+
+export const CreateTicketSchema = TicketWriteShape.refine(
     d => !d.startDate || !d.endDate || new Date(d.endDate) >= new Date(d.startDate),
     { path: ["endDate"], message: "endDate must be after startDate" }
 );
 
-export const UpdateTicketSchema = TicketShape
+export const UpdateTicketSchema = TicketWriteShape
     .partial()
     .refine(
         d => !d.startDate || !d.endDate || new Date(d.endDate) >= new Date(d.startDate),

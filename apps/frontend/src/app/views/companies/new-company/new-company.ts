@@ -40,7 +40,7 @@ export class NewCompany {
     this.errors = {};
     try {
       const company = await firstValueFrom(this.companyService.createCompany(this.form.getRawValue() as any));
-      this.router.navigate(['/dashboard/companies', company.id]);
+      this.router.navigate(['/dashboard/companies', company.companyCode]);
     } catch (err: any) {
       this.errors = { api: [err.error?.message || 'Creation failed.'] };
     }

@@ -87,7 +87,7 @@ export class TicketsList implements OnInit {
 
 
   viewTicket(ticket: Ticket) {
-    this.router.navigate(['/dashboard/tickets', ticket.id]);
+    this.router.navigate(['/dashboard/tickets', ticket.ticketCode]);
   }
 
   newTicket() {

@@ -10,6 +10,8 @@ import { SelectField, SelectOption } from '../../../components/fields/select-fie
 import { DateField } from '../../../components/fields/date-field/date-field';
 import { TicketService } from '../../../services/ticket.service';
 import { ProjectService } from '../../../services/project.service';
+import { TICKET_CATEGORY_OPTIONS, TICKET_PRIORITY_OPTIONS, TICKET_STATUS_OPTIONS } from '../../../services/constants/ticket.constants';
+import { dateRangeValidator } from '../../../services/ticket.validator';
 
 @Component({
   selector: 'app-edit-ticket',
@@ -23,10 +25,12 @@ export class EditTicket implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
-  private id!: string;
+  private code!: string;
   projects = signal<SelectOption[]>([]);
   loading = signal(true);
   errors: Record<string, string[]> = {};
+  isSubmitting = signal(false);
+  displayCode = signal('');
 
   form = new FormGroup({
     ticketCode: new FormControl('', [Validators.required, Validators.maxLength(20)]),
@@ -38,23 +42,25 @@ export class EditTicket implements OnInit {
     category: new FormControl(''),
     priority: new FormControl(''),
     projectId: new FormControl(''),
-  });
+  }, { validators: dateRangeValidator });
 
-  // stesse opzioni di new-ticket (duplicazione intenzionale — no shared state)
-  readonly statusOptions: SelectOption[] = [ /* ...stesso array... */];
-  readonly categoryOptions: SelectOption[] = [ /* ...stesso array... */];
-  readonly priorityOptions: SelectOption[] = [ /* ...stesso array... */];
+  readonly statusOptions = TICKET_STATUS_OPTIONS;
+
+  readonly categoryOptions = TICKET_CATEGORY_OPTIONS;
+
+  readonly priorityOptions = TICKET_PRIORITY_OPTIONS;
 
   toDateInput = (val: string | null | undefined) => val?.substring(0, 10) ?? '';
 
   get hasErrors() { return Object.keys(this.errors).length > 0; }
+  get hasDateRangeError() { return this.form.hasError('dateRange'); }
 
   async ngOnInit() {
-    this.id = this.route.snapshot.paramMap.get('id')!;
+    this.code = this.route.snapshot.paramMap.get('code')!;
     try {
       const [projectData, ticket] = await Promise.all([
         firstValueFrom(this.projectService.getProjects(1, 100)),
-        firstValueFrom(this.ticketService.getById(this.id)),
+        firstValueFrom(this.ticketService.getByCode(this.code)),
       ]);
       this.projects.set(projectData.map(p => ({ value: p.id, label: p.projectName })));
       this.form.patchValue({
@@ -68,6 +74,7 @@ export class EditTicket implements OnInit {
         priority: ticket.priority,
         projectId: ticket.projectId ?? '',
       });
+      this.displayCode.set(this.code);
     } catch {
       this.errors = { api: ['Failed to load ticket.'] };
     } finally {
@@ -76,17 +83,20 @@ export class EditTicket implements OnInit {
   }
 
   async onSubmit() {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+    if (this.form.invalid || this.isSubmitting()) { this.form.markAllAsTouched(); return; }
     this.errors = {};
+    this.isSubmitting.set(true);
     try {
       const raw = this.form.getRawValue();
-      await firstValueFrom(this.ticketService.update(this.id, raw as any));
-      this.router.navigate(['/dashboard/tickets', this.id]);
+      await firstValueFrom(this.ticketService.update(this.code, raw as any));
+      this.router.navigate(['/dashboard/tickets', this.code]);
     } catch (err: any) {
       this.errors = { api: [err.error?.message || 'Update failed.'] };
+    } finally {
+      this.isSubmitting.set(false);
     }
   }
 
-  cancel() { this.router.navigate(['/dashboard/tickets', this.id]); }
+  cancel() { this.router.navigate(['/dashboard/tickets', this.code]); }
   reset() { this.form.reset(); this.errors = {}; }
 }

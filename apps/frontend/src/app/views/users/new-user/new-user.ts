@@ -38,7 +38,7 @@ export class NewUser {
     this.errors = {};
     try {
       const user = await firstValueFrom(this.userService.createUser(this.form.getRawValue() as any));
-      this.router.navigate(['/dashboard/users', user.id]);
+      this.router.navigate(['/dashboard/users', user.userCode]);
     } catch (err: any) {
       this.errors = { api: [err.error?.message || 'Creation failed.'] };
     }

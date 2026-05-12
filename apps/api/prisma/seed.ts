@@ -1,6 +1,7 @@
 import { Priority, PrismaClient, Status, TicketCategory } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
+import { randomUUID } from "crypto";
 
 const adapter = new PrismaMariaDb({
     host: process.env.DB_HOST,
@@ -198,7 +199,7 @@ function makeTicket(
 
     const ticketName = rng.pick(POOL[category]) as string;
     const ticketDescription = (rng.pick(DESC[category]) as string) + ` [${ticketName.slice(0, 40)}]`;
-    const ticketCode = `TF-${String(n).padStart(5, "0")}`;
+    const ticketCode = randomUUID();
 
     const resolved = status === "DONE" || status === "CANCELLED" || status === "REJECTED";
     const active = status === "FULFILLMENT" || status === "APPROVED" || status === "ON_APPROVAL";
@@ -286,6 +287,10 @@ async function main() {
         create: { email: "pending.user@example.com", name: "Mario Verdi", pswHash: userHash, role: "CUSTOMER", status: "PENDING_APPROVAL" },
     });
 
+    await prisma.$executeRaw`UPDATE \`User\` SET userCode = CONCAT('USR-', LPAD(CAST(id AS CHAR), 8, '0')) WHERE userCode IS NULL`;
+    await prisma.$executeRaw`UPDATE Company SET companyCode = CONCAT('CMP-', LPAD(CAST(id AS CHAR), 8, '0')) WHERE companyCode IS NULL`;
+    await prisma.$executeRaw`UPDATE Project SET projectCode = CONCAT('PRJ-', LPAD(CAST(id AS CHAR), 8, '0')) WHERE projectCode IS NULL`;
+
     const ticketCount = await prisma.ticket.count();
     if (ticketCount < 100) {
         console.log("Generating bulk data...");
@@ -339,6 +344,11 @@ async function main() {
 
         console.log(`Inserting ${allTickets.length} tickets...`);
         await batchInsert(allTickets);
+
+        console.log('Assigning ticket codes from IDs...');
+        await prisma.$executeRaw`
+            UPDATE Ticket SET ticketCode = CONCAT('TF-', LPAD(CAST(id AS CHAR), 8, '0'))
+        `;
     }
 
     console.log("Seed completed.");

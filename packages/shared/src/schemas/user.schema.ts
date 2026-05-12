@@ -43,6 +43,7 @@ export const UpdateUserSchema = z.object({
 
 export const UserResponseSchema = UserBaseSchema.extend({
     id: z.string(),
+    userCode: z.string().optional().nullable(),
     email: z.string().trim().email(),
     name: z.string().trim().min(2).max(100),
     role: RoleEnum,

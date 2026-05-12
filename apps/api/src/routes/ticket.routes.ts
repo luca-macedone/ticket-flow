@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createTicket, deleteTicket, getMyQueue, getMyTickets, getTicketById, getTickets, updateTicket } from "../controllers/ticket.controller";
+import { createTicket, deleteTicket, getMyQueue, getMyTickets, getTicketByCode, getTickets, updateTicket } from "../controllers/ticket.controller";
 import { zodValidate } from "../middlewares/zodValidate";
 import { CreateTicketSchema, UpdateTicketSchema } from "@packages/shared";
 import { requireAuth } from "../middlewares/requireAuth";
@@ -27,10 +27,10 @@ router.get(
     getMyTickets
 );
 router.get(
-    "/:id",
+    "/:code",
     requireAuth,
     requireRole("CUSTOMER"),
-    getTicketById
+    getTicketByCode
 );
 router.post(
     "/",
@@ -40,14 +40,14 @@ router.post(
     createTicket
 );
 router.patch(
-    "/:id",
+    "/:code",
     requireAuth,
     requireRole("CUSTOMER"),
     zodValidate(UpdateTicketSchema),
     updateTicket
 );
 router.delete(
-    "/:id",
+    "/:code",
     requireAuth,
     requireRole("ADMIN"),
     deleteTicket

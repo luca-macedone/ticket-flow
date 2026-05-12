@@ -6,15 +6,16 @@ export type UserStatus = 'PENDING_APPROVAL' | 'APPROVED' | 'REJECTED' | 'SUSPEND
 
 export interface AdminUser {
   id: string;
+  userCode: string | null;
   name: string;
   email: string;
   role: UserRole;
   status: UserStatus;
   createdAt: string;
   updatedAt: string;
-  projects?: { id: string; projectName: string }[];
-  assignedTickets?: { id: string; ticketName: string; status: string }[];
-  reportedTickets?: { id: string; ticketName: string; status: string }[];
+  projects?: { id: string; projectCode: string; projectName: string }[];
+  assignedTickets?: { id: string; ticketCode: string; ticketName: string; status: string }[];
+  reportedTickets?: { id: string; ticketCode: string; ticketName: string; status: string }[];
 }
 
 export interface CreateUserPayload {
@@ -41,8 +42,8 @@ export class UserService {
     });
   }
 
-  getUserById(id: string) {
-    return this.http.get<AdminUser>(`/api/users/${id}`, {
+  getUserByCode(code: string) {
+    return this.http.get<AdminUser>(`/api/users/${code}`, {
       withCredentials: true,
     });
   }
@@ -53,21 +54,21 @@ export class UserService {
     });
   }
 
-  updateUser(id: string, payload: UpdateUserPayload) {
-    return this.http.patch<AdminUser>(`/api/users/${id}`, payload, {
+  updateUser(code: string, payload: UpdateUserPayload) {
+    return this.http.patch<AdminUser>(`/api/users/${code}`, payload, {
       withCredentials: true,
     });
   }
 
-  deleteUser(id: string) {
-    return this.http.delete<void>(`/api/users/${id}`, {
+  deleteUser(code: string) {
+    return this.http.delete<void>(`/api/users/${code}`, {
       withCredentials: true,
     });
   }
 
-  approveUser(id: string, role?: UserRole) {
+  approveUser(code: string, role?: UserRole) {
     return this.http.patch<AdminUser>(
-      `/api/admin/users/${id}/approve`,
+      `/api/admin/users/${code}/approve`,
       role ? { role } : {},
       { withCredentials: true }
     );

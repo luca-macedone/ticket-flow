@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 
 export interface Project {
   id: string;
+  projectCode: string | null;
   projectName: string;
   description: string | null;
   startDate: string;
@@ -17,11 +18,13 @@ export interface Project {
   };
   users?: {
     id: string;
+    userCode: string;
     name: string;
     email: string;
   }[];
   tickets?: {
     id: string;
+    ticketCode: string;
     ticketName: string;
     status: string;
   }[];
@@ -48,8 +51,8 @@ export class ProjectService {
     });
   }
 
-  getProjectById(id: string) {
-    return this.http.get<Project>(`/api/projects/${id}`, {
+  getProjectByCode(code: string) {
+    return this.http.get<Project>(`/api/projects/${code}`, {
       withCredentials: true,
     });
   }
@@ -60,14 +63,14 @@ export class ProjectService {
     });
   }
 
-  updateProject(id: string, payload: UpdateProjectPayload) {
-    return this.http.patch<Project>(`/api/projects/${id}`, payload, {
+  updateProject(code: string, payload: UpdateProjectPayload) {
+    return this.http.patch<Project>(`/api/projects/${code}`, payload, {
       withCredentials: true,
     });
   }
 
-  deleteProject(id: string) {
-    return this.http.delete<void>(`/api/projects/${id}`, {
+  deleteProject(code: string) {
+    return this.http.delete<void>(`/api/projects/${code}`, {
       withCredentials: true,
     });
   }

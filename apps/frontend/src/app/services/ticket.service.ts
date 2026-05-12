@@ -27,7 +27,6 @@ export interface Ticket {
 }
 
 export interface CreateTicketPayload {
-  ticketCode: string;
   ticketName: string;
   ticketDescription?: string;
   startDate?: string;
@@ -79,8 +78,8 @@ export class TicketService {
     });
   }
 
-  getById(id: string) {
-    return this.http.get<Ticket>(`/api/tickets/${id}`, {
+  getByCode(code: string) {
+    return this.http.get<Ticket>(`/api/tickets/${code}`, {
       withCredentials: true,
     });
   }
@@ -91,14 +90,14 @@ export class TicketService {
     });
   }
 
-  update(id: string, payload: UpdateTicketPayload) {
-    return this.http.patch<Ticket>(`/api/tickets/${id}`, payload, {
+  update(code: string, payload: UpdateTicketPayload) {
+    return this.http.patch<Ticket>(`/api/tickets/${code}`, payload, {
       withCredentials: true,
     });
   }
 
-  delete(id: string) {
-    return this.http.delete<void>(`/api/tickets/${id}`, {
+  delete(code: string) {
+    return this.http.delete<void>(`/api/tickets/${code}`, {
       withCredentials: true,
     });
   }

@@ -19,9 +19,10 @@ export class EditCompany implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
-  private id!: string;
+  private code!: string;
   loading = signal(true);
   errors: Record<string, string[]> = {};
+  displayCode = signal("");
 
   form = new FormGroup({
     companyName: new FormControl('', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]),
@@ -35,15 +36,16 @@ export class EditCompany implements OnInit {
   }
 
   async ngOnInit() {
-    this.id = this.route.snapshot.paramMap.get('id')!;
+    this.code = this.route.snapshot.paramMap.get('code')!;
     try {
-      const company = await firstValueFrom(this.companyService.getCompanyById(this.id));
+      const company = await firstValueFrom(this.companyService.getCompanyByCode(this.code));
       this.form.patchValue({
         companyName: company.companyName,
         nationality: company.nationality,
         referralEmail: company.referralEmail,
         description: company.description,
       });
+      this.displayCode.set(company.companyCode ?? '')
     } catch (err) {
       this.errors = { api: ['Company not found.'] };
     } finally {
@@ -58,15 +60,15 @@ export class EditCompany implements OnInit {
     }
     this.errors = {};
     try {
-      await firstValueFrom(this.companyService.updateCompany(this.id, this.form.getRawValue() as any));
-      this.router.navigate(['/dashboard/companies', this.id]);
+      await firstValueFrom(this.companyService.updateCompany(this.code, this.form.getRawValue() as any));
+      this.router.navigate(['/dashboard/companies', this.code]);
     } catch (err: any) {
       this.errors = { api: ['Update failed.'] };
     }
   }
 
   cancel() {
-    this.router.navigate(['/dashboard/companies', this.id]);
+    this.router.navigate(['/dashboard/companies', this.code]);
   }
 
   reset() {

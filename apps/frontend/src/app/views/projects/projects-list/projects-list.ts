@@ -6,6 +6,7 @@ import { DataTable, TableColumn } from '../../../components/tables/ticket-table/
 import { AuthService } from '../../../services/auth.service';
 
 const COLUMNS: TableColumn<Project>[] = [
+  { key: 'projectCode', label: 'Code', getValue: (p) => p.projectCode as string, cellClass: 'font-mono text-xs text-text/50' },
   { key: 'projectName', label: 'Name', getValue: (p) => p.projectName, cellClass: 'font-medium' },
   { key: 'description', label: 'Description', getValue: (p) => p.description ?? '—', cellClass: 'text-text/70' },
   { key: 'startDate', label: 'Registered', getValue: (p) => new Date(p.startDate).toLocaleDateString('it-IT') },
@@ -41,7 +42,7 @@ export class ProjectsList {
   }
 
   viewProject(project: Project) {
-    this.router.navigate(['/dashboard/projects', project.id]);
+    this.router.navigate(['/dashboard/projects', project.projectCode]);
   }
 
   newProject() {

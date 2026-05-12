@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 
 export interface Company {
   id: string;
+  companyCode: string | null;
   companyName: string;
   nationality: string;
   description: string | null;
@@ -11,6 +12,7 @@ export interface Company {
   updatedAt: string;
   projects?: {
     id: string;
+    projectCode: string;
     projectName: string;
     startDate: string;
     endDate: string | null;
@@ -37,8 +39,8 @@ export class CompanyService {
     });
   }
 
-  getCompanyById(id: string) {
-    return this.http.get<Company>(`/api/companies/${id}`, {
+  getCompanyByCode(code: string) {
+    return this.http.get<Company>(`/api/companies/${code}`, {
       withCredentials: true,
     });
   }
@@ -49,14 +51,14 @@ export class CompanyService {
     });
   }
 
-  updateCompany(id: string, payload: UpdateCompanyPayload) {
-    return this.http.patch<Company>(`/api/companies/${id}`, payload, {
+  updateCompany(code: string, payload: UpdateCompanyPayload) {
+    return this.http.patch<Company>(`/api/companies/${code}`, payload, {
       withCredentials: true,
     });
   }
 
-  deleteCompany(id: string) {
-    return this.http.delete<void>(`/api/companies/${id}`, {
+  deleteCompany(code: string) {
+    return this.http.delete<void>(`/api/companies/${code}`, {
       withCredentials: true,
     });
   }

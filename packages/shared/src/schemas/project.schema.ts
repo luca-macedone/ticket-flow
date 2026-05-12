@@ -36,6 +36,7 @@ export const UpdateProjectSchema = ProjectShape
 export const ProjectResponseSchema = ProjectShape
     .extend({
         id: z.string(),
+        projectCode: z.string().optional().nullable(),
         createdAt: z.string().datetime(),
         updatedAt: z.string().datetime(),
     });

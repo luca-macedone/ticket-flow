@@ -13,6 +13,7 @@ export const UpdateCompanySchema = CompanyBaseSchema.partial();
 
 export const CompanyResponseSchema = CompanyBaseSchema.extend({
     id: z.string(),
+    companyCode: z.string().optional().nullable(),
     createdAt: z.string().datetime(),
     updatedAt: z.string().datetime(),
 });
