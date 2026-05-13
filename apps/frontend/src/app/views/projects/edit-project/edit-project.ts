@@ -10,6 +10,8 @@ import { BaseCard } from '../../../components/overview-cards/base-card/base-card
 import { DateField } from "../../../components/fields/date-field/date-field";
 import { SelectField, SelectOption } from "../../../components/fields/select-field/select-field";
 import { CompanyService } from '../../../services/company.service';
+import { ToastService } from '../../../components/toast/toast-service';
+import { toISODate } from '../../../utils/zod-form.utils';
 
 @Component({
   selector: 'app-edit-project',
@@ -22,12 +24,14 @@ export class EditProject implements OnInit {
   private companyService = inject(CompanyService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private toast = inject(ToastService);
 
   private code!: string;
   displayCode = signal("");
   companies = signal<SelectOption[]>([]);
   loading = signal(true);
   errors: Record<string, string[]> = {};
+  isSubmitting = signal(false);
 
   form = new FormGroup({
     projectName: new FormControl('', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]),
@@ -58,24 +62,38 @@ export class EditProject implements OnInit {
       });
       this.displayCode.set(project.projectCode ?? '');
     } catch (err) {
-      this.errors = { api: ['Project not found.'] };
+      this.toast.error('Project not found.');
     } finally {
       this.loading.set(false);
     }
   }
 
   async submit() {
-    if (this.form.invalid) {
+    if (this.form.invalid || this.isSubmitting()) {
       this.form.markAllAsTouched();
       return;
     }
+    this.isSubmitting.set(true);
     this.errors = {};
     try {
-      await firstValueFrom(this.projectService.updateProject(this.code, this.form.getRawValue() as any));
+      await firstValueFrom(this.projectService.updateProject(this.code, {
+        ...this.form.getRawValue() as any,
+        startDate: toISODate(this.form.getRawValue().startDate),
+        endDate: toISODate(this.form.getRawValue().endDate) ?? null,
+      }));
+      this.toast.success('Project updated.')
       this.router.navigate(['/dashboard/projects', this.code]);
     } catch (err: any) {
-      this.errors = { api: [err.error?.message || 'Update failed.'] };
+      const fieldErrors = err.error?.errors?.fieldErrors;
+      if (fieldErrors && Object.keys(fieldErrors).length > 0) {
+        this.errors = fieldErrors;
+      } else {
+        this.toast.error(err.error?.message || 'Patch failed.');
+      }
+    } finally {
+      this.isSubmitting.set(false);
     }
+
   }
 
   cancel() {

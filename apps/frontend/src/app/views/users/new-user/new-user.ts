@@ -7,6 +7,7 @@ import { InputField } from '../../../components/fields/input-field/input-field';
 import { SelectField } from '../../../components/fields/select-field/select-field';
 import { KeyValuePipe } from '@angular/common';
 import { BaseCard } from '../../../components/overview-cards/base-card/base-card';
+import { ToastService } from '../../../components/toast/toast-service';
 
 @Component({
   selector: 'app-new-user',
@@ -16,6 +17,7 @@ import { BaseCard } from '../../../components/overview-cards/base-card/base-card
 export class NewUser {
   private userService = inject(UserService);
   private router = inject(Router);
+  private toast = inject(ToastService);
 
   readonly roleOptions = [
     { value: 'CUSTOMER', label: 'Customer' },
@@ -40,8 +42,14 @@ export class NewUser {
       const user = await firstValueFrom(this.userService.createUser(this.form.getRawValue() as any));
       this.router.navigate(['/dashboard/users', user.userCode]);
     } catch (err: any) {
-      this.errors = { api: [err.error?.message || 'Creation failed.'] };
+      const fieldErrors = err.error?.errors?.fieldErrors;
+      if (fieldErrors && Object.keys(fieldErrors).length > 0) {
+        this.errors = fieldErrors;
+      } else {
+        this.toast.error(err.error?.message || 'Creation failed.');
+      }
     }
+
   }
 
   cancel() { this.router.navigate(['/dashboard/users']); }

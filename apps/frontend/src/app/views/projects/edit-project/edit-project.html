@@ -46,8 +46,8 @@
                         class="border border-secondary/40 bg-secondary/30 text-text px-[40px] py-2 rounded-full font-body text-base hover:opacity-90 transition-all ease-in capitalize backdrop-blur-xl"
                         (click)="reset()">Reset</button>
                     <button type="submit"
-                        class="border border-accent/40 bg-accent/30 text-text px-[40px] py-2 rounded-full font-body text-base hover:opacity-90 transition-all ease-in capitalize backdrop-blur-xl">Update
-                        Project</button>
+                        class="border border-accent/40 bg-accent/30 text-text px-[40px] py-2 rounded-full font-body text-base hover:opacity-90 transition-all ease-in capitalize backdrop-blur-xl"
+                        [disabled]="isSubmitting()">{{isSubmitting() ? 'Saving...' : 'Update project'}}</button>
                 </div>
             </div>
         </form>

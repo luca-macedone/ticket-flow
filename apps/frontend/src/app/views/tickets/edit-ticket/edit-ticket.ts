@@ -13,6 +13,8 @@ import { ProjectService } from '../../../services/project.service';
 import { TICKET_CATEGORY_OPTIONS, TICKET_PRIORITY_OPTIONS, TICKET_STATUS_OPTIONS } from '../../../services/constants/ticket.constants';
 import { dateRangeValidator } from '../../../services/ticket.validator';
 import { SkeletonBlock } from "../../../components/skeleton/skeleton-block/skeleton-block";
+import { ToastService } from '../../../components/toast/toast-service';
+import { toISODate } from '../../../utils/zod-form.utils';
 
 @Component({
   selector: 'app-edit-ticket',
@@ -25,6 +27,7 @@ export class EditTicket implements OnInit {
   private projectService = inject(ProjectService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private toast = inject(ToastService);
 
   private code!: string;
   projects = signal<SelectOption[]>([]);
@@ -77,7 +80,7 @@ export class EditTicket implements OnInit {
       });
       this.displayCode.set(this.code);
     } catch {
-      this.errors = { api: ['Failed to load ticket.'] };
+      this.toast.error('Failed to laod projects.')
     } finally {
       this.loading.set(false);
     }
@@ -89,11 +92,22 @@ export class EditTicket implements OnInit {
     this.isSubmitting.set(true);
     try {
       const raw = this.form.getRawValue();
-      await firstValueFrom(this.ticketService.update(this.code, raw as any));
+      await firstValueFrom(this.ticketService.update(this.code, {
+        ...raw as any,
+        startDate: toISODate(raw.startDate),
+        endDate: toISODate(raw.endDate) ?? null,
+      }));
+      this.toast.success('Ticket updated.')
       this.router.navigate(['/dashboard/tickets', this.code]);
     } catch (err: any) {
-      this.errors = { api: [err.error?.message || 'Update failed.'] };
-    } finally {
+      const fieldErrors = err.error?.errors?.fieldErrors;
+      if (fieldErrors && Object.keys(fieldErrors).length > 0) {
+        this.errors = fieldErrors;
+      } else {
+        this.toast.error(err.error?.message || 'Patch failed.');
+      }
+    }
+    finally {
       this.isSubmitting.set(false);
     }
   }

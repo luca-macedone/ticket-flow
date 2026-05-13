@@ -10,6 +10,8 @@ import { BaseCard } from '../../../components/overview-cards/base-card/base-card
 import { DateField } from "../../../components/fields/date-field/date-field";
 import { CompanyService } from '../../../services/company.service';
 import { SelectOption, SelectField } from '../../../components/fields/select-field/select-field';
+import { ToastService } from '../../../components/toast/toast-service';
+import { toISODate } from '../../../utils/zod-form.utils';
 
 @Component({
   selector: 'app-new-project',
@@ -21,6 +23,7 @@ export class NewProject implements OnInit {
   private projectService = inject(ProjectService);
   private companyService = inject(CompanyService);
   private router = inject(Router);
+  private toast = inject(ToastService);
 
   form = new FormGroup({
     projectName: new FormControl('', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]),
@@ -32,6 +35,7 @@ export class NewProject implements OnInit {
 
   companies = signal<SelectOption[]>([]);
   errors: Record<string, string[]> = {};
+  isSubmitting = signal(false);
 
   get hasErrors() {
     return Object.keys(this.errors).length > 0;
@@ -41,24 +45,35 @@ export class NewProject implements OnInit {
     try {
       const companyData = await firstValueFrom(this.companyService.getCompanies(1, 100));
       this.companies.set(companyData.map((c: any) => ({ value: c.id, label: c.companyName })));
-
     } catch (err) {
-      this.errors = { api: ['Failed to load companies.'] };
+      this.toast.error('Failed to load companies.');
     }
   }
 
   async onSubmit() {
-    if (this.form.invalid) {
+    if (this.form.invalid || this.isSubmitting()) {
       this.form.markAllAsTouched();
       return;
     }
-
+    this.isSubmitting.set(true);
     this.errors = {};
     try {
-      const project = await firstValueFrom(this.projectService.createProject(this.form.getRawValue() as any));
+      const project = await firstValueFrom(this.projectService.createProject({
+        ...this.form.getRawValue() as any,
+        startDate: toISODate(this.form.getRawValue().startDate),
+        endDate: toISODate(this.form.getRawValue().endDate),
+      }));
+      this.toast.success('Project created.')
       this.router.navigate(['/dashboard/projects', project.projectCode]);
     } catch (err: any) {
-      this.errors = { api: [err.error?.message || 'Creation failed.'] };
+      const fieldErrors = err.error?.errors?.fieldErrors;
+      if (fieldErrors && Object.keys(fieldErrors).length > 0) {
+        this.errors = fieldErrors;
+      } else {
+        this.toast.error(err.error?.message || 'Creation failed.');
+      }
+    } finally {
+      this.isSubmitting.set(false)
     }
   }
 

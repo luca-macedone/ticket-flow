@@ -7,6 +7,7 @@ import { InputField } from '../../../components/fields/input-field/input-field';
 import { SelectField } from '../../../components/fields/select-field/select-field';
 import { KeyValuePipe } from '@angular/common';
 import { BaseCard } from '../../../components/overview-cards/base-card/base-card';
+import { ToastService } from '../../../components/toast/toast-service';
 
 @Component({
   selector: 'app-edit-user',
@@ -17,6 +18,7 @@ export class EditUser implements OnInit {
   private userService = inject(UserService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private toast = inject(ToastService);
 
   private code!: string;
   loading = signal(true);
@@ -44,7 +46,7 @@ export class EditUser implements OnInit {
       this.form.patchValue({ name: user.name, email: user.email, role: user.role });
       this.displayCode.set(user.userCode ?? '');
     } catch {
-      this.errors = { api: ['User not found.'] };
+      this.toast.error('User not found.')
     } finally {
       this.loading.set(false);
     }
@@ -55,10 +57,17 @@ export class EditUser implements OnInit {
     this.errors = {};
     try {
       await firstValueFrom(this.userService.updateUser(this.code, this.form.getRawValue() as any));
+      this.toast.success('User updated.')
       this.router.navigate(['/dashboard/users', this.code]);
     } catch (err: any) {
-      this.errors = { api: [err.error?.message || 'Update failed.'] };
+      const fieldErrors = err.error?.errors?.fieldErrors;
+      if (fieldErrors && Object.keys(fieldErrors).length > 0) {
+        this.errors = fieldErrors;
+      } else {
+        this.toast.error(err.error?.message || 'Patch failed.');
+      }
     }
+
   }
 
   cancel() { this.router.navigate(['/dashboard/users', this.code]); }

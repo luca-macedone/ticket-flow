@@ -12,6 +12,8 @@ import { TicketService } from '../../../services/ticket.service';
 import { ProjectService } from '../../../services/project.service';
 import { TICKET_CATEGORY_OPTIONS, TICKET_PRIORITY_OPTIONS, TICKET_STATUS_OPTIONS } from '../../../services/constants/ticket.constants';
 import { dateRangeValidator } from '../../../services/ticket.validator';
+import { ToastService } from '../../../components/toast/toast-service';
+import { toISODate } from '../../../utils/zod-form.utils';
 
 @Component({
   selector: 'app-new-ticket',
@@ -23,6 +25,7 @@ export class NewTicket implements OnInit {
   private ticketService = inject(TicketService);
   private projectService = inject(ProjectService);
   private router = inject(Router);
+  private toast = inject(ToastService);
 
   form = new FormGroup({
     ticketName: new FormControl('', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]),
@@ -53,7 +56,7 @@ export class NewTicket implements OnInit {
       const data = await firstValueFrom(this.projectService.getProjects(1, 100));
       this.projects.set(data.map(p => ({ value: p.id, label: p.projectName })));
     } catch {
-      this.errors = { api: ['Failed to load projects.'] };
+      this.toast.error('Failed to load projects.')
     }
   }
 
@@ -66,18 +69,25 @@ export class NewTicket implements OnInit {
       const payload: any = {
         ticketName: raw.ticketName!,
         ...(raw.ticketDescription && { ticketDescription: raw.ticketDescription }),
-        ...(raw.startDate && { startDate: raw.startDate }),
-        ...(raw.endDate && { endDate: raw.endDate }),
+        ...(raw.startDate && { startDate: toISODate(raw.startDate) }),
+        ...(raw.endDate && { endDate: toISODate(raw.endDate) }),
         ...(raw.status && { status: raw.status }),
         ...(raw.category && { category: raw.category }),
         ...(raw.priority && { priority: raw.priority }),
         ...(raw.projectId && { projectId: raw.projectId }),
       };
       const ticket = await firstValueFrom(this.ticketService.create(payload));
-      this.router.navigate(['/dashboard/tickets', ticket.id]);
+      this.toast.success('Ticket created.');
+      this.router.navigate(['/dashboard/tickets', ticket.ticketCode]);
     } catch (err: any) {
-      this.errors = { api: [err.error?.message || 'Creation failed.'] };
-    } finally {
+      const fieldErrors = err.error?.errors?.fieldErrors;
+      if (fieldErrors && Object.keys(fieldErrors).length > 0) {
+        this.errors = fieldErrors;
+      } else {
+        this.toast.error(err.error?.message || 'Creation failed.');
+      }
+    }
+    finally {
       this.isSubmitting.set(false);
     }
   }

@@ -12,3 +12,7 @@ export function mapZodErrors(schema: ZodType, form: FormGroup): Record<string, s
     }
     return errors;
 }
+
+export const toISODate = (val: string | null | undefined): string | undefined =>
+    val ? `${val}T00:00:00.000Z` : undefined;
+

@@ -7,6 +7,7 @@ import { InputField } from '../../../components/fields/input-field/input-field';
 import { TextareaField } from '../../../components/fields/textarea-field/textarea-field';
 import { KeyValuePipe } from '@angular/common';
 import { BaseCard } from "../../../components/overview-cards/base-card/base-card";
+import { ToastService } from '../../../components/toast/toast-service';
 
 @Component({
   selector: 'app-new-company',
@@ -17,6 +18,7 @@ import { BaseCard } from "../../../components/overview-cards/base-card/base-card
 export class NewCompany {
   private companyService = inject(CompanyService);
   private router = inject(Router);
+  private toast = inject(ToastService);
 
   form = new FormGroup({
     companyName: new FormControl('', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]),
@@ -42,8 +44,14 @@ export class NewCompany {
       const company = await firstValueFrom(this.companyService.createCompany(this.form.getRawValue() as any));
       this.router.navigate(['/dashboard/companies', company.companyCode]);
     } catch (err: any) {
-      this.errors = { api: [err.error?.message || 'Creation failed.'] };
+      const fieldErrors = err.error?.errors?.fieldErrors;
+      if (fieldErrors && Object.keys(fieldErrors).length > 0) {
+        this.errors = fieldErrors;
+      } else {
+        this.toast.error(err.error?.message || 'Creation failed.');
+      }
     }
+
   }
 
   cancel() {

@@ -7,6 +7,7 @@ import { BaseCard } from '../../../components/overview-cards/base-card/base-card
 import { KeyValuePipe } from '@angular/common';
 import { TextareaField } from '../../../components/fields/textarea-field/textarea-field';
 import { InputField } from '../../../components/fields/input-field/input-field';
+import { ToastService } from '../../../components/toast/toast-service';
 
 @Component({
   selector: 'app-edit-company',
@@ -18,6 +19,7 @@ export class EditCompany implements OnInit {
   private companyService = inject(CompanyService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private toast = inject(ToastService);
 
   private code!: string;
   loading = signal(true);
@@ -47,7 +49,7 @@ export class EditCompany implements OnInit {
       });
       this.displayCode.set(company.companyCode ?? '')
     } catch (err) {
-      this.errors = { api: ['Company not found.'] };
+      this.toast.error('Company not found.');
     } finally {
       this.loading.set(false);
     }
@@ -61,10 +63,17 @@ export class EditCompany implements OnInit {
     this.errors = {};
     try {
       await firstValueFrom(this.companyService.updateCompany(this.code, this.form.getRawValue() as any));
+      this.toast.success('Company updated.');
       this.router.navigate(['/dashboard/companies', this.code]);
     } catch (err: any) {
-      this.errors = { api: ['Update failed.'] };
+      const fieldErrors = err.error?.errors?.fieldErrors;
+      if (fieldErrors && Object.keys(fieldErrors).length > 0) {
+        this.errors = fieldErrors;
+      } else {
+        this.toast.error(err.error?.message || 'Patch failed.');
+      }
     }
+
   }
 
   cancel() {
