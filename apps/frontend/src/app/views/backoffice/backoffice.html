@@ -2,8 +2,7 @@
 
     <!-- Tab bar -->
     <div class="flex gap-2 border-b border-text/10 pb-3">
-        <button type="button" (click)="switchTab('approvals')"
-            class="px-4 py-1.5 rounded-full text-sm transition-colors"
+        <button type="button" (click)="switchTab('approvals')" class="px-4 py-1.5 rounded-full transition-colors"
             [class.bg-primary]="selectedTab() === 'approvals'" [class.text-background]="selectedTab() === 'approvals'"
             [class.bg-text\/10]="selectedTab() !== 'approvals'">
             Approvals
@@ -13,14 +12,12 @@
             </span>
             }
         </button>
-        <button type="button" (click)="switchTab('admin-logs')"
-            class="px-4 py-1.5 rounded-full text-sm transition-colors"
+        <button type="button" (click)="switchTab('admin-logs')" class="px-4 py-1.5 rounded-full transition-colors"
             [class.bg-primary]="selectedTab() === 'admin-logs'" [class.text-background]="selectedTab() === 'admin-logs'"
             [class.bg-text\/10]="selectedTab() !== 'admin-logs'">
             Admin Log
         </button>
-        <button type="button" (click)="switchTab('system-logs')"
-            class="px-4 py-1.5 rounded-full text-sm transition-colors"
+        <button type="button" (click)="switchTab('system-logs')" class="px-4 py-1.5 rounded-full transition-colors"
             [class.bg-primary]="selectedTab() === 'system-logs'"
             [class.text-background]="selectedTab() === 'system-logs'"
             [class.bg-text\/10]="selectedTab() !== 'system-logs'">
@@ -55,21 +52,21 @@
     <ng-template #approvalActions let-user>
         @if (approvingCode() === user.userCode) {
         <div class="flex items-center gap-2" (click)="$event.stopPropagation()">
-            <select class="px-2 py-1 bg-background border border-secondary/40 rounded-lg text-xs"
-                [value]="selectedRole()" (change)="selectedRole.set($any($event.target).value)">
+            <select class="px-2 py-1 bg-background border border-secondary/40 rounded-lg " [value]="selectedRole()"
+                (change)="selectedRole.set($any($event.target).value)">
                 <option value="CUSTOMER">Customer</option>
                 <option value="AGENT">Agent</option>
             </select>
-            <button class="px-3 py-1 bg-accent/30 border border-accent/40 rounded-full text-xs hover:opacity-90"
+            <button class="px-3 py-1 bg-accent/30 border border-accent/40 rounded-full  hover:opacity-90"
                 (click)="confirmApprove(user.userCode)">Confirm</button>
-            <button class="px-3 py-1 bg-text/10 rounded-full text-xs hover:opacity-90"
+            <button class="px-3 py-1 bg-text/10 rounded-full  hover:opacity-90"
                 (click)="cancelApprove()">Cancel</button>
         </div>
         } @else {
         <div class="flex gap-2" (click)="$event.stopPropagation()">
-            <button class="px-3 py-1 bg-accent/30 border border-accent/40 rounded-full text-xs hover:opacity-90"
+            <button class="px-3 py-1 bg-accent/30 border border-accent/40 rounded-full  hover:opacity-90"
                 (click)="startApprove(user.userCode)">Approve</button>
-            <button class="px-3 py-1 bg-primary/20 border border-primary/40 rounded-full text-xs hover:opacity-90"
+            <button class="px-3 py-1 bg-primary/20 border border-primary/40 rounded-full  hover:opacity-90"
                 (click)="rejectUser(user.userCode)">Reject</button>
         </div>
         }

@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 
 export interface AdminLog {
   id: string;
@@ -31,11 +31,17 @@ export interface OverviewData {
   byCategory: { category: string; count: number }[];
   byProject: { projectId: string; projectName: string; count: number }[];
   byCompany: { companyName: string; count: number }[];
+  pendingCount: number;
 }
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
   private http = inject(HttpClient);
+
+  readonly pendingCount = signal(0);
+
+  setPendingCount(n: number) { this.pendingCount.set(n); }
+  decrementPending() { this.pendingCount.update(n => Math.max(0, n - 1)); }
 
   getOverview() {
     return this.http.get<OverviewData>('/api/admin/overview', {

@@ -5,6 +5,7 @@ import { AuthService } from '../../services/auth.service';
 import { firstValueFrom } from 'rxjs';
 import { NgIcon } from "@ng-icons/core";
 import { TooltipBase } from "../../components/tooltip-base/tooltip-base";
+import { AdminService } from '../../services/admin.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -15,6 +16,7 @@ import { TooltipBase } from "../../components/tooltip-base/tooltip-base";
 export class Dashboard {
   private auth = inject(AuthService);
   private route = inject(ActivatedRoute);
+  adminService = inject(AdminService);
 
   user = this.auth.user;
   isAdmin = computed(() => this.auth.user()?.role === 'admin');

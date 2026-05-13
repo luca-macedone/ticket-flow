@@ -14,6 +14,7 @@ export async function getAdminOverview(req: Request, res: Response) {
             byCategory,
             byProject,
             byCompany,
+            pendingCount,
         ] = await Promise.all([
             prisma.ticket.count({ where: { status: { notIn: [...CLOSED] } } }),
 
@@ -59,6 +60,8 @@ export async function getAdminOverview(req: Request, res: Response) {
                 JOIN Company c ON p.companyId = c.id
                 GROUP BY c.id, c.companyName
             `,
+
+            prisma.user.count({ where: { status: 'PENDING_APPROVAL' } }),
         ]);
 
         const avgResolutionHours = resolvedTickets.length > 0
@@ -115,6 +118,7 @@ export async function getAdminOverview(req: Request, res: Response) {
                 companyName: r.companyName,
                 count: Number(r.count),
             })),
+            pendingCount
         });
     } catch (error) {
         console.error(error);

@@ -1,4 +1,4 @@
-<section class="flex flex-col gap-4 p-4 border border-text/10 rounded-2xl">
+<section class="flex flex-col gap-3 p-4 border border-text/10 rounded-2xl">
     <h2 class="text-2xl font-heading font-bold">
         Good morning, <em class="text-primary">{{ user()?.name }}</em>
         <span class="text-lg text-secondary ml-2">[{{ user()?.role }}]</span>
@@ -22,6 +22,17 @@
     } @else {
     @let ov = adminOverview();
     @if (ov) {
+    @if (adminService.pendingCount() > 0) {
+    <a routerLink="/dashboard/backoffice"
+        class="flex flex-row-reverse items-center justify-between px-5 py-3 rounded-xl border border-primary/40 bg-primary/10 hover:bg-primary/20 transition-colors cursor-pointer">
+        <div class="flex items-center gap-3">
+            <span class="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shrink-0"></span>
+            <span class="font-semibold">{{ adminService.pendingCount() }} user{{ adminService.pendingCount() > 1 ? 's' :
+                '' }} waiting for approval</span>
+        </div>
+        <span class="text-text/50">Go to Backoffice</span>
+    </a>
+    }
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 overflow-auto">
         <app-base-card title="open tickets" description="total tickets still open" class="row-span-2 lg:row-span-1">
             <div class="flex items-end h-full">
@@ -67,6 +78,32 @@
                     <span class="capitalize">{{ c.category.toLowerCase() }}</span>
                     <span class="font-mono font-bold">{{ c.count }}</span>
                 </div>
+                }
+            </div>
+        </app-base-card>
+        <app-base-card title="by Project">
+            <div class="h-full">
+                @for (p of ov.byProject; track p.projectId) {
+                <div class="flex justify-between items-center py-1">
+                    <span class="text-text/80 truncate max-w-[70%]">{{ p.projectName }}</span>
+                    <span class="font-mono font-bold">{{ p.count }}</span>
+                </div>
+                } @empty {
+                <p class="text-text/40">No project data.</p>
+                }
+            </div>
+        </app-base-card>
+
+
+        <app-base-card title="by Company">
+            <div class="h-full">
+                @for (c of ov.byCompany; track c.companyName) {
+                <div class="flex justify-between items-center py-1">
+                    <span class="text-text/80 truncate max-w-[70%]">{{ c.companyName }}</span>
+                    <span class="font-mono font-bold">{{ c.count }}</span>
+                </div>
+                } @empty {
+                <p class="text-text/40">No company data.</p>
                 }
             </div>
         </app-base-card>

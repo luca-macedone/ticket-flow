@@ -6,6 +6,7 @@ import { BaseCard } from '../../components/overview-cards/base-card/base-card';
 import { DataTable, SortState, TableColumn } from '../../components/tables/ticket-table/data-table';
 import { AdminService, OverviewData } from '../../services/admin.service';
 import { PRIORITY_BADGE, STATUS_BADGE } from '../../services/constants/badge.constants';
+import { RouterLinkWithHref } from '@angular/router';
 
 interface AdminOverview {
   tickets: { open: number; resolved: number; avgResolutionHours: number };
@@ -39,14 +40,14 @@ const CUSTOMER_COLUMNS: TableColumn<Ticket>[] = [
 
 @Component({
   selector: 'app-overview',
-  imports: [BaseCard, DataTable],
+  imports: [BaseCard, DataTable, RouterLinkWithHref],
   templateUrl: './overview.html',
   styleUrl: './overview.css',
 })
 export class Overview {
   private auth = inject(AuthService);
   private ticketService = inject(TicketService);
-  private adminService = inject(AdminService);
+  adminService = inject(AdminService);
 
   user = this.auth.user;
   isAdmin = computed(() => this.auth.user()?.role === 'admin');
@@ -96,6 +97,7 @@ export class Overview {
       try {
         const data: OverviewData = await firstValueFrom(this.adminService.getOverview());
         this.adminOverview.set(data);
+        this.adminService.setPendingCount(data.pendingCount);
       } catch {
         this.error.set('Failed to load overview.');
       } finally {
