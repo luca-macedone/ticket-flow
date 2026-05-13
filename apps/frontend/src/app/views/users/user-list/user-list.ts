@@ -5,6 +5,8 @@ import { DataTable, TableColumn } from '../../../components/tables/ticket-table/
 import { Router } from '@angular/router';
 import { ROLE_BADGE, userStatusBadge } from '../../../services/constants/badge.constants';
 import { USER_STATUS_LABEL } from '../../../services/constants/user.constants';
+import { ToastService } from '../../../components/toast/toast-service';
+import { AdminService } from '../../../services/admin.service';
 
 @Component({
   selector: 'app-user-list',
@@ -14,7 +16,9 @@ import { USER_STATUS_LABEL } from '../../../services/constants/user.constants';
 })
 export class UserList implements AfterViewInit {
   private userService = inject(UserService);
+  private adminService = inject(AdminService);
   private router = inject(Router);
+  private toast = inject(ToastService);
 
   @ViewChild('actionsCell') actionsCellTemplate!: TemplateRef<{ $implicit: AdminUser }>;
 
@@ -48,7 +52,7 @@ export class UserList implements AfterViewInit {
       const res = await firstValueFrom(this.userService.getUsers());
       this.users.set(res);
     } catch {
-      this.error.set('Users load failed.');
+      this.toast.error('Users load failed.');
     } finally {
       this.loading.set(false);
     }
@@ -67,10 +71,41 @@ export class UserList implements AfterViewInit {
     try {
       const updated = await firstValueFrom(this.userService.approveUser(code, this.selectedRole()));
       this.users.update(list => list.map(u => u.userCode === code ? { ...u, ...updated } : u));
+      this.toast.success('User approved.');
     } catch {
-      this.error.set('Approval failed. Retry.');
+      this.toast.error('Approval failed. Retry.');
     } finally {
       this.approvingCode.set(null);
+    }
+  }
+
+  async rejectUser(code: string) {
+    try {
+      const updated = await firstValueFrom(this.adminService.changeUserStatus(code, 'REJECTED'));
+      this.users.update(list => list.map(u => u.userCode === code ? { ...u, ...updated } : u));
+      this.toast.success('User rejected.');
+    } catch {
+      this.toast.error('Action failed. Retry.');
+    }
+  }
+
+  async suspendUser(code: string) {
+    try {
+      const updated = await firstValueFrom(this.adminService.changeUserStatus(code, 'SUSPENDED'));
+      this.users.update(list => list.map(u => u.userCode === code ? { ...u, ...updated } : u));
+      this.toast.success('User suspended.');
+    } catch {
+      this.toast.error('Action failed. Retry.');
+    }
+  }
+
+  async reactivateUser(code: string) {
+    try {
+      const updated = await firstValueFrom(this.adminService.changeUserStatus(code, 'APPROVED'));
+      this.users.update(list => list.map(u => u.userCode === code ? { ...u, ...updated } : u));
+      this.toast.success('User reactivated.');
+    } catch {
+      this.toast.error('Action failed. Retry.');
     }
   }
 

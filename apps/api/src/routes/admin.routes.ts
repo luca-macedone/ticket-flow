@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { requireAuth } from "../middlewares/requireAuth";
 import { requireRole } from "../middlewares/requireRole";
-import { approveUser } from "../controllers/user.controller";
-import { getAdminOverview } from "../controllers/overview.controller";
+import { approveUser, changeUserStatus } from "../controllers/user.controller";
+import { getAdminLogs, getAdminOverview, getSystemLogs } from "../controllers/overview.controller";
 
 const router = Router();
 
@@ -19,5 +19,26 @@ router.get(
     requireRole("ADMIN"),
     getAdminOverview
 );
+
+router.get(
+    "/admin/logs/admin",
+    requireAuth,
+    requireRole("ADMIN"),
+    getAdminLogs
+);
+
+router.get(
+    "/admin/logs/system",
+    requireAuth,
+    requireRole("ADMIN"),
+    getSystemLogs
+);
+
+router.patch(
+    "/admin/users/:code/status",
+    requireAuth,
+    requireRole("ADMIN"),
+    changeUserStatus
+)
 
 export default router;

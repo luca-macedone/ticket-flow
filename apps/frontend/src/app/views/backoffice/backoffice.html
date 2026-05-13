@@ -1,1 +1,78 @@
-<p>backoffice works!</p>
+<div class="flex flex-col gap-4 p-4 border border-text/10 rounded-2xl">
+
+    <!-- Tab bar -->
+    <div class="flex gap-2 border-b border-text/10 pb-3">
+        <button type="button" (click)="switchTab('approvals')"
+            class="px-4 py-1.5 rounded-full text-sm transition-colors"
+            [class.bg-primary]="selectedTab() === 'approvals'" [class.text-background]="selectedTab() === 'approvals'"
+            [class.bg-text\/10]="selectedTab() !== 'approvals'">
+            Approvals
+            @if (pendingUsers().length > 0) {
+            <span class="ml-1.5 px-1.5 py-0.5 rounded-full text-xs bg-primary/30 text-primary">
+                {{ pendingUsers().length }}
+            </span>
+            }
+        </button>
+        <button type="button" (click)="switchTab('admin-logs')"
+            class="px-4 py-1.5 rounded-full text-sm transition-colors"
+            [class.bg-primary]="selectedTab() === 'admin-logs'" [class.text-background]="selectedTab() === 'admin-logs'"
+            [class.bg-text\/10]="selectedTab() !== 'admin-logs'">
+            Admin Log
+        </button>
+        <button type="button" (click)="switchTab('system-logs')"
+            class="px-4 py-1.5 rounded-full text-sm transition-colors"
+            [class.bg-primary]="selectedTab() === 'system-logs'"
+            [class.text-background]="selectedTab() === 'system-logs'"
+            [class.bg-text\/10]="selectedTab() !== 'system-logs'">
+            System Log
+        </button>
+    </div>
+
+    <!-- Tab: Approvals -->
+    @if (selectedTab() === 'approvals') {
+    <app-data-table [columns]="approvalColumns()" [rows]="pendingUsers()" [loading]="approvalsLoading()"
+        [skeletonRows]="5" emptyMessage="No pending approvals." (rowClick)="viewUser($event)">
+    </app-data-table>
+    }
+
+    <!-- Tab: Admin Logs -->
+    @if (selectedTab() === 'admin-logs') {
+    <app-data-table [columns]="adminLogsColumns" [rows]="adminLogs()" [loading]="adminLogsLoading()"
+        [total]="adminLogsTotal()" [page]="adminLogsPage()" [pageSize]="PAGE_SIZE" [skeletonRows]="10"
+        emptyMessage="No admin logs." (pageChange)="loadAdminLogs($event)">
+    </app-data-table>
+    }
+
+    <!-- Tab: System Logs -->
+    @if (selectedTab() === 'system-logs') {
+    <app-data-table [columns]="systemLogsColumns" [rows]="systemLogs()" [loading]="systemLogsLoading()"
+        [total]="systemLogsTotal()" [page]="systemLogsPage()" [pageSize]="PAGE_SIZE" [skeletonRows]="10"
+        emptyMessage="No system logs." (pageChange)="loadSystemLogs($event)">
+    </app-data-table>
+    }
+
+    <!-- Template azioni colonna Approvals -->
+    <ng-template #approvalActions let-user>
+        @if (approvingCode() === user.userCode) {
+        <div class="flex items-center gap-2" (click)="$event.stopPropagation()">
+            <select class="px-2 py-1 bg-background border border-secondary/40 rounded-lg text-xs"
+                [value]="selectedRole()" (change)="selectedRole.set($any($event.target).value)">
+                <option value="CUSTOMER">Customer</option>
+                <option value="AGENT">Agent</option>
+            </select>
+            <button class="px-3 py-1 bg-accent/30 border border-accent/40 rounded-full text-xs hover:opacity-90"
+                (click)="confirmApprove(user.userCode)">Confirm</button>
+            <button class="px-3 py-1 bg-text/10 rounded-full text-xs hover:opacity-90"
+                (click)="cancelApprove()">Cancel</button>
+        </div>
+        } @else {
+        <div class="flex gap-2" (click)="$event.stopPropagation()">
+            <button class="px-3 py-1 bg-accent/30 border border-accent/40 rounded-full text-xs hover:opacity-90"
+                (click)="startApprove(user.userCode)">Approve</button>
+            <button class="px-3 py-1 bg-primary/20 border border-primary/40 rounded-full text-xs hover:opacity-90"
+                (click)="rejectUser(user.userCode)">Reject</button>
+        </div>
+        }
+    </ng-template>
+
+</div>

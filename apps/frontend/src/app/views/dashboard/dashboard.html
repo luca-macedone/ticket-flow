@@ -105,6 +105,23 @@
                     </app-tooltip-base>
                     }
                 </li>
+
+                <li class="w-full py-2 flex cursor-pointer hover:bg-primary/20 rounded-full transition-colors ease-in"
+                    [class.justify-center]="!sidebarExpanded()" [class.justify-start]="sidebarExpanded()"
+                    [class.px-6]="sidebarExpanded()" routerLinkActive="bg-primary/60 hover:bg-primary/60 font-semibold"
+                    routerLink="/dashboard/backoffice">
+                    @if (sidebarExpanded()) {
+                    <span class="flex items-center gap-3">
+                        <ng-icon name="heroWrenchScrewdriver" size="20" />
+                        <span>Backoffice</span>
+                    </span>
+                    } @else {
+                    <app-tooltip-base content="Backoffice" position="right"
+                        wrapperClass="relative flex w-full items-center justify-center gap-3">
+                        <ng-icon name="heroWrenchScrewdriver" size="20" />
+                    </app-tooltip-base>
+                    }
+                </li>
                 }
 
             </ul>
@@ -191,6 +208,11 @@
             class="flex flex-col items-center gap-0.5 text-xs text-text/60">
             <ng-icon name="heroUsers" size="22" />
             <span>Users</span>
+        </a>
+        <a routerLink="/dashboard/backoffice" routerLinkActive="text-primary"
+            class="flex flex-col items-center gap-0.5 text-xs text-text/60">
+            <ng-icon name="heroWrenchScrewdriver" size="22" />
+            <span>Backoffice</span>
         </a>
         }
         <button (click)="logout()" class="flex flex-col items-center gap-0.5 text-xs text-text/60">

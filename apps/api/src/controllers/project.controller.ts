@@ -3,6 +3,7 @@ import { prisma } from "../db";
 import { Prisma } from "@prisma/client";
 import { AuthRequest } from "../middlewares/requireAuth";
 import { randomUUID } from "crypto";
+import { logAdminAction } from "../utils/logger";
 
 //? get:/projects
 export async function getProjects(req: AuthRequest, res: Response) {
@@ -89,6 +90,14 @@ export async function createProject(req: Request, res: Response) {
             return tx.project.update({ where: { id: temp.id }, data: { projectCode: code } });
         });
 
+        logAdminAction(
+            (req as AuthRequest).user!.userId,
+            'PROJECT_CREATE',
+            'PROJECT',
+            project.projectCode ?? undefined,
+            project.projectName
+        );
+
         res.status(201).json(project);
     } catch (error) {
         console.error(error)
@@ -134,6 +143,14 @@ export async function updateProject(req: Request, res: Response) {
             data
         });
 
+        logAdminAction(
+            (req as AuthRequest).user!.userId,
+            'PROJECT_UPDATE',
+            'PROJECT',
+            project.projectCode ?? undefined,
+            project.projectName
+        );
+
         res.status(200).json(project);
     } catch (error) {
         console.error(error)
@@ -151,11 +168,19 @@ export async function updateProject(req: Request, res: Response) {
 //? delete:/projects/:code
 export async function deleteProject(req: Request, res: Response) {
     try {
-        await prisma.project.delete({
+        const project = await prisma.project.delete({
             where: {
                 projectCode: req.params.code as string
             },
         });
+
+        logAdminAction(
+            (req as AuthRequest).user!.userId,
+            'PROJECT_DELETE',
+            'PROJECT',
+            project.projectCode ?? undefined,
+            project.projectName
+        );
 
         res.status(204).send();
     } catch (error) {

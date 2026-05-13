@@ -20,7 +20,9 @@ export const USER_STATUS_BADGE: Record<string, string> = {
     PENDING_APPROVAL: 'bg-yellow-500/20 text-yellow-300',
     APPROVED: 'bg-green-500/20 text-green-300',
     REJECTED: 'bg-red-500/20 text-red-300',
+    SUSPENDED: 'bg-orange-500/20 text-orange-300',
 };
+
 
 export const ROLE_BADGE = 'border border-secondary capitalize';
 

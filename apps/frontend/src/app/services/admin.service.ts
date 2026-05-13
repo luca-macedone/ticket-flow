@@ -1,6 +1,25 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 
+export interface AdminLog {
+  id: string;
+  action: string;
+  targetType: string;
+  targetCode: string | null;
+  targetLabel: string | null;
+  createdAt: string;
+  actor: { userCode: string | null; name: string };
+}
+
+export interface SystemLog {
+  id: string;
+  level: 'INFO' | 'WARN' | 'ERROR';
+  message: string;
+  stack: string | null;
+  context: Record<string, unknown> | null;
+  createdAt: string;
+}
+
 export interface OverviewData {
   tickets: {
     open: number;
@@ -23,4 +42,31 @@ export class AdminService {
       withCredentials: true,
     });
   }
+
+  getAdminLogs(page = 1, amount = 50, targetType?: string) {
+    const params: any = { page, amount };
+    if (targetType) params['targetType'] = targetType;
+    return this.http.get<{ data: AdminLog[]; total: number; page: number }>(
+      '/api/admin/logs/admin',
+      { withCredentials: true, params }
+    );
+  }
+
+  getSystemLogs(page = 1, amount = 50, level?: string) {
+    const params: any = { page, amount };
+    if (level) params['level'] = level;
+    return this.http.get<{ data: SystemLog[]; total: number; page: number }>(
+      '/api/admin/logs/system',
+      { withCredentials: true, params }
+    );
+  }
+
+  changeUserStatus(code: string, status: 'REJECTED' | 'SUSPENDED' | 'APPROVED') {
+    return this.http.patch<any>(
+      `/api/admin/users/${code}/status`,
+      { status },
+      { withCredentials: true }
+    );
+  }
+
 }

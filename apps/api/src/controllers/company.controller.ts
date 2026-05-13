@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { prisma } from "../db";
 import { Prisma } from "@prisma/client";
 import { randomUUID } from "crypto";
+import { logAdminAction } from "../utils/logger";
+import { AuthRequest } from "../middlewares/requireAuth";
 
 //? get:/companies
 export async function getCompanies(req: Request, res: Response) {
@@ -72,6 +74,13 @@ export async function createCompany(req: Request, res: Response) {
             return tx.company.update({ where: { id: temp.id }, data: { companyCode: code } });
         });
 
+        logAdminAction(
+            (req as AuthRequest).user!.userId,
+            'COMPANY_CREATE',
+            'COMPANY',
+            company.companyCode ?? undefined,
+            company.companyName
+        );
 
         res.status(201).json(company);
     } catch (error) {
@@ -104,6 +113,14 @@ export async function updateCompany(req: Request, res: Response) {
             data
         });
 
+        logAdminAction(
+            (req as AuthRequest).user!.userId,
+            'COMPANY_UPDATE',
+            'COMPANY',
+            company.companyCode ?? undefined,
+            company.companyName
+        );
+
         res.status(200).json(company);
     } catch (error) {
         console.error(error)
@@ -121,11 +138,19 @@ export async function updateCompany(req: Request, res: Response) {
 //? delete:/companies/:code
 export async function deleteCompany(req: Request, res: Response) {
     try {
-        await prisma.company.delete({
+        const company = await prisma.company.delete({
             where: {
                 companyCode: req.params.code as string
             }
         });
+
+        logAdminAction(
+            (req as AuthRequest).user!.userId,
+            'COMPANY_DELETE',
+            'COMPANY',
+            company.companyCode ?? undefined,
+            company.companyName
+        );
 
         res.status(204).send();
     } catch (error) {

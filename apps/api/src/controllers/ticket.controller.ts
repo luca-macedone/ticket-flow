@@ -4,6 +4,7 @@ import { Prisma } from "@prisma/client";
 import { AuthRequest } from "../middlewares/requireAuth";
 import { parseSortParams, PRIORITY_SQL_ORDER, serializeOrmRow, serializeRawRow } from "../utils/ticket-sort";
 import { randomUUID } from 'crypto';
+import { logAdminAction } from "../utils/logger";
 
 const CLOSED = ['DONE', 'CANCELLED', 'REJECTED'] as const;
 
@@ -190,6 +191,14 @@ export async function createTicket(req: AuthRequest, res: Response) {
             return tx.ticket.update({ where: { id: temp.id }, data: { ticketCode: code } });
         });
 
+        logAdminAction(
+            (req as AuthRequest).user!.userId,
+            'TICKET_CREATE',
+            'TICKET',
+            ticket.ticketCode ?? undefined,
+            ticket.ticketName
+        );
+
         res.status(201).json(ticket);
     } catch (error) {
         console.error(error);
@@ -241,6 +250,14 @@ export async function updateTicket(req: AuthRequest, res: Response) {
             data
         });
 
+        logAdminAction(
+            (req as AuthRequest).user!.userId,
+            'TICKET_UPDATE',
+            'TICKET',
+            ticket.ticketCode ?? undefined,
+            ticket.ticketName
+        );
+
         res.status(200).json(ticket);
     } catch (error) {
         console.error(error)
@@ -258,7 +275,16 @@ export async function updateTicket(req: AuthRequest, res: Response) {
 //? delete:/tickets/:code
 export async function deleteTicket(req: Request, res: Response) {
     try {
-        await prisma.ticket.delete({ where: { ticketCode: req.params.code as string } });
+        const ticket = await prisma.ticket.delete({ where: { ticketCode: req.params.code as string } });
+
+        logAdminAction(
+            (req as AuthRequest).user!.userId,
+            'TICKET_DELETE',
+            'TICKET',
+            ticket.ticketCode ?? undefined,
+            ticket.ticketName
+        );
+
         res.status(204).send();
     } catch (error) {
         console.error(error);

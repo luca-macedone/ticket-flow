@@ -15,9 +15,10 @@
     }
 
     <ng-template #actionsCell let-user>
+
         @if (user.status === 'PENDING_APPROVAL') {
         @if (approvingCode() === user.userCode) {
-        <div class="flex items-center gap-2 flex-wrap">
+        <div class="flex items-center gap-2 flex-wrap" (click)="$event.stopPropagation()">
             <select class="px-2 py-1 bg-background border border-secondary/40 rounded-lg text-xs"
                 [value]="selectedRole()" (change)="selectedRole.set($any($event.target).value)">
                 <option value="CUSTOMER">Customer</option>
@@ -29,9 +30,26 @@
                 (click)="cancelApprove()">Cancel</button>
         </div>
         } @else {
-        <button class="px-3 py-1 bg-accent/30 border border-accent/40 rounded-full text-xs hover:opacity-90"
-            (click)="startApprove(user.userCode)">Approve</button>
+        <div class="flex gap-2" (click)="$event.stopPropagation()">
+            <button class="px-3 py-1 bg-accent/30 border border-accent/40 rounded-full text-xs hover:opacity-90"
+                (click)="startApprove(user.userCode)">Approve</button>
+            <button class="px-3 py-1 bg-red-500/20 border border-red-500/40 rounded-full text-xs hover:opacity-90"
+                (click)="rejectUser(user.userCode)">Reject</button>
+        </div>
         }
         }
+
+        @if (user.status === 'APPROVED') {
+        <button class="px-3 py-1 bg-orange-500/20 border border-orange-500/40 rounded-full text-xs hover:opacity-90"
+            (click)="$event.stopPropagation(); suspendUser(user.userCode)">Suspend</button>
+        }
+
+        @if (user.status === 'SUSPENDED' || user.status === 'REJECTED') {
+        <button class="px-3 py-1 bg-blue-500/30 border border-blue-500/40 rounded-full text-xs hover:opacity-90"
+            (click)="$event.stopPropagation(); reactivateUser(user.userCode)">Reactivate</button>
+        }
+
     </ng-template>
+
+
 </div>

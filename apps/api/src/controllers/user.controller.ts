@@ -3,6 +3,8 @@ import { prisma } from "../db";
 import { Prisma } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { randomUUID } from "crypto";
+import { AdminAction, logAdminAction } from "../utils/logger";
+import { AuthRequest } from "../middlewares/requireAuth";
 
 //? get:/users
 export async function getUsers(req: Request, res: Response) {
@@ -98,6 +100,13 @@ export async function createUser(req: Request, res: Response) {
             return tx.user.update({ where: { id: temp.id }, data: { userCode: code } });
         });
 
+        logAdminAction(
+            (req as AuthRequest).user!.userId,
+            'USER_CREATE',
+            'USER',
+            user.userCode ?? undefined,
+            user.name
+        );
 
         res.status(201).json(user);
     } catch (error) {
@@ -129,6 +138,7 @@ export async function registerUser(req: Request, res: Response) {
             return tx.user.update({ where: { id: temp.id }, data: { userCode: code } });
         });
         const { pswHash: _, ...safeUser } = user;
+
         res.status(201).json(safeUser);
     } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
@@ -167,6 +177,14 @@ export async function updateUser(req: Request, res: Response) {
             data
         });
 
+        logAdminAction(
+            (req as AuthRequest).user!.userId,
+            'USER_UPDATE',
+            'USER',
+            user.userCode ?? undefined,
+            user.name
+        );
+
         res.status(200).json(user);
     } catch (error) {
         console.error(error)
@@ -199,6 +217,14 @@ export async function approveUser(req: Request, res: Response) {
             data
         });
 
+        logAdminAction(
+            (req as AuthRequest).user!.userId,
+            'USER_APPROVE',
+            'USER',
+            user.userCode ?? undefined,
+            user.name
+        );
+
         res.status(200).json(user);
     } catch (error) {
         console.error(error)
@@ -216,11 +242,19 @@ export async function approveUser(req: Request, res: Response) {
 //? delete:/users/:code
 export async function deleteUser(req: Request, res: Response) {
     try {
-        await prisma.user.delete({
+        const user = await prisma.user.delete({
             where: {
                 userCode: req.params.code as string
             }
         });
+
+        logAdminAction(
+            (req as AuthRequest).user!.userId,
+            'USER_DELETE',
+            'USER',
+            user.userCode ?? undefined,
+            user.name
+        );
 
         res.status(204).send();
     } catch (error) {
@@ -236,3 +270,42 @@ export async function deleteUser(req: Request, res: Response) {
     }
 }
 
+export async function changeUserStatus(req: AuthRequest, res: Response) {
+    try {
+        const { code } = req.params;
+        const { status } = req.body; // 'REJECTED' | 'SUSPENDED' | 'APPROVED'
+
+        const existing = await prisma.user.findUnique({ where: { userCode: code as string } });
+        if (!existing) return res.status(404).json({ message: 'User not found' });
+
+        const user = await prisma.user.update({
+            where: { id: existing.id },
+            data: { status }
+        });
+
+        const actionMap: Record<string, AdminAction> = {
+            APPROVED: 'USER_REACTIVATE',
+            REJECTED: 'USER_REJECT',
+            SUSPENDED: 'USER_SUSPEND'
+        };
+        logAdminAction(
+            req.user!.userId,
+            actionMap[status],
+            'USER',
+            existing.userCode ?? undefined,
+            existing.name
+        );
+
+        res.status(200).json(user)
+    } catch (error) {
+        console.error(error)
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === "P2025") {
+                return res.status(404).json({ message: "User not found" });
+            }
+        }
+        res.status(500).json({
+            message: "Internal Server Error"
+        })
+    }
+}

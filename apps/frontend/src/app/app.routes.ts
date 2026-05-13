@@ -21,6 +21,7 @@ import { TicketsList } from './views/tickets/tickets-list/tickets-list';
 import { NewTicket } from './views/tickets/new-ticket/new-ticket';
 import { TicketView } from './views/tickets/ticket-view/ticket-view';
 import { EditTicket } from './views/tickets/edit-ticket/edit-ticket';
+import { Backoffice } from './views/backoffice/backoffice';
 
 export const routes: Routes = [
     {
@@ -49,6 +50,15 @@ export const routes: Routes = [
                     roles: ['admin', 'agent', 'customer']
                 },
                 component: Overview
+            },
+            {
+                path: "backoffice",
+                canActivate: [roleGuard],
+                data: {
+                    breadcrumb: "Backoffice",
+                    roles: ['admin']
+                },
+                component: Backoffice
             },
             {
                 path: "tickets",
