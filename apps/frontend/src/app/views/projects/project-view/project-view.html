@@ -1,11 +1,37 @@
 <section class="">
-    @if (loading()) {
-    <p class="text-text/60">Caricamento...</p>
-    } @else if (error()) {
+    @if (error()) {
     <p class="text-red-400">{{ error() }}</p>
-    } @else if (project()) {
-    <app-base-card [title]="project()!.projectName" [description]="project()?.description ?? undefined"
-        variant="opposite">
+    } @else {
+    <app-base-card [title]="project()?.projectName ?? ''" [description]="project()?.description ?? undefined"
+        variant="opposite" [loading]="loading()" [skeletonLines]="0">
+
+        <ng-container skeleton>
+            <main class="grid grid-cols-2 gap-3">
+                <app-base-card title="project details" style="--sk-delay:0s">
+                    <app-skeleton-block class="h-10 w-full rounded-full" />
+                    <app-skeleton-block class="h-10 w-4/5 rounded-full" />
+                </app-base-card>
+                <app-base-card title="company info" style="--sk-delay:0.15s">
+                    <app-skeleton-block class="h-10 w-full rounded-full" />
+                    <app-skeleton-block class="h-10 w-full rounded-full" />
+                </app-base-card>
+                <app-base-card title="tickets" style="--sk-delay:0.30s">
+                    <app-skeleton-block class="h-8 w-full rounded-lg" />
+                    <app-skeleton-block class="h-8 w-full rounded-lg" />
+                    <app-skeleton-block class="h-8 w-4/5 rounded-lg" />
+                </app-base-card>
+                <app-base-card title="users" style="--sk-delay:0.45s">
+                    <app-skeleton-block class="h-8 w-full rounded-lg" />
+                    <app-skeleton-block class="h-8 w-full rounded-lg" />
+                    <app-skeleton-block class="h-8 w-4/5 rounded-lg" />
+                </app-base-card>
+            </main>
+            <footer class="col-span-2 flex justify-end">
+                <app-skeleton-block class="h-10 w-36 rounded-full" />
+            </footer>
+        </ng-container>
+
+        @if (!loading() && project()) {
         <main class="grid grid-cols-2 gap-3">
             <app-base-card title="project details">
                 <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
@@ -44,13 +70,14 @@
             }
         </main>
         <footer class="col-span-2 flex justify-end">
-
             @if (isAdmin()) {
             <button
                 class="border border-secondary/40 bg-secondary/30 text-text px-[40px] py-2 rounded-full font-body text-base hover:opacity-90 transition-all ease-in capitalize backdrop-blur-xl"
                 (click)="editProject()">Edit Project</button>
             }
         </footer>
+        }
+
     </app-base-card>
     }
 </section>

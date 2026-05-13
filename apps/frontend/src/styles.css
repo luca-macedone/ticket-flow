@@ -4,25 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ? old
-@layer base {
-    :root {
-        --text: 17.80% 0.006 0.00;
-        --background: 96.87% 0.002 0.00;
-        --primary: 40.29% 0.133 0.07;
-        --secondary: 80.78% 0.041 0.11;
-        --accent: 76.81% 0.025 0.15;
-    }
-
-    .dark {
-        --text: 94.32% 0.004 0.00;
-        --background: 14.24% 0.003 0.00;
-        --primary: 72.22% 0.133 0.06;
-        --secondary: 53.42% 0.054 0.10;
-        --accent: 78.32% 0.024 0.16;
-    }
-}
-*/
 @layer base {
     :root {
         --text: 14.95% 0.032 -0.05;
@@ -40,8 +21,6 @@
         --accent: 82.77% -0.193 0.16;
     }
 }
-
-/* Aggiungere in styles.css dopo le direttive @tailwind */
 
 /* WebKit (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
@@ -71,4 +50,34 @@
 * {
     scrollbar-width: thin;
     scrollbar-color: oklab(var(--primary) / 0.3) transparent;
+}
+
+/* ── Skeleton shimmer ────────────────────────────── */
+@keyframes shimmer {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(200%);
+    }
+}
+
+.skeleton {
+    position: relative;
+    overflow: hidden;
+    background-color: oklab(var(--text) / 0.08);
+}
+
+.skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            oklab(var(--background) / 0.28) 45%,
+            oklab(var(--background) / 0.38) 50%,
+            oklab(var(--background) / 0.28) 55%,
+            transparent 100%);
+    animation: shimmer 1.6s ease-in-out var(--sk-delay, 0s) infinite;
 }

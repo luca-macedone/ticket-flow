@@ -1,8 +1,14 @@
 <section>
-    @if (loading()) {
-    <p class="text-text/60">Caricamento...</p>
-    } @else {
-    <app-base-card title="Edit Ticket" description="Update the ticket details.">
+    <app-base-card title="Edit Ticket" description="Update the ticket details." [loading]="loading()"
+        [skeletonLines]="0">
+        <div skeleton class="grid grid-cols-2 gap-3">
+            @for (i of [0,1,2,3,4,5,6,7,8]; track i) {
+            <div class="flex flex-col gap-1.5" [class.col-span-2]="i === 2" [style]="'--sk-delay:' + (i * 0.1) + 's'">
+                <app-skeleton-block class="h-4 w-24 rounded-md" />
+                <app-skeleton-block class="h-10 w-full rounded-xl" />
+            </div>
+            }
+        </div>
         <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-3">
             <div class="grid grid-cols-2 gap-3">
                 <div class="flex flex-col gap-1 pt-0.5">
@@ -64,5 +70,4 @@
             </div>
         </form>
     </app-base-card>
-    }
 </section>

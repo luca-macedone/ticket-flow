@@ -11,3 +11,10 @@ export const ROLE_OPTIONS: SelectOption[] = RoleEnum.options.map(v => ({
     value: v,
     label: ROLE_LABEL[v] ?? v,
 }));
+
+// Nuove
+export const USER_STATUS_LABEL: Record<string, string> = {
+    PENDING_APPROVAL: 'On hold',
+    APPROVED: 'Approved',
+    REJECTED: 'Refused',
+};

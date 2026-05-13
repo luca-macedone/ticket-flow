@@ -3,6 +3,7 @@ import { NgClass, NgTemplateOutlet } from '@angular/common';
 import { CheckboxField } from "../../fields/checkbox-field/checkbox-field";
 import { FormControl } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { SkeletonBlock } from '../../skeleton/skeleton-block/skeleton-block';
 
 export interface TableColumn<T> {
   key: string;
@@ -12,6 +13,7 @@ export interface TableColumn<T> {
   getValue?: (row: T) => string;
   badgeClass?: (value: string) => string;
   cellTemplate?: TemplateRef<{ $implicit: T; value?: string }>;
+  skeletonWidth?: string;
 }
 
 export interface SortState {
@@ -21,7 +23,7 @@ export interface SortState {
 
 @Component({
   selector: 'app-data-table',
-  imports: [NgClass, NgTemplateOutlet, CheckboxField],
+  imports: [NgClass, NgTemplateOutlet, CheckboxField, SkeletonBlock],
   templateUrl: './data-table.html',
 })
 export class DataTable<T extends { id: string }> {
@@ -46,6 +48,11 @@ export class DataTable<T extends { id: string }> {
   private destroyRef = inject(DestroyRef);
   columnControls = new Map<string, FormControl<boolean>>();
 
+  loading = input<boolean>(false);
+  skeletonRows = input<number>(6);
+  refreshing = input<boolean>(false);
+
+  skeletonRowRange = computed(() => Array.from({ length: this.skeletonRows() }, (_, i) => i));
 
   visibleColumns = computed(() => {
     const hidden = this.hiddenKeys();

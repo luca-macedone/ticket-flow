@@ -1,29 +1,55 @@
-<section class="">
-    @if (loading()) {
-    <p class="text-text/60">Caricamento...</p>
-    } @else if (error()) {
+<section>
+    @if (error()) {
     <p class="text-red-400">{{ error() }}</p>
-    } @else if (user()) {
-    <app-base-card [title]="user()!.name" variant="opposite">
+    } @else {
+    <app-base-card [title]="user()?.name ?? ''" variant="opposite" [loading]="loading()" [skeletonLines]="0">
+
+        <ng-container skeleton>
+            <main class="grid grid-cols-2 gap-3">
+                <app-base-card title="user details" style="--sk-delay:0s">
+                    <app-skeleton-block class="h-10 w-full rounded-full" />
+                    <app-skeleton-block class="h-10 w-full rounded-full" />
+                    <app-skeleton-block class="h-10 w-full rounded-full" />
+                    <app-skeleton-block class="h-10 w-full rounded-full" />
+                </app-base-card>
+                <app-base-card title="Projects" style="--sk-delay:0.15s">
+                    <app-skeleton-block class="h-8 w-full rounded-lg" />
+                    <app-skeleton-block class="h-8 w-full rounded-lg" />
+                    <app-skeleton-block class="h-8 w-4/5 rounded-lg" />
+                </app-base-card>
+                <app-base-card title="Assigned Tickets" style="--sk-delay:0.30s">
+                    <app-skeleton-block class="h-8 w-full rounded-lg" />
+                    <app-skeleton-block class="h-8 w-full rounded-lg" />
+                    <app-skeleton-block class="h-8 w-4/5 rounded-lg" />
+                </app-base-card>
+                <app-base-card title="Reported Tickets" style="--sk-delay:0.45s">
+                    <app-skeleton-block class="h-8 w-full rounded-lg" />
+                    <app-skeleton-block class="h-8 w-full rounded-lg" />
+                    <app-skeleton-block class="h-8 w-4/5 rounded-lg" />
+                </app-base-card>
+            </main>
+            <footer class="col-span-2 flex justify-end">
+                <app-skeleton-block class="h-10 w-36 rounded-full" />
+            </footer>
+        </ng-container>
+
+        @if (!loading() && user()) {
         <main class="grid grid-cols-2 gap-3">
             <app-base-card title="user details">
                 <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
-                    <strong class="not-italic text-base font-body">Email:</strong>
-                    {{user()?.email}}
+                    <strong class="not-italic text-base font-body">Email:</strong> {{user()?.email}}
                 </span>
                 <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
-                    <strong class="not-italic text-base font-body">Name:</strong>
-                    {{user()?.name}}
+                    <strong class="not-italic text-base font-body">Name:</strong> {{user()?.name}}
                 </span>
                 <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading flex items-center gap-2">
                     <strong class="not-italic text-base font-body">Role:</strong>
-                    <span class="border border-secondary capitalize px-2 py-1 rounded-full text-xs">
-                        {{user()?.role}}
-                    </span>
+                    <span
+                        class="border border-secondary capitalize px-2 py-1 rounded-full text-xs">{{user()?.role}}</span>
                 </span>
                 <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
                     <strong class="not-italic text-base font-body">Created At:</strong>
-                    {{user()?.createdAt | date:'dd/MM/yyyy' }}
+                    {{user()?.createdAt | date:'dd/MM/yyyy'}}
                 </span>
             </app-base-card>
             <app-base-card title="Projects">
@@ -55,6 +81,8 @@
                 (click)="editUser()">Edit User</button>
             }
         </footer>
+        }
+
     </app-base-card>
     }
 </section>

@@ -5,11 +5,11 @@ import { firstValueFrom } from 'rxjs';
 import { DataTable, TableColumn } from '../../../components/tables/ticket-table/data-table';
 
 const COLUMNS: TableColumn<Company>[] = [
-  { key: 'companyCode', label: 'Code', getValue: (c) => c.companyCode as string, cellClass: 'font-mono text-xs text-text/50' },
-  { key: 'companyName', label: 'Name', getValue: (c) => c.companyName, cellClass: 'font-medium' },
-  { key: 'nationality', label: 'Nationality', getValue: (c) => c.nationality, cellClass: 'text-text/70' },
-  { key: 'referralEmail', label: 'Email', getValue: (c) => c.referralEmail, cellClass: 'text-text/70' },
-  { key: 'description', label: 'Description', getValue: (c) => c.description ?? '—', cellClass: 'text-text/50 truncate max-w-xs' },
+  { key: 'companyCode', label: 'Code', getValue: (c) => c.companyCode as string, cellClass: 'font-mono text-xs text-text/50', skeletonWidth: 'w-20' },
+  { key: 'companyName', label: 'Name', getValue: (c) => c.companyName, cellClass: 'font-medium', skeletonWidth: 'w-32' },
+  { key: 'nationality', label: 'Nationality', getValue: (c) => c.nationality, cellClass: 'text-text/70', skeletonWidth: 'w-24' },
+  { key: 'referralEmail', label: 'Email', getValue: (c) => c.referralEmail, cellClass: 'text-text/70', skeletonWidth: 'w-44' },
+  { key: 'description', label: 'Description', getValue: (c) => c.description ?? '—', cellClass: 'text-text/50 truncate max-w-xs', skeletonWidth: 'w-48' },
 ];
 
 @Component({

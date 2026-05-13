@@ -6,13 +6,11 @@
             (click)="newUser()">Create New User</button>
     </div>
 
-    @if (loading()) {
-    <p class="text-text/60">Loading...</p>
-    } @else if (error()) {
+    @if (error()) {
     <p class="text-red-400">{{ error() }}</p>
     } @else {
-    <app-data-table [columns]="columns()" [rows]="users()" emptyMessage="No user found." (rowClick)="viewUser($event)"
-        [hideable]="true">
+    <app-data-table [columns]="columns()" [rows]="users()" [loading]="loading()" [skeletonRows]="20"
+        emptyMessage="No user found." (rowClick)="viewUser($event)" [hideable]="true">
     </app-data-table>
     }
 

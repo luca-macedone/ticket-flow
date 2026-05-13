@@ -7,12 +7,10 @@
             (click)="newProject()">Create New Project</button>
         }
     </div>
-    @if (loading()) {
-    <p class="text-text/60">Loading...</p>
-    } @else if (error()) {
+    @if (error()) {
     <p class="text-red-400">{{ error() }}</p>
     } @else {
-    <app-data-table [columns]="columns" [rows]="projects()" emptyMessage="No project found."
-        (rowClick)="viewProject($event)" [hideable]="true" />
+    <app-data-table [columns]="columns" [rows]="projects()" [loading]="loading()" [skeletonRows]="20"
+        emptyMessage="No project found." (rowClick)="viewProject($event)" [hideable]="true" />
     }
 </section>

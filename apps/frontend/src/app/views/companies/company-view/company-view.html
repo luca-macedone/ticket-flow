@@ -1,24 +1,39 @@
 <section>
-    @if (loading()) {
-    <p class="text-text/60">Caricamento...</p>
-    } @else if (error()) {
+    @if (error()) {
     <p class="text-red-400">{{ error() }}</p>
-    } @else if (company()) {
-    <app-base-card [title]="company()!.companyName" [description]="company()?.description ?? undefined"
-        variant="opposite">
+    } @else {
+    <app-base-card [title]="company()?.companyName ?? ''" [description]="company()?.description ?? undefined"
+        variant="opposite" [loading]="loading()" [skeletonLines]="0">
+
+        <ng-container skeleton>
+            <section class="grid grid-cols-2 gap-3">
+                <app-base-card title="company info" style="--sk-delay:0s">
+                    <app-skeleton-block class="h-10 w-full rounded-full" />
+                    <app-skeleton-block class="h-10 w-full rounded-full" />
+                    <app-skeleton-block class="h-10 w-4/5 rounded-full" />
+                </app-base-card>
+                <app-base-card title="Projects" style="--sk-delay:0.15s">
+                    <app-skeleton-block class="h-8 w-full rounded-lg" />
+                    <app-skeleton-block class="h-8 w-full rounded-lg" />
+                    <app-skeleton-block class="h-8 w-4/5 rounded-lg" />
+                </app-base-card>
+                <footer class="col-span-2 flex justify-end">
+                    <app-skeleton-block class="h-10 w-36 rounded-full" />
+                </footer>
+            </section>
+        </ng-container>
+
+        @if (!loading() && company()) {
         <section class="grid grid-cols-2 gap-3">
             <app-base-card title="company info">
                 <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
-                    <strong class="not-italic text-base font-body">Company:</strong>
-                    {{company()?.companyName}}
+                    <strong class="not-italic text-base font-body">Company:</strong> {{company()?.companyName}}
                 </span>
                 <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
-                    <strong class="not-italic text-base font-body">Referral:</strong>
-                    {{company()?.referralEmail}}
+                    <strong class="not-italic text-base font-body">Referral:</strong> {{company()?.referralEmail}}
                 </span>
                 <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
-                    <strong class="not-italic text-base font-body">Nationality:</strong>
-                    {{company()?.nationality}}
+                    <strong class="not-italic text-base font-body">Nationality:</strong> {{company()?.nationality}}
                 </span>
             </app-base-card>
             <app-base-card title="Projects">
@@ -28,8 +43,6 @@
                     (pageChange)="projectPage.set($event)" variant="opposite">
                 </app-data-table>
             </app-base-card>
-
-
             <footer class="col-span-2 flex justify-end">
                 @if (isAdmin()) {
                 <button
@@ -38,6 +51,8 @@
                 }
             </footer>
         </section>
+        }
+
     </app-base-card>
     }
 </section>

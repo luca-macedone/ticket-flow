@@ -4,30 +4,15 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { TableColumn, DataTable, SortState } from '../../../components/tables/ticket-table/data-table';
 import { firstValueFrom } from 'rxjs';
+import { PRIORITY_BADGE, STATUS_BADGE } from '../../../services/constants/badge.constants';
 
-const PRIORITY: Record<string, string> = {
-  LOW: 'bg-slate-200 text-slate-700',
-  MEDIUM: 'bg-yellow-200 text-yellow-800',
-  HIGH: 'bg-orange-200 text-orange-800',
-  URGENT: 'bg-red-200 text-red-800',
-};
-const STATUS: Record<string, string> = {
-  ON_QUEUE: 'bg-slate-200 text-slate-700',
-  ON_HOLD: 'bg-yellow-200 text-yellow-800',
-  ON_APPROVAL: 'bg-purple-200 text-purple-800',
-  APPROVED: 'bg-teal-200 text-teal-800',
-  FULFILLMENT: 'bg-blue-200 text-blue-800',
-  DONE: 'bg-green-200 text-green-800',
-  REJECTED: 'bg-red-200 text-red-800',
-  CANCELLED: 'bg-gray-200 text-gray-700',
-};
 const COLUMNS: TableColumn<Ticket>[] = [
-  { key: 'ticketCode', label: 'Code', getValue: t => t.ticketCode, cellClass: 'font-mono text-xs text-text/50' },
-  { key: 'ticketName', label: 'Title', getValue: t => t.ticketName, cellClass: 'font-medium', sortable: true },
-  { key: 'project', label: 'Project', getValue: t => t.project?.projectName ?? '—', cellClass: 'text-text/70' },
-  { key: 'priority', label: 'Priority', getValue: t => t.priority, badgeClass: v => PRIORITY[v] ?? 'bg-slate-200 text-slate-700', sortable: true },
-  { key: 'status', label: 'Status', getValue: t => t.status, badgeClass: v => STATUS[v] ?? 'bg-slate-200 text-slate-700', sortable: true },
-  { key: 'createdAt', label: 'Created', getValue: t => new Date(t.createdAt).toLocaleDateString('it-IT'), cellClass: 'text-text/50', sortable: true },
+  { key: 'ticketCode', label: 'Code', getValue: t => t.ticketCode, cellClass: 'font-mono text-xs text-text/50', skeletonWidth: 'w-20' },
+  { key: 'ticketName', label: 'Title', getValue: t => t.ticketName, cellClass: 'font-medium', sortable: true, skeletonWidth: 'w-48' },
+  { key: 'project', label: 'Project', getValue: t => t.project?.projectName ?? '—', cellClass: 'text-text/70', skeletonWidth: 'w-32' },
+  { key: 'priority', label: 'Priority', getValue: t => t.priority, badgeClass: v => PRIORITY_BADGE[v] ?? 'bg-slate-200 text-slate-700', sortable: true, skeletonWidth: 'w-16' },
+  { key: 'status', label: 'Status', getValue: t => t.status, badgeClass: v => STATUS_BADGE[v] ?? 'bg-slate-200 text-slate-700', sortable: true, skeletonWidth: 'w-24' },
+  { key: 'createdAt', label: 'Created', getValue: t => new Date(t.createdAt).toLocaleDateString('it-IT'), cellClass: 'text-text/50', sortable: true, skeletonWidth: 'w-20' },
 ];
 
 @Component({

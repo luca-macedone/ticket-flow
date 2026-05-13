@@ -5,6 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { BaseCard } from "../../../components/overview-cards/base-card/base-card";
 import { DataTable, TableColumn } from '../../../components/tables/ticket-table/data-table';
 import { AuthService } from '../../../services/auth.service';
+import { SkeletonBlock } from '../../../components/skeleton/skeleton-block/skeleton-block';
 
 type ProjectRow = { id: string; projectCode: string; projectName: string; startDate: string; endDate: string | null };
 
@@ -17,7 +18,7 @@ const PROJECT_COLUMNS: TableColumn<ProjectRow>[] = [
 
 @Component({
   selector: 'app-company-view',
-  imports: [BaseCard, DataTable],
+  imports: [BaseCard, DataTable, SkeletonBlock],
   templateUrl: './company-view.html',
   styleUrl: './company-view.css',
 })

@@ -6,6 +6,7 @@ import { TableColumn, DataTable } from '../../../components/tables/ticket-table/
 import { BaseCard } from "../../../components/overview-cards/base-card/base-card";
 import { DatePipe } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
+import { SkeletonBlock } from '../../../components/skeleton/skeleton-block/skeleton-block';
 
 type TicketRow = { id: string; ticketCode: string; ticketName: string; status: string };
 type ProjectRow = { id: string; projectCode: string; projectName: string };
@@ -23,7 +24,7 @@ const TICKET_COLUMNS: TableColumn<TicketRow>[] = [
 
 @Component({
   selector: 'app-user-view',
-  imports: [BaseCard, DataTable, DatePipe],
+  imports: [BaseCard, DataTable, DatePipe, SkeletonBlock],
   templateUrl: './user-view.html',
   styleUrl: './user-view.css',
 })

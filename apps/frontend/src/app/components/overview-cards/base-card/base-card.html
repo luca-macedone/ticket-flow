@@ -5,9 +5,33 @@
     }">
     @if(title()) {
     <h5 class="font-display text-xl text-text/75 border-b border-text/10 pb-2 capitalize">{{title()}}</h5>
+    } @else if (loading()) {
+    <div class="pb-2 border-b border-text/10">
+        <app-skeleton-block class="h-7 w-48 rounded-lg" />
+    </div>
     }
+
     @if(description()) {
     <p class="text-text/60 italic">{{description()}}</p>
+    } @else if (loading()) {
+    <app-skeleton-block class="h-4 w-64 rounded-md" />
     }
+
+    @if(loading()){
+    <ng-content select="[skeleton]" />
+    @if(skeletonLines() > 0) {
+    @for(i of skeletonLineRange(); track i) {
+    @if(skeletonVariant() == 'pills') {
+    <app-skeleton-block class="h-10 rounded-full" [style.width.%]="70+(i%3)*10" [style.--sk-delay]="(i * 0.12) + 's'" />
+    } @else {
+    <div class="grid grid-cols-2 gap-2" [style.--sk-delay]="(i * 0.12) + 's'">
+        <app-skeleton-block class="h-4 w-24 rounded-md" />
+        <app-skeleton-block class="h-9 rounded-xl" />
+    </div>
+    }
+    }
+    }
+    } @else {
     <ng-content />
+    }
 </article>

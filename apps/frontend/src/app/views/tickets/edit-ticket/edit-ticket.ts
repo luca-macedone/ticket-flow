@@ -12,10 +12,11 @@ import { TicketService } from '../../../services/ticket.service';
 import { ProjectService } from '../../../services/project.service';
 import { TICKET_CATEGORY_OPTIONS, TICKET_PRIORITY_OPTIONS, TICKET_STATUS_OPTIONS } from '../../../services/constants/ticket.constants';
 import { dateRangeValidator } from '../../../services/ticket.validator';
+import { SkeletonBlock } from "../../../components/skeleton/skeleton-block/skeleton-block";
 
 @Component({
   selector: 'app-edit-ticket',
-  imports: [ReactiveFormsModule, BaseCard, InputField, TextareaField, SelectField, DateField, KeyValuePipe],
+  imports: [ReactiveFormsModule, BaseCard, InputField, TextareaField, SelectField, DateField, KeyValuePipe, SkeletonBlock],
   templateUrl: './edit-ticket.html',
   styleUrl: './edit-ticket.css',
 })

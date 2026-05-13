@@ -1,10 +1,35 @@
-<section class="">
-    @if (loading()) {
-    <p class="text-text/60">Caricamento...</p>
-    } @else if (error()) {
+<section>
+    @if (error()) {
     <p class="text-red-400">{{ error() }}</p>
-    } @else if (ticket()) {
-    <app-base-card [title]="ticket()!.ticketName" [description]="ticket()?.ticketDescription ?? ''" variant="opposite">
+    } @else {
+    <app-base-card [title]="ticket()?.ticketName ?? ''" [description]="ticket()?.ticketDescription ?? ''"
+        variant="opposite" [loading]="loading()" [skeletonLines]="0">
+        <ng-container skeleton>
+            <main class="grid grid-cols-2 gap-3">
+                <app-base-card description="Ticket Details" class="col-span-2">
+                    <div class="flex gap-3 w-full">
+                        <app-base-card variant="opposite" class="w-full" style="--sk-delay:0s">
+                            <app-skeleton-block class="h-10 w-full rounded-full" />
+                            <app-skeleton-block class="h-10 w-4/5 rounded-full" />
+                            <app-skeleton-block class="h-10 w-full rounded-full" />
+                            <app-skeleton-block class="h-10 w-3/4 rounded-full" />
+                            <app-skeleton-block class="h-10 w-full rounded-full" />
+                        </app-base-card>
+                        <app-base-card variant="opposite" class="w-full" style="--sk-delay:0.3s">
+                            <app-skeleton-block class="h-10 w-full rounded-full" />
+                            <app-skeleton-block class="h-10 w-3/4 rounded-full" />
+                            <app-skeleton-block class="h-10 w-full rounded-full" />
+                            <app-skeleton-block class="h-10 w-3/4 rounded-full" />
+                        </app-base-card>
+                    </div>
+                </app-base-card>
+            </main>
+            <footer class="flex justify-end">
+                <app-skeleton-block class="h-10 w-36 rounded-full" />
+            </footer>
+        </ng-container>
+
+        @if (!loading() && ticket()) {
         <main class="grid grid-cols-2 gap-3">
             <app-base-card description="Ticket Details" class="col-span-2">
                 <div class="flex gap-3 w-full">
@@ -61,13 +86,14 @@
             </app-base-card>
         </main>
         <footer class="col-span-2 flex justify-end">
-
             @if (isAdmin() || isAgent() || isOwnTicket()) {
             <button
                 class="border border-secondary/40 bg-secondary/30 text-text px-[40px] py-2 rounded-full font-body text-base hover:opacity-90 transition-all ease-in capitalize backdrop-blur-xl"
                 (click)="editTicket()">Edit Ticket</button>
             }
         </footer>
+        }
+
     </app-base-card>
     }
 </section>

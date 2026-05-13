@@ -3,6 +3,8 @@ import { AdminUser, UserService } from '../../../services/user.service';
 import { firstValueFrom } from 'rxjs';
 import { DataTable, TableColumn } from '../../../components/tables/ticket-table/data-table';
 import { Router } from '@angular/router';
+import { ROLE_BADGE, userStatusBadge } from '../../../services/constants/badge.constants';
+import { USER_STATUS_LABEL } from '../../../services/constants/user.constants';
 
 @Component({
   selector: 'app-user-list',
@@ -26,12 +28,12 @@ export class UserList implements AfterViewInit {
 
   ngAfterViewInit() {
     this.columns.set([
-      { key: 'userCode', label: 'Code', getValue: u => u.userCode as string, cellClass: "font-mono text-xs text-text/50" },
-      { key: 'name', label: 'Name', getValue: u => u.name },
-      { key: 'email', label: 'Email', getValue: u => u.email },
-      { key: 'role', label: 'Role', getValue: u => u.role.toLowerCase(), badgeClass: () => 'border border-secondary capitalize' },
-      { key: 'status', label: 'Status', getValue: u => this.statusLabel(u.status), badgeClass: v => this.statusClass(v) },
-      { key: 'createdAt', label: 'Registered', getValue: u => new Date(u.createdAt).toLocaleDateString('en-GB') },
+      { key: 'userCode', label: 'Code', getValue: u => u.userCode as string, cellClass: "font-mono text-xs text-text/50", skeletonWidth: 'w-20' },
+      { key: 'name', label: 'Name', getValue: u => u.name, skeletonWidth: 'w-36' },
+      { key: 'email', label: 'Email', getValue: u => u.email, skeletonWidth: 'w-44' },
+      { key: 'role', label: 'Role', getValue: u => u.role.toLowerCase(), badgeClass: () => ROLE_BADGE, skeletonWidth: 'w-20' },
+      { key: 'status', label: 'Status', getValue: u => USER_STATUS_LABEL[u.status], badgeClass: userStatusBadge, skeletonWidth: 'w-24' },
+      { key: 'createdAt', label: 'Registered', getValue: u => new Date(u.createdAt).toLocaleDateString('en-GB'), skeletonWidth: 'w-20' },
       { key: 'actions', label: 'Actions', cellTemplate: this.actionsCellTemplate },
     ]);
   }
@@ -70,24 +72,6 @@ export class UserList implements AfterViewInit {
     } finally {
       this.approvingCode.set(null);
     }
-  }
-
-  statusClass(status: string): string {
-    const map: Record<string, string> = {
-      PENDING_APPROVAL: 'bg-yellow-500/20 text-yellow-300',
-      APPROVED: 'bg-green-500/20 text-green-300',
-      REJECTED: 'bg-red-500/20 text-red-300',
-    };
-    return map[status] ?? '';
-  }
-
-  statusLabel(status: string): string {
-    const map: Record<string, string> = {
-      PENDING_APPROVAL: 'On hold',
-      APPROVED: 'Approved',
-      REJECTED: 'Refused',
-    };
-    return map[status] ?? status;
   }
 
   viewUser(user: AdminUser) {

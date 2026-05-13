@@ -5,13 +5,12 @@
             class="border border-accent/40 bg-accent/30 text-text px-[40px] py-2 rounded-full font-body text-base hover:opacity-90 transition-all ease-in capitalize backdrop-blur-xl"
             (click)="newTicket()">New Ticket</button>
     </div>
-    @if (loading()) {
-    <p class="text-text/60">Loading...</p>
-    } @else if (error()) {
+    @if (error()) {
     <p class="text-red-400">{{ error() }}</p>
     } @else {
     <app-data-table [columns]="columns" [rows]="rows()" [total]="totalItems()" [page]="currentPage()"
-        [pageSize]="pageSize" emptyMessage="No tickets found." (pageChange)="goToPage($event)"
-        (rowClick)="viewTicket($event)" (sortChange)="onSort($event)" [hideable]="true" />
+        [pageSize]="pageSize" [loading]="loading()" [skeletonRows]="20" [refreshing]="refreshing()"
+        emptyMessage="No tickets found." (pageChange)="goToPage($event)" (rowClick)="viewTicket($event)"
+        (sortChange)="onSort($event)" [hideable]="true" />
     }
 </section>

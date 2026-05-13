@@ -6,6 +6,7 @@ import { DatePipe } from '@angular/common';
 import { BaseCard } from "../../../components/overview-cards/base-card/base-card";
 import { TableColumn, DataTable } from '../../../components/tables/ticket-table/data-table';
 import { AuthService } from '../../../services/auth.service';
+import { SkeletonBlock } from '../../../components/skeleton/skeleton-block/skeleton-block';
 
 type TicketRow = { id: string; ticketCode: string; ticketName: string; status: string };
 type UserRow = { id: string; userCode: string; name: string; email: string };
@@ -25,7 +26,7 @@ const USER_COLUMNS: TableColumn<UserRow>[] = [
 
 @Component({
   selector: 'app-project-view',
-  imports: [DatePipe, BaseCard, DataTable],
+  imports: [DatePipe, BaseCard, DataTable, SkeletonBlock],
   templateUrl: './project-view.html',
 })
 export class ProjectView implements OnInit {

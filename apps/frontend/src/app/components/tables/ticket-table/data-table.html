@@ -3,6 +3,9 @@
     <!-- Toolbar: bottone "Columns" visibile solo se hideable=true -->
     @if (hideable()) {
     <div class="flex justify-end">
+        @if(loading()) {
+        <app-skeleton-block class="h-8 w-24 rounded-lg" />
+        }@else {
         <div class="relative">
             <button (click)="showColumnPanel.set(!showColumnPanel())"
                 class="flex items-center gap-1.5 px-3 py-1.5 bg-text/10 text-xs rounded-lg hover:bg-text/20 transition-colors">
@@ -25,11 +28,33 @@
             </div>
             }
         </div>
+        }
+    </div>
+    }
+
+    @if(refreshing() && !loading()) {
+    <div class="h-0.5 w-full overflow-hidden rounded-full bg-text/10">
+        <div class="h-full w-3/5 rounded-full bg-secondary/60 animate-pulse"></div>
     </div>
     }
 
     <!-- Mobile cards -->
     <div class="lg:hidden flex flex-col gap-2">
+        @if (loading()) {
+        @for (rowIdx of skeletonRowRange(); track rowIdx) {
+        <div class="bg-text/5 rounded-xl p-3 flex flex-col gap-1.5" [style]="'--sk-delay: ' + (rowIdx * 0.15) + 's'">
+            <div class="pb-1.5 border-b border-text/10">
+                <app-skeleton-block [class]="'h-5 ' + (visibleColumns()[0]?.skeletonWidth ?? 'w-32')" />
+            </div>
+            @for (col of visibleColumns().slice(1); track col.key) {
+            <div class="flex justify-between items-center gap-2">
+                <app-skeleton-block class="h-3.5 w-16 rounded-md shrink-0" />
+                <app-skeleton-block [class]="'h-5 ' + (col.skeletonWidth ?? 'w-24')" />
+            </div>
+            }
+        </div>
+        }
+        } @else {
         @for (row of rows(); track row.id) {
         <div class="bg-text/5 hover:bg-text/10 rounded-xl p-3 cursor-pointer flex flex-col gap-1.5"
             (click)="rowClick.emit(row)">
@@ -70,6 +95,7 @@
         <div class="px-4 py-6 text-center text-text/50 bg-text/10 rounded-xl">
             {{ emptyMessage() }}
         </div>
+        }
         }
     </div>
 
@@ -117,6 +143,17 @@
                 </tr>
             </thead>
             <tbody>
+                @if (loading()) {
+                @for (rowIdx of skeletonRowRange(); track rowIdx) {
+                <tr class="bg-text/5" [style]="'--sk-delay: ' + (rowIdx * 0.15) + 's'">
+                    @for (col of visibleColumns(); track col.key; let first = $first; let last = $last) {
+                    <td class="px-4 py-3" [class.rounded-l-xl]="first" [class.rounded-r-xl]="last">
+                        <app-skeleton-block [class]="'h-5 ' + (col.skeletonWidth ?? 'w-28')" />
+                    </td>
+                    }
+                </tr>
+                }
+                } @else {
                 @for (row of rows(); track row.id) {
                 <tr class="bg-text/5 hover:bg-text/10 cursor-pointer" (click)="rowClick.emit(row)">
                     @for (col of visibleColumns(); track col.key; let first = $first; let last = $last) {
@@ -142,6 +179,7 @@
                         {{ emptyMessage() }}
                     </td>
                 </tr>
+                }
                 }
             </tbody>
         </table>
