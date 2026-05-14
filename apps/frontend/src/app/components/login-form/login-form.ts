@@ -46,11 +46,15 @@ export class LoginForm {
 		try {
 			await firstValueFrom(this.auth.login(result.data.email, result.data.password, result.data.rememberMe));
 			this.router.navigate(['/dashboard']);
-		} catch (err: any) {
-			this.errors = { auth: [err.error?.message ?? 'Login failed'] };
-			if (err instanceof HttpErrorResponse && err.status === 403) {
-				this.changeView.emit("pending");
-				return;
+		} catch (err: unknown) {
+			if (err instanceof HttpErrorResponse) {
+				this.errors = { auth: [err.error?.message ?? 'Login failed'] };
+				if (err.status === 403) {
+					this.changeView.emit('pending');
+					return;
+				}
+			} else {
+				this.errors = { auth: ['Login failed'] };
 			}
 			this.cdr.detectChanges();
 		}

@@ -79,7 +79,7 @@ export class DataTable<T extends { id: string }> {
               .pipe(takeUntilDestroyed(this.destroyRef))
               .subscribe(visible => {
                 const hidden = new Set(untracked(() => this.hiddenKeys()));
-                visible ? hidden.delete(col.key) : hidden.add(col.key);
+                if (visible) hidden.delete(col.key); else hidden.add(col.key);
                 this.hiddenKeys.set(hidden);
               });
             this.columnControls.set(col.key, ctrl);
@@ -107,7 +107,7 @@ export class DataTable<T extends { id: string }> {
 
   toggleColumn(key: string): void {
     const hidden = new Set(this.hiddenKeys());
-    hidden.has(key) ? hidden.delete(key) : hidden.add(key);
+    if (hidden.has(key)) hidden.delete(key); else hidden.add(key);
     this.hiddenKeys.set(hidden)
   }
 

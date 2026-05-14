@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { ProjectService } from '../../../services/project.service';
+import { CreateProjectPayload, ProjectService } from '../../../services/project.service';
 import { Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
@@ -12,6 +12,7 @@ import { CompanyService } from '../../../services/company.service';
 import { SelectOption, SelectField } from '../../../components/fields/select-field/select-field';
 import { ToastService } from '../../../components/toast/toast-service';
 import { toISODate } from '../../../utils/zod-form.utils';
+import { CreateUserPayload } from '../../../services/user.service';
 
 @Component({
   selector: 'app-new-project',
@@ -44,8 +45,8 @@ export class NewProject implements OnInit {
   async ngOnInit() {
     try {
       const companyData = await firstValueFrom(this.companyService.getCompanies(1, 100));
-      this.companies.set(companyData.map((c: any) => ({ value: c.id, label: c.companyName })));
-    } catch (err) {
+      this.companies.set(companyData.map((c) => ({ value: c.id, label: c.companyName })));
+    } catch {
       this.toast.error('Failed to load companies.');
     }
   }
@@ -59,8 +60,8 @@ export class NewProject implements OnInit {
     this.errors = {};
     try {
       const project = await firstValueFrom(this.projectService.createProject({
-        ...this.form.getRawValue() as any,
-        startDate: toISODate(this.form.getRawValue().startDate),
+        ...this.form.getRawValue() as CreateProjectPayload,
+        startDate: toISODate(this.form.getRawValue().startDate)!,
         endDate: toISODate(this.form.getRawValue().endDate),
       }));
       this.toast.success('Project created.')

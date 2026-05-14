@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, input } from '@angular/core';
+import { Component, ElementRef, HostListener, input, inject } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 export interface SelectOption {
@@ -12,6 +12,8 @@ export interface SelectOption {
   templateUrl: './select-field.html',
 })
 export class SelectField {
+  private elRef = inject(ElementRef);
+
   label = input<string>('');
   id = input<string>('');
   control = input.required<FormControl>();
@@ -22,8 +24,6 @@ export class SelectField {
   open = false;
   dropdownPosition: 'up' | 'down' = 'down';
   dropdownMaxHeight = 240;
-
-  constructor(private elRef: ElementRef) { }
 
   toggle() {
     if (!this.open) this.calculatePosition();
@@ -59,11 +59,12 @@ export class SelectField {
   }
 
   get selectedLabel(): string {
-    return this.options().find(o => o.value === this.control().value)?.label ?? '';
+    return this.options().find((o) => o.value === this.control().value)?.label ?? '';
   }
 
   get triggerClass(): string {
-    const base = 'flex items-center justify-between w-full px-4 py-2 bg-background/10 border rounded-xl outline-none transition-all ease-in font-body text-left';
+    const base =
+      'flex items-center justify-between w-full px-4 py-2 bg-background/10 border rounded-xl outline-none transition-all ease-in font-body text-left';
     return this.errorMessage
       ? `${base} border-primary/40 focus-visible:border-primary/60`
       : `${base} border-secondary/40 focus-visible:border-accent/40`;

@@ -7,7 +7,7 @@ import { DataTable, TableColumn } from '../../../components/tables/ticket-table/
 import { AuthService } from '../../../services/auth.service';
 import { SkeletonBlock } from '../../../components/skeleton/skeleton-block/skeleton-block';
 
-type ProjectRow = { id: string; projectCode: string; projectName: string; startDate: string; endDate: string | null };
+interface ProjectRow { id: string; projectCode: string; projectName: string; startDate: string; endDate: string | null }
 
 const PROJECT_COLUMNS: TableColumn<ProjectRow>[] = [
   { key: 'projectCode', label: 'Code', getValue: (p) => p.projectCode, cellClass: 'font-mono text-xs text-text/50' },
@@ -48,7 +48,7 @@ export class CompanyView implements OnInit {
         const data = await firstValueFrom(this.companyService.getCompanyByCode(code!));
         this.company.set(data);
 
-      } catch (error) {
+      } catch {
         this.error.set('Company not found.');
       } finally {
         this.loading.set(false);

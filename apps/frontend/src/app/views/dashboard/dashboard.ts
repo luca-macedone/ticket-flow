@@ -1,5 +1,5 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { RouterOutlet, RouterLinkWithHref, Router, ActivatedRoute, RouterLinkActive } from "@angular/router";
+import { Component, computed, inject, signal, OnInit } from '@angular/core';
+import { RouterOutlet, RouterLinkWithHref, ActivatedRoute, RouterLinkActive } from "@angular/router";
 import { Breadcrump } from "../../components/breadcrump/breadcrump";
 import { AuthService } from '../../services/auth.service';
 import { firstValueFrom } from 'rxjs';
@@ -13,7 +13,7 @@ import { AdminService } from '../../services/admin.service';
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
-export class Dashboard {
+export class Dashboard implements OnInit {
   private auth = inject(AuthService);
   private route = inject(ActivatedRoute);
   adminService = inject(AdminService);

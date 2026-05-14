@@ -48,7 +48,7 @@ export class EditCompany implements OnInit {
         description: company.description,
       });
       this.displayCode.set(company.companyCode ?? '')
-    } catch (err) {
+    } catch {
       this.toast.error('Company not found.');
     } finally {
       this.loading.set(false);

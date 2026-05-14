@@ -1,4 +1,101 @@
-@import url('https://fonts.googleapis.com/css?family=LINE%20Seed%20JP:100,400,700|Urbanist:100,200,300,400,500,600,700');
+/* LINE Seed JP */
+@font-face {
+    font-family: 'LINE Seed JP';
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+    src: url('/fonts/lineseedjp/LINESeedJP_OTF_Th.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'LINE Seed JP';
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+    src: url('/fonts/lineseedjp/LINESeedJP_OTF_Rg.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'LINE Seed JP';
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+    src: url('/fonts/lineseedjp/LINESeedJP_OTF_Bd.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'LINE Seed JP';
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+    src: url('/fonts/lineseedjp/LINESeedJP_OTF_Eb.woff2') format('woff2');
+}
+
+/* Urbanist */
+@font-face {
+    font-family: 'Urbanist';
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+    src: url('/fonts/urbanist/Urbanist-Regular.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Urbanist';
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+    src: url('/fonts/urbanist/Urbanist-Italic.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Urbanist';
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+    src: url('/fonts/urbanist/Urbanist-Medium.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Urbanist';
+    font-weight: 500;
+    font-style: italic;
+    font-display: swap;
+    src: url('/fonts/urbanist/Urbanist-MediumItalic.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Urbanist';
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+    src: url('/fonts/urbanist/Urbanist-SemiBold.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Urbanist';
+    font-weight: 600;
+    font-style: italic;
+    font-display: swap;
+    src: url('/fonts/urbanist/Urbanist-SemiBoldItalic.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Urbanist';
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+    src: url('/fonts/urbanist/Urbanist-Bold.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Urbanist';
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+    src: url('/fonts/urbanist/Urbanist-BoldItalic.woff2') format('woff2');
+}
+
 
 @tailwind base;
 @tailwind components;

@@ -8,12 +8,13 @@ import { InputField } from '../../../components/fields/input-field/input-field';
 import { TextareaField } from '../../../components/fields/textarea-field/textarea-field';
 import { SelectField, SelectOption } from '../../../components/fields/select-field/select-field';
 import { DateField } from '../../../components/fields/date-field/date-field';
-import { TicketService } from '../../../services/ticket.service';
+import { CreateTicketPayload, TicketCategory, TicketPriority, TicketService, TicketStatus } from '../../../services/ticket.service';
 import { ProjectService } from '../../../services/project.service';
 import { TICKET_CATEGORY_OPTIONS, TICKET_PRIORITY_OPTIONS, TICKET_STATUS_OPTIONS } from '../../../services/constants/ticket.constants';
 import { dateRangeValidator } from '../../../services/ticket.validator';
 import { ToastService } from '../../../components/toast/toast-service';
 import { toISODate } from '../../../utils/zod-form.utils';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-new-ticket',
@@ -66,25 +67,28 @@ export class NewTicket implements OnInit {
     this.errors = {};
     try {
       const raw = this.form.getRawValue();
-      const payload: any = {
+      const payload: CreateTicketPayload = {
         ticketName: raw.ticketName!,
         ...(raw.ticketDescription && { ticketDescription: raw.ticketDescription }),
-        ...(raw.startDate && { startDate: toISODate(raw.startDate) }),
-        ...(raw.endDate && { endDate: toISODate(raw.endDate) }),
-        ...(raw.status && { status: raw.status }),
-        ...(raw.category && { category: raw.category }),
-        ...(raw.priority && { priority: raw.priority }),
+        ...(raw.startDate && { startDate: toISODate(raw.startDate) ?? undefined }),
+        ...(raw.endDate && { endDate: toISODate(raw.endDate) ?? undefined }),
+        ...(raw.status && { status: raw.status as TicketStatus }),
+        ...(raw.category && { category: raw.category as TicketCategory }),
+        ...(raw.priority && { priority: raw.priority as TicketPriority }),
         ...(raw.projectId && { projectId: raw.projectId }),
       };
       const ticket = await firstValueFrom(this.ticketService.create(payload));
       this.toast.success('Ticket created.');
       this.router.navigate(['/dashboard/tickets', ticket.ticketCode]);
-    } catch (err: any) {
-      const fieldErrors = err.error?.errors?.fieldErrors;
-      if (fieldErrors && Object.keys(fieldErrors).length > 0) {
-        this.errors = fieldErrors;
-      } else {
-        this.toast.error(err.error?.message || 'Creation failed.');
+
+    } catch (err: unknown) {
+      if (err instanceof HttpErrorResponse) {
+        const fieldErrors = err.error?.errors?.fieldErrors;
+        if (fieldErrors && Object.keys(fieldErrors).length > 0) {
+          this.errors = fieldErrors;
+        } else {
+          this.toast.error(err.error?.message || 'Creation failed.');
+        }
       }
     }
     finally {

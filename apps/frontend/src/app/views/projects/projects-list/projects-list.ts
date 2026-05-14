@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Project, ProjectService } from '../../../services/project.service';
 import { firstValueFrom } from 'rxjs';
@@ -17,7 +17,7 @@ const COLUMNS: TableColumn<Project>[] = [
   imports: [DataTable],
   templateUrl: './projects-list.html',
 })
-export class ProjectsList {
+export class ProjectsList implements OnInit {
   private projectService = inject(ProjectService);
   private router = inject(Router);
 

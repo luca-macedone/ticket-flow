@@ -11,5 +11,9 @@
         "test": "pnpm -r --if-present test",
         "dev:fe": "pnpm --filter @apps/frontend dev",
         "dev:api": "pnpm --filter @apps/api dev"
+    },
+    "devDependencies": {
+        "husky": "^9.1.7",
+        "lint-staged": "^17.0.4"
     }
 }

@@ -8,8 +8,8 @@ import { TableColumn, DataTable } from '../../../components/tables/ticket-table/
 import { AuthService } from '../../../services/auth.service';
 import { SkeletonBlock } from '../../../components/skeleton/skeleton-block/skeleton-block';
 
-type TicketRow = { id: string; ticketCode: string; ticketName: string; status: string };
-type UserRow = { id: string; userCode: string; name: string; email: string };
+interface TicketRow { id: string; ticketCode: string; ticketName: string; status: string }
+interface UserRow { id: string; userCode: string; name: string; email: string }
 
 const TICKET_COLUMNS: TableColumn<TicketRow>[] = [
   { key: 'ticketCode', label: 'Code', getValue: (t) => t.ticketCode, cellClass: 'font-mono text-xs text-text/50' },

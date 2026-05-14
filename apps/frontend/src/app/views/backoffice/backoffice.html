@@ -51,23 +51,23 @@
     <!-- Template azioni colonna Approvals -->
     <ng-template #approvalActions let-user>
         @if (approvingCode() === user.userCode) {
-        <div class="flex items-center gap-2" (click)="$event.stopPropagation()">
+        <div class="flex items-center gap-2">
             <select class="px-2 py-1 bg-background border border-secondary/40 rounded-lg " [value]="selectedRole()"
                 (change)="selectedRole.set($any($event.target).value)">
                 <option value="CUSTOMER">Customer</option>
                 <option value="AGENT">Agent</option>
             </select>
             <button class="px-3 py-1 bg-accent/30 border border-accent/40 rounded-full  hover:opacity-90"
-                (click)="confirmApprove(user.userCode)">Confirm</button>
+                (click)="$event.stopPropagation(); confirmApprove(user.userCode)">Confirm</button>
             <button class="px-3 py-1 bg-text/10 rounded-full  hover:opacity-90"
-                (click)="cancelApprove()">Cancel</button>
+                (click)="$event.stopPropagation(); cancelApprove()">Cancel</button>
         </div>
         } @else {
-        <div class="flex gap-2" (click)="$event.stopPropagation()">
+        <div class="flex gap-2">
             <button class="px-3 py-1 bg-accent/30 border border-accent/40 rounded-full  hover:opacity-90"
-                (click)="startApprove(user.userCode)">Approve</button>
+                (click)="$event.stopPropagation(); startApprove(user.userCode)">Approve</button>
             <button class="px-3 py-1 bg-primary/20 border border-primary/40 rounded-full  hover:opacity-90"
-                (click)="rejectUser(user.userCode)">Reject</button>
+                (click)="$event.stopPropagation(); rejectUser(user.userCode)">Reject</button>
         </div>
         }
     </ng-template>

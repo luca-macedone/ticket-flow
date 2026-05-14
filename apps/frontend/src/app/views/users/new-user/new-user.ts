@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
@@ -8,6 +8,7 @@ import { SelectField } from '../../../components/fields/select-field/select-fiel
 import { KeyValuePipe } from '@angular/common';
 import { BaseCard } from '../../../components/overview-cards/base-card/base-card';
 import { ToastService } from '../../../components/toast/toast-service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-new-user',
@@ -34,20 +35,26 @@ export class NewUser {
 
   errors: Record<string, string[]> = {};
   get hasErrors() { return Object.keys(this.errors).length > 0; }
+  isSubmitting = signal<boolean>(false)
 
   async onSubmit() {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+    if (this.form.invalid || this.isSubmitting()) { this.form.markAllAsTouched(); return; }
     this.errors = {};
+    this.isSubmitting.set(true);
     try {
       const user = await firstValueFrom(this.userService.createUser(this.form.getRawValue() as any));
       this.router.navigate(['/dashboard/users', user.userCode]);
-    } catch (err: any) {
-      const fieldErrors = err.error?.errors?.fieldErrors;
-      if (fieldErrors && Object.keys(fieldErrors).length > 0) {
-        this.errors = fieldErrors;
-      } else {
-        this.toast.error(err.error?.message || 'Creation failed.');
+    } catch (err: unknown) {
+      if (err instanceof HttpErrorResponse) {
+        const fieldErrors = err.error?.errors?.fieldErrors;
+        if (fieldErrors && Object.keys(fieldErrors).length > 0) {
+          this.errors = fieldErrors;
+        } else {
+          this.toast.error(err.error?.message || 'Creation failed.');
+        }
       }
+    } finally {
+      this.isSubmitting.set(false);
     }
 
   }

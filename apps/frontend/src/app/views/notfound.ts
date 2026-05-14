@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { firstValueFrom } from 'rxjs';
@@ -7,7 +7,7 @@ import { firstValueFrom } from 'rxjs';
     selector: 'app-not-found-redirect',
     template: `` // vuoto: redirige subito
 })
-export class NotFoundRedirectComponent {
+export class NotFoundRedirectComponent implements OnInit {
     private router = inject(Router);
     private auth = inject(AuthService);
 

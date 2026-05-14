@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { Ticket, TicketService } from '../../services/ticket.service';
 import { firstValueFrom } from 'rxjs';
@@ -44,7 +44,7 @@ const CUSTOMER_COLUMNS: TableColumn<Ticket>[] = [
   templateUrl: './overview.html',
   styleUrl: './overview.css',
 })
-export class Overview {
+export class Overview implements OnInit {
   private auth = inject(AuthService);
   private ticketService = inject(TicketService);
   adminService = inject(AdminService);

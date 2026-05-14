@@ -29,11 +29,11 @@
         class="border rounded-4xl p-4  absolute top-auto left-auto right-auto z-50 border-secondary/40 backdrop-blur-3xl rounded-3xl w-fit flex flex-col gap-3 min-w-[400px] bg-text/10">
         <header class="flex justify-between items-center gap-6 border-b border-secondary/40 pb-3">
             <h2 class="text-xl font-heading">
-                @if (formType() == "login") {
+                @if (formType() === "login") {
                 Welcome Back
-                } @else if(formType() == "register") {
+                } @else if(formType() === "register") {
                 Create Account
-                } @else if(formType() == "pending") {
+                } @else if(formType() === "pending") {
                 Under Approval
                 }
             </h2>
@@ -44,11 +44,11 @@
                 </span>
             </button>
         </header>
-        @if(formType() == "login") {
+        @if(formType() === "login") {
         <app-login-form (changeView)="changeForm($event)" />
-        } @else if(formType() == "register"){
+        } @else if(formType() === "register"){
         <app-register-form (changeView)="changeForm($event)" />
-        } @else if(formType() == "pending") {
+        } @else if(formType() === "pending") {
         <div class="flex flex-col items-center gap-4 py-4 text-center">
             <p class="text-lg">Your account is under approval.</p>
             <p class="text-sm opacity-70">You will receive a notification whit the approval response.</p>

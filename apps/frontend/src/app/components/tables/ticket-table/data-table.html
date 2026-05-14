@@ -18,7 +18,8 @@
             </button>
             @if (showColumnPanel()) {
             <!-- backdrop trasparente per chiudere il panel cliccando fuori -->
-            <div class="fixed inset-0 z-10" (click)="showColumnPanel.set(false)"></div>
+            <div class="fixed inset-0 z-10" (click)="showColumnPanel.set(false)"
+                (keyup.escape)="showColumnPanel.set(false)" tabindex="-1"></div>
             <div
                 class="absolute right-0 z-20 mt-1 w-48 bg-background/40 backdrop-blur-3xl border border-text/20 rounded-xl shadow-lg p-3 flex flex-col gap-2">
                 @for (col of columnOrder(); track col.key) {
@@ -56,8 +57,8 @@
         }
         } @else {
         @for (row of rows(); track row.id) {
-        <div class="bg-text/5 hover:bg-text/10 rounded-xl p-3 cursor-pointer flex flex-col gap-1.5"
-            (click)="rowClick.emit(row)">
+        <div class="bg-text/5 hover:bg-text/10 rounded-xl p-3 cursor-pointer flex flex-col gap-1.5" role="button"
+            tabindex="0" (click)="rowClick.emit(row)" (keyup.enter)="rowClick.emit(row)">
             @for (col of visibleColumns(); track col.key; let first = $first) {
             @if (first) {
             <div class="font-semibold pb-1.5 border-b border-text/10">

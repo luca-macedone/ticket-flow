@@ -1,27 +1,8 @@
 import { Routes } from '@angular/router';
-
-import { Home } from './views/home/home';
-import { Dashboard } from './views/dashboard/dashboard';
 import { roleGuard } from './roleguard.service';
-import { NotFoundRedirectComponent } from './views/notfound';
-import { ProjectsList } from './views/projects/projects-list/projects-list';
-import { ProjectView } from './views/projects/project-view/project-view';
 import { Overview } from './views/overview/overview';
-import { UserList } from './views/users/user-list/user-list';
-import { CompaniesList } from './views/companies/companies-list/companies-list';
-import { CompanyView } from './views/companies/company-view/company-view';
-import { NewCompany } from './views/companies/new-company/new-company';
-import { EditCompany } from './views/companies/edit-company/edit-company';
-import { NewProject } from './views/projects/new-project/new-project';
-import { EditProject } from './views/projects/edit-project/edit-project';
-import { UserView } from './views/users/user-view/user-view';
-import { EditUser } from './views/users/edit-user/edit-user';
-import { NewUser } from './views/users/new-user/new-user';
-import { TicketsList } from './views/tickets/tickets-list/tickets-list';
-import { NewTicket } from './views/tickets/new-ticket/new-ticket';
-import { TicketView } from './views/tickets/ticket-view/ticket-view';
-import { EditTicket } from './views/tickets/edit-ticket/edit-ticket';
-import { Backoffice } from './views/backoffice/backoffice';
+import { Dashboard } from './views/dashboard/dashboard';
+import { Home } from './views/home/home';
 
 export const routes: Routes = [
     {
@@ -58,7 +39,7 @@ export const routes: Routes = [
                     breadcrumb: "Backoffice",
                     roles: ['admin']
                 },
-                component: Backoffice
+                loadComponent: () => import('./views/backoffice/backoffice').then(m => m.Backoffice)
             },
             {
                 path: "tickets",
@@ -66,7 +47,7 @@ export const routes: Routes = [
                 children: [
                     {
                         path: "",
-                        component: TicketsList,
+                        loadComponent: () => import('./views/tickets/tickets-list/tickets-list').then(m => m.TicketsList),
                         canActivate: [roleGuard],
                         data: {
                             roles: ['admin', 'agent', 'customer'],
@@ -75,7 +56,7 @@ export const routes: Routes = [
                     },
                     {
                         path: 'new',
-                        component: NewTicket,
+                        loadComponent: () => import('./views/tickets/new-ticket/new-ticket').then(m => m.NewTicket),
                         canActivate: [roleGuard],
                         data: {
                             roles: ['admin', 'agent', 'customer'],
@@ -84,7 +65,7 @@ export const routes: Routes = [
                     },
                     {
                         path: ':code',
-                        component: TicketView,
+                        loadComponent: () => import('./views/tickets/ticket-view/ticket-view').then(m => m.TicketView),
                         canActivate: [roleGuard],
                         data: {
                             roles: ['admin', 'agent', 'customer'],
@@ -93,7 +74,7 @@ export const routes: Routes = [
                     },
                     {
                         path: ':code/edit',
-                        component: EditTicket,
+                        loadComponent: () => import('./views/tickets/edit-ticket/edit-ticket').then(m => m.EditTicket),
                         canActivate: [roleGuard],
                         data: {
                             roles: ['admin', 'agent', 'customer'],
@@ -108,7 +89,7 @@ export const routes: Routes = [
                 children: [
                     {
                         path: "",
-                        component: ProjectsList,
+                        loadComponent: () => import('./views/projects/projects-list/projects-list').then(m => m.ProjectsList),
                         canActivate: [roleGuard],
                         data: {
                             roles: ['admin', 'agent', 'customer'],
@@ -116,7 +97,7 @@ export const routes: Routes = [
                     },
                     {
                         path: 'new',
-                        component: NewProject,
+                        loadComponent: () => import('./views/projects/new-project/new-project').then(m => m.NewProject),
                         canActivate: [roleGuard],
                         data: {
                             roles: ['admin', 'agent', 'customer'],
@@ -125,7 +106,7 @@ export const routes: Routes = [
                     },
                     {
                         path: ':code',
-                        component: ProjectView,
+                        loadComponent: () => import('./views/projects/project-view/project-view').then(m => m.ProjectView),
                         canActivate: [roleGuard],
                         data: {
                             roles: ['admin', 'agent', 'customer'],
@@ -134,7 +115,7 @@ export const routes: Routes = [
                     },
                     {
                         path: ':code/edit',
-                        component: EditProject,
+                        loadComponent: () => import('./views/projects/edit-project/edit-project').then(m => m.EditProject),
                         canActivate: [roleGuard],
                         data: {
                             roles: ['admin', 'agent', 'customer'],
@@ -149,7 +130,7 @@ export const routes: Routes = [
                 children: [
                     {
                         path: "",
-                        component: CompaniesList,
+                        loadComponent: () => import('./views/companies/companies-list/companies-list').then(m => m.CompaniesList),
                         canActivate: [roleGuard],
                         data: {
                             roles: ['admin'],
@@ -157,7 +138,7 @@ export const routes: Routes = [
                     },
                     {
                         path: 'new',
-                        component: NewCompany,
+                        loadComponent: () => import('./views/companies/new-company/new-company').then(m => m.NewCompany),
                         canActivate: [roleGuard],
                         data: {
                             roles: ['admin'],
@@ -166,7 +147,7 @@ export const routes: Routes = [
                     },
                     {
                         path: ':code',
-                        component: CompanyView,
+                        loadComponent: () => import('./views/companies/company-view/company-view').then(m => m.CompanyView),
                         canActivate: [roleGuard],
                         data: {
                             roles: ['admin'],
@@ -175,7 +156,7 @@ export const routes: Routes = [
                     },
                     {
                         path: ':code/edit',
-                        component: EditCompany,
+                        loadComponent: () => import('./views/companies/edit-company/edit-company').then(m => m.EditCompany),
                         canActivate: [roleGuard],
                         data: {
                             roles: ['admin'],
@@ -190,7 +171,7 @@ export const routes: Routes = [
                 children: [
                     {
                         path: "",
-                        component: UserList,
+                        loadComponent: () => import('./views/users/user-list/user-list').then(m => m.UserList),
                         canActivate: [roleGuard],
                         data: {
                             roles: ['admin'],
@@ -198,7 +179,7 @@ export const routes: Routes = [
                     },
                     {
                         path: 'new',
-                        component: NewUser,
+                        loadComponent: () => import('./views/users/new-user/new-user').then(m => m.NewUser),
                         canActivate: [roleGuard],
                         data: {
                             roles: ['admin'],
@@ -207,7 +188,7 @@ export const routes: Routes = [
                     },
                     {
                         path: ':code',
-                        component: UserView,
+                        loadComponent: () => import('./views/users/user-view/user-view').then(m => m.UserView),
                         canActivate: [roleGuard],
                         data: {
                             roles: ['admin'],
@@ -216,7 +197,7 @@ export const routes: Routes = [
                     },
                     {
                         path: ':code/edit',
-                        component: EditUser,
+                        loadComponent: () => import('./views/users/edit-user/edit-user').then(m => m.EditUser),
                         canActivate: [roleGuard],
                         data: {
                             roles: ['admin'],
@@ -229,7 +210,7 @@ export const routes: Routes = [
     },
     {
         path: "**",
-        component: NotFoundRedirectComponent,
+        loadComponent: () => import('./views/notfound').then(m => m.NotFoundRedirectComponent),
     },
 
 ];

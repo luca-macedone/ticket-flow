@@ -8,13 +8,14 @@ import { InputField } from '../../../components/fields/input-field/input-field';
 import { TextareaField } from '../../../components/fields/textarea-field/textarea-field';
 import { SelectField, SelectOption } from '../../../components/fields/select-field/select-field';
 import { DateField } from '../../../components/fields/date-field/date-field';
-import { TicketService } from '../../../services/ticket.service';
+import { TicketCategory, TicketPriority, TicketService, TicketStatus, UpdateTicketPayload } from '../../../services/ticket.service';
 import { ProjectService } from '../../../services/project.service';
 import { TICKET_CATEGORY_OPTIONS, TICKET_PRIORITY_OPTIONS, TICKET_STATUS_OPTIONS } from '../../../services/constants/ticket.constants';
 import { dateRangeValidator } from '../../../services/ticket.validator';
 import { SkeletonBlock } from "../../../components/skeleton/skeleton-block/skeleton-block";
 import { ToastService } from '../../../components/toast/toast-service';
 import { toISODate } from '../../../utils/zod-form.utils';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-edit-ticket',
@@ -93,18 +94,25 @@ export class EditTicket implements OnInit {
     try {
       const raw = this.form.getRawValue();
       await firstValueFrom(this.ticketService.update(this.code, {
-        ...raw as any,
-        startDate: toISODate(raw.startDate),
-        endDate: toISODate(raw.endDate) ?? null,
-      }));
+        ticketName: raw.ticketName ?? undefined,
+        ticketDescription: raw.ticketDescription ?? undefined,
+        startDate: toISODate(raw.startDate) ?? undefined,
+        endDate: toISODate(raw.endDate) ?? undefined,
+        ...(raw.status && { status: raw.status as TicketStatus }),
+        ...(raw.category && { category: raw.category as TicketCategory }),
+        ...(raw.priority && { priority: raw.priority as TicketPriority }),
+        ...(raw.projectId && { projectId: raw.projectId }),
+      } satisfies UpdateTicketPayload));
       this.toast.success('Ticket updated.')
       this.router.navigate(['/dashboard/tickets', this.code]);
-    } catch (err: any) {
-      const fieldErrors = err.error?.errors?.fieldErrors;
-      if (fieldErrors && Object.keys(fieldErrors).length > 0) {
-        this.errors = fieldErrors;
-      } else {
-        this.toast.error(err.error?.message || 'Patch failed.');
+    } catch (err: unknown) {
+      if (err instanceof HttpErrorResponse) {
+        const fieldErrors = err.error?.errors?.fieldErrors;
+        if (fieldErrors && Object.keys(fieldErrors).length > 0) {
+          this.errors = fieldErrors;
+        } else {
+          this.toast.error(err.error?.message || 'Patch failed.');
+        }
       }
     }
     finally {

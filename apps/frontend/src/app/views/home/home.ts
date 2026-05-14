@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LoginForm } from "../../components/login-form/login-form";
@@ -11,7 +11,7 @@ import { AuthService } from '../../services/auth.service';
   imports: [FormsModule, ReactiveFormsModule, LoginForm, RegisterForm, NgIcon],
   templateUrl: './home.html',
 })
-export class Home {
+export class Home implements OnInit {
   reason: string | null = null;
   isFormVisible = signal<boolean>(false)
   formType = signal<"register" | "login" | "pending">("login")
@@ -27,7 +27,7 @@ export class Home {
     } else {
       this.auth.me().subscribe({
         next: () => this.router.navigate(['/dashboard']),
-        error: () => { }
+        error: () => {/* not authenticated, stay on home */ }
       });
     }
   }

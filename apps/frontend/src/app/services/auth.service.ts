@@ -18,7 +18,7 @@ export class AuthService {
   readonly user = signal<AuthUser | null>(null);
   private refreshInProgress$: Observable<void> | null = null;
 
-  login(email: string, password: string, rememberMe: boolean = false) {
+  login(email: string, password: string, rememberMe = false) {
     return this.http.post<AuthUser>('/api/auth/login', { email, password, rememberMe },
       { withCredentials: true }
     ).pipe(tap(u => this.user.set(u)));

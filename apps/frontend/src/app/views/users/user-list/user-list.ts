@@ -1,4 +1,4 @@
-import { Component, inject, signal, ViewChild, TemplateRef, AfterViewInit } from '@angular/core';
+import { Component, inject, signal, ViewChild, TemplateRef, AfterViewInit, OnInit } from '@angular/core';
 import { AdminUser, UserService } from '../../../services/user.service';
 import { firstValueFrom } from 'rxjs';
 import { DataTable, TableColumn } from '../../../components/tables/ticket-table/data-table';
@@ -14,7 +14,7 @@ import { AdminService } from '../../../services/admin.service';
   templateUrl: './user-list.html',
   styleUrl: './user-list.css',
 })
-export class UserList implements AfterViewInit {
+export class UserList implements AfterViewInit, OnInit {
   private userService = inject(UserService);
   private adminService = inject(AdminService);
   private router = inject(Router);
@@ -81,8 +81,8 @@ export class UserList implements AfterViewInit {
 
   async rejectUser(code: string) {
     try {
-      const updated = await firstValueFrom(this.adminService.changeUserStatus(code, 'REJECTED'));
-      this.users.update(list => list.map(u => u.userCode === code ? { ...u, ...updated } : u));
+      await firstValueFrom(this.adminService.changeUserStatus(code, 'REJECTED'));
+      this.users.update(list => list.map(u => u.userCode === code ? { ...u, status: 'REJECTED' } : u));
       this.toast.success('User rejected.');
     } catch {
       this.toast.error('Action failed. Retry.');
@@ -91,8 +91,8 @@ export class UserList implements AfterViewInit {
 
   async suspendUser(code: string) {
     try {
-      const updated = await firstValueFrom(this.adminService.changeUserStatus(code, 'SUSPENDED'));
-      this.users.update(list => list.map(u => u.userCode === code ? { ...u, ...updated } : u));
+      await firstValueFrom(this.adminService.changeUserStatus(code, 'SUSPENDED'));
+      this.users.update(list => list.map(u => u.userCode === code ? { ...u, status: 'SUSPENDED' } : u));
       this.toast.success('User suspended.');
     } catch {
       this.toast.error('Action failed. Retry.');
@@ -101,8 +101,8 @@ export class UserList implements AfterViewInit {
 
   async reactivateUser(code: string) {
     try {
-      const updated = await firstValueFrom(this.adminService.changeUserStatus(code, 'APPROVED'));
-      this.users.update(list => list.map(u => u.userCode === code ? { ...u, ...updated } : u));
+      await firstValueFrom(this.adminService.changeUserStatus(code, 'APPROVED'));
+      this.users.update(list => list.map(u => u.userCode === code ? { ...u, status: 'APPROVED' } : u));
       this.toast.success('User reactivated.');
     } catch {
       this.toast.error('Action failed. Retry.');

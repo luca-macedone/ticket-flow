@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { ActivatedRouteSnapshot, NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 
@@ -6,23 +6,23 @@ import { filter } from 'rxjs';
   providedIn: 'root',
 })
 export class BreadcrumbService {
-  breadcrumbs: Array<{ label: string, url: string }> = []
+  private router = inject(Router);
 
-  constructor(private router: Router) {
-    this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe(() => {
-        this.breadcrumbs = this.buildBreadcrumbs(this.router.routerState.snapshot.root)
-      })
+  breadcrumbs: { label: string; url: string }[] = [];
+
+  constructor() {
+    this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
+      this.breadcrumbs = this.buildBreadcrumbs(this.router.routerState.snapshot.root);
+    });
   }
 
   private buildBreadcrumbs(
     route: ActivatedRouteSnapshot,
-    url: string = "",
-    breadcrumbs: any[] = []
-  ): any[] {
+    url = '',
+    breadcrumbs: { label: string; url: string }[] = [],
+  ): { label: string; url: string }[] {
     const label = route.data['breadcrumb'];
-    const pathSegments = route.url.map(s => s.path).join('/');
+    const pathSegments = route.url.map((s) => s.path).join('/');
 
     if (pathSegments) {
       url = `${url}/${pathSegments}`;
@@ -38,8 +38,7 @@ export class BreadcrumbService {
     return breadcrumbs;
   }
 
-
   getBreadcrumbs() {
-    return this.breadcrumbs
+    return this.breadcrumbs;
   }
 }

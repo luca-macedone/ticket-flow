@@ -50,7 +50,7 @@ export class AdminService {
   }
 
   getAdminLogs(page = 1, amount = 50, targetType?: string) {
-    const params: any = { page, amount };
+    const params: Record<string, string | number> = { page, amount };
     if (targetType) params['targetType'] = targetType;
     return this.http.get<{ data: AdminLog[]; total: number; page: number }>(
       '/api/admin/logs/admin',
@@ -59,7 +59,7 @@ export class AdminService {
   }
 
   getSystemLogs(page = 1, amount = 50, level?: string) {
-    const params: any = { page, amount };
+    const params: Record<string, string | number> = { page, amount };
     if (level) params['level'] = level;
     return this.http.get<{ data: SystemLog[]; total: number; page: number }>(
       '/api/admin/logs/system',
@@ -68,7 +68,7 @@ export class AdminService {
   }
 
   changeUserStatus(code: string, status: 'REJECTED' | 'SUSPENDED' | 'APPROVED') {
-    return this.http.patch<any>(
+    return this.http.patch<void>(
       `/api/admin/users/${code}/status`,
       { status },
       { withCredentials: true }

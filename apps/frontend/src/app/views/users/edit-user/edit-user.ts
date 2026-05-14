@@ -8,6 +8,7 @@ import { SelectField } from '../../../components/fields/select-field/select-fiel
 import { KeyValuePipe } from '@angular/common';
 import { BaseCard } from '../../../components/overview-cards/base-card/base-card';
 import { ToastService } from '../../../components/toast/toast-service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-edit-user',
@@ -59,15 +60,16 @@ export class EditUser implements OnInit {
       await firstValueFrom(this.userService.updateUser(this.code, this.form.getRawValue() as any));
       this.toast.success('User updated.')
       this.router.navigate(['/dashboard/users', this.code]);
-    } catch (err: any) {
-      const fieldErrors = err.error?.errors?.fieldErrors;
-      if (fieldErrors && Object.keys(fieldErrors).length > 0) {
-        this.errors = fieldErrors;
-      } else {
-        this.toast.error(err.error?.message || 'Patch failed.');
+    } catch (err: unknown) {
+      if (err instanceof HttpErrorResponse) {
+        const fieldErrors = err.error?.errors?.fieldErrors;
+        if (fieldErrors && Object.keys(fieldErrors).length > 0) {
+          this.errors = fieldErrors;
+        } else {
+          this.toast.error(err.error?.message || 'Patch failed.');
+        }
       }
     }
-
   }
 
   cancel() { this.router.navigate(['/dashboard/users', this.code]); }

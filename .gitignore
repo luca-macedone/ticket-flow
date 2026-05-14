@@ -91,3 +91,4 @@ Thumbs.db
 ############################################
 bazel-out/
 ``
+apps/frontend/public/fonts/

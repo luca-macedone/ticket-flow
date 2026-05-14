@@ -21,7 +21,7 @@
     <ng-content select="[skeleton]" />
     @if(skeletonLines() > 0) {
     @for(i of skeletonLineRange(); track i) {
-    @if(skeletonVariant() == 'pills') {
+    @if(skeletonVariant() === 'pills') {
     <app-skeleton-block class="h-10 rounded-full" [style.width.%]="70+(i%3)*10" [style.--sk-delay]="(i * 0.12) + 's'" />
     } @else {
     <div class="grid grid-cols-2 gap-2" [style.--sk-delay]="(i * 0.12) + 's'">

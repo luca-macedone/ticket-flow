@@ -8,8 +8,8 @@ import { DatePipe } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
 import { SkeletonBlock } from '../../../components/skeleton/skeleton-block/skeleton-block';
 
-type TicketRow = { id: string; ticketCode: string; ticketName: string; status: string };
-type ProjectRow = { id: string; projectCode: string; projectName: string };
+interface TicketRow { id: string; ticketCode: string; ticketName: string; status: string }
+interface ProjectRow { id: string; projectCode: string; projectName: string }
 
 const PROJECT_COLUMNS: TableColumn<ProjectRow>[] = [
   { key: 'projectCode', label: 'Code', getValue: (p) => p.projectCode, cellClass: 'font-font-mono text-xs text-text/50' },
@@ -56,7 +56,7 @@ export class UserView implements OnInit {
         this.loading.set(true);
         const data = await firstValueFrom(this.userService.getUserByCode(code!));
         this.user.set(data);
-      } catch (error) {
+      } catch {
         this.error.set('User not found.');
       } finally {
         this.loading.set(false);

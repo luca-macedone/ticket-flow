@@ -7,6 +7,7 @@ import { KeyValuePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { InputField } from "../fields/input-field/input-field";
 import { SelectField } from "../fields/select-field/select-field";
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
 	selector: 'app-register-form',
@@ -53,9 +54,17 @@ export class RegisterForm {
 			// pending: setta lo stato e naviga alla dashboard bloccata
 			this.changeView.emit("pending");
 			this.router.navigate(['/dashboard']);
-		} catch (err: any) {
-			this.errors = {
-				auth: [err.error?.message ?? "Registration failed"]
+		} catch (err: unknown) {
+			if (err instanceof HttpErrorResponse) {
+				this.errors = {
+					auth: [err.error?.message ?? "Registration failed"]
+				}
+				if (err.status === 403) {
+					this.changeView.emit('pending')
+					return;
+				}
+			} else {
+				this.errors = { auth: ['Registration failed'] };
 			}
 			this.cdr.detectChanges()
 		}

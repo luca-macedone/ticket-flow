@@ -88,7 +88,7 @@ export class Backoffice implements OnInit, AfterViewInit {
   }
 
   async switchTab(tab: typeof this.selectedTab extends ReturnType<infer F> ? Parameters<F>[0] : never) {
-    this.selectedTab.set(tab as any);
+    this.selectedTab.set(tab);
     if (tab === 'admin-logs' && !this.adminLogsLoaded()) await this.loadAdminLogs(1);
     if (tab === 'system-logs' && !this.systemLogsLoaded()) await this.loadSystemLogs(1);
   }

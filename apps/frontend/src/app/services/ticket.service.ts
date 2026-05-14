@@ -50,7 +50,7 @@ export class TicketService {
   private http = inject(HttpClient);
 
   getMyQueue(page = 1, amount = 20, sortBy?: string, sortDir?: string) {
-    const params: any = { page, amount };
+    const params: Record<string, string | number> = { page, amount };
     if (sortBy) { params['sortBy'] = sortBy; params['sortDir'] = sortDir ?? 'asc'; }
 
     return this.http.get<PaginatedTickets>('/api/tickets/my-queue', {
@@ -60,7 +60,7 @@ export class TicketService {
   }
 
   getMyTickets(page = 1, amount = 20, sortBy?: string, sortDir?: string) {
-    const params: any = { page, amount };
+    const params: Record<string, string | number> = { page, amount };
     if (sortBy) { params['sortBy'] = sortBy; params['sortDir'] = sortDir ?? 'asc'; }
 
     return this.http.get<PaginatedTickets>('/api/tickets/my-tickets', {
@@ -70,7 +70,7 @@ export class TicketService {
   }
 
   getAll(page = 1, amount = 20, sortBy?: string, sortDir?: string) {
-    const params: any = { page, amount };
+    const params: Record<string, string | number> = { page, amount };
     if (sortBy) { params['sortBy'] = sortBy; params['sortDir'] = sortDir ?? 'desc'; }
     return this.http.get<PaginatedTickets>('/api/tickets', {
       params,
