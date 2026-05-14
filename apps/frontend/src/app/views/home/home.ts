@@ -22,14 +22,14 @@ export class Home implements OnInit {
 
   ngOnInit() {
     this.reason = this.route.snapshot.queryParams['reason'];
-    if (this.reason) {
-      this.isFormVisible.set(true);
-    } else {
-      this.auth.me().subscribe({
-        next: () => this.router.navigate(['/dashboard']),
-        error: () => {/* not authenticated, stay on home */ }
-      });
-    }
+    this.auth.me().subscribe({
+      next: () => this.router.navigate(['/dashboard']),
+      error: () => {
+        // If the guard redirected here with a reason, show the login form.
+        // Without a reason the user is on the landing page by choice.
+        if (this.reason) this.isFormVisible.set(true);
+      }
+    })
   }
 
   toggleForm() {

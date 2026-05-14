@@ -9,6 +9,7 @@ export interface JwtPayload {
     userId: string;
     role: string;
     persist?: boolean;
+    loginAt?: number;
 }
 
 export function signAccessToken(payload: JwtPayload): string {
@@ -30,5 +31,5 @@ export function verifyAccessToken(token: string): JwtPayload {
 
 export function verifyRefreshToken(token: string): JwtPayload {
     const decoded = jwt.verify(token, REFRESH_SECRET) as JwtPayload;
-    return { userId: decoded.userId, role: String(decoded.role), persist: decoded.persist };
+    return { userId: decoded.userId, role: String(decoded.role), persist: decoded.persist, loginAt: decoded.loginAt };
 }

@@ -41,7 +41,8 @@ router.post("/login", loginRateLimit, zodValidate(LoginSchema), async (req: Requ
     const payload: JwtPayload = {
         userId: user.id.toString(),
         role: user.role.toLowerCase(),
-        persist: !!rememberMe
+        persist: !!rememberMe,
+        loginAt: rememberMe ? Date.now() : undefined,
     };
 
     res.clearCookie('refreshToken', { ...BASE_COOKIE, path: '/api/auth/refresh' });
@@ -67,13 +68,23 @@ router.post("/refresh", async (req: Request, res: Response) => {
     try {
         const payload = verifyRefreshToken(token);
 
-        // verifica che l'utente esista ancora ed sia ancora approvato
+        // force re-login every month for persisten sessions
+        const THIRTY_DAY_MS = 30 * 24 * 60 * 60 * 1000;
+        if (payload.persist && payload.loginAt && Date.now() - payload.loginAt > THIRTY_DAY_MS) {
+            res.clearCookie('refreshToken', { ...BASE_COOKIE, path: '/api/auth/refresh' });
+        }
+
         const user = await prisma.user.findUnique({ where: { id: BigInt(payload.userId) } });
         if (!user || user.status !== "APPROVED") {
             return res.status(401).json({ message: "Invalid session" });
         }
 
-        const newPayload: JwtPayload = { userId: user.id.toString(), role: user.role.toLowerCase(), persist: payload.persist };
+        const newPayload: JwtPayload = {
+            userId: user.id.toString(),
+            role: user.role.toLowerCase(),
+            persist: payload.persist,
+            loginAt: payload.loginAt,
+        };
 
         res.clearCookie('refreshToken', { ...BASE_COOKIE, path: '/api/auth/refresh' });
         res.cookie('accessToken', signAccessToken(newPayload), payload.persist ? ACCESS_COOKIE_OPTIONS : ACCESS_SESSION_OPTIONS);

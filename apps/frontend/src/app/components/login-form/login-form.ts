@@ -18,7 +18,7 @@ export class LoginForm {
 	loginForm = new FormGroup({
 		email: new FormControl("", [Validators.required, Validators.email]),
 		password: new FormControl("", [Validators.required, Validators.minLength(8)]),
-		rememberMe: new FormControl(false),
+		rememberMe: new FormControl(false, { nonNullable: true }),
 	})
 	errors: Record<string, string[]> = {};
 	private auth = inject(AuthService)
