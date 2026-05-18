@@ -7,6 +7,7 @@ export interface AuthUser {
   email: string;
   name: string;
   role: string;
+  userCode: string | null;
   status: 'PENDING_APPROVAL' | 'APPROVED' | 'REJECTED';
 }
 

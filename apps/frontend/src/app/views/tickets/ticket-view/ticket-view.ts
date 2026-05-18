@@ -8,10 +8,11 @@ import { DatePipe } from '@angular/common';
 import { NgIcon } from "@ng-icons/core";
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SkeletonBlock } from "../../../components/skeleton/skeleton-block/skeleton-block";
+import { TicketComments } from '../../../components/ticket-comments/ticket-comments';
 
 @Component({
   selector: 'app-ticket-view',
-  imports: [BaseCard, DatePipe, RouterLink, NgIcon, SkeletonBlock],
+  imports: [BaseCard, DatePipe, RouterLink, NgIcon, SkeletonBlock, TicketComments],
   templateUrl: './ticket-view.html',
   styleUrl: './ticket-view.css',
 })

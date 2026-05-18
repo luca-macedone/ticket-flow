@@ -48,17 +48,17 @@ router.post("/login", loginRateLimit, zodValidate(LoginSchema), async (req: Requ
     res.clearCookie('refreshToken', { ...BASE_COOKIE, path: '/api/auth/refresh' });
     res.cookie('accessToken', signAccessToken(payload), rememberMe ? ACCESS_COOKIE_OPTIONS : ACCESS_SESSION_OPTIONS);
     res.cookie('refreshToken', signRefreshToken(payload), rememberMe ? REFRESH_COOKIE_OPTIONS : REFRESH_SESSION_OPTIONS);
-    res.json({ name: user.name, role: user.role.toLowerCase(), status: user.status, email: user.email });
+    res.json({ name: user.name, role: user.role.toLowerCase(), status: user.status, email: user.email, userCode: user.userCode });
 });
 
 
 router.get('/me', requireAuth, async (req: Request, res: Response) => {
     const user = await prisma.user.findUnique({
         where: { id: BigInt(req.user.userId) },
-        select: { name: true, role: true, status: true, email: true }
+        select: { name: true, role: true, status: true, email: true, userCode: true }
     });
     if (!user) return res.status(401).json({ message: 'User not found' });
-    res.json({ name: user.name, role: user.role.toLowerCase(), status: user.status, email: user.email });
+    res.json({ name: user.name, role: user.role.toLowerCase(), status: user.status, email: user.email, userCode: user.userCode });
 });
 
 router.post("/refresh", async (req: Request, res: Response) => {

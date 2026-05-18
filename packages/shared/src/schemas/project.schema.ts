@@ -40,3 +40,7 @@ export const ProjectResponseSchema = ProjectShape
         createdAt: z.string().datetime(),
         updatedAt: z.string().datetime(),
     });
+
+export const ProjectMemberSchema = z.object({
+    userCode: z.string().trim().min(1),
+})

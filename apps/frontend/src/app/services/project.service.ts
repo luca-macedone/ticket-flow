@@ -74,4 +74,12 @@ export class ProjectService {
       withCredentials: true,
     });
   }
+
+  addMember(projectCode: string, userCode: string) {
+    return this.http.post<void>(`/api/projects/${projectCode}/members`, { userCode }, { withCredentials: true })
+  }
+
+  removeMember(projectCode: string, userCode: string) {
+    return this.http.delete<void>(`/api/projects/${projectCode}/members/${userCode}`, { withCredentials: true })
+  }
 }

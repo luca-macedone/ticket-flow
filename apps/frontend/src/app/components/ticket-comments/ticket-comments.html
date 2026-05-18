@@ -1,0 +1,40 @@
+<app-base-card [loading]="loading()">
+    @for (comment of comments(); track comment.id) {
+    <div class="flex flex-col gap-1 px-4 py-3 border border-text/10 rounded-xl">
+        <div class="flex items-center justify-between gap-2">
+            <strong class="font-body text-secondary font-semibold text-sm">{{ comment.author.name }}</strong>
+            <div class="flex items-center gap-2">
+                @if (comment.visibility === 'INTERNAL') {
+                <span class="text-xs px-2 py-0.5 rounded-full bg-accent/20 text-accent font-mono">internal</span>
+                }
+                <span class="text-xs text-text/50">{{ comment.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                @if (canDelete(comment)) {
+                <button class="text-xs text-primary/60 hover:text-primary transition-all"
+                    (click)="deleteComment(comment)">Delete</button>
+                }
+            </div>
+        </div>
+        <p class="font-body text-text/80 whitespace-pre-line">{{ comment.content }}</p>
+    </div>
+    } @empty {
+    @if (!loading()) {
+    <p class="text-text/50 italic pt-3">No comments yet.</p>
+    }
+    }
+
+    <form class="flex flex-col gap-3 pt-2 border-t border-text/10 mt-2" [formGroup]="commentForm" (ngSubmit)="submit()">
+        <app-textarea-field label="Add a comment" id="comment-content" [control]="contentControl"
+            placeholder="Write a comment..." [rows]="3" />
+        @if (canSeeInternal()) {
+        <app-select-field label="Visibility" id="comment-visibility" [control]="visibilityControl"
+            [options]="visibilityOptions" />
+        }
+        <div class="flex justify-end">
+            <button type="submit"
+                class="border border-secondary/40 bg-secondary/30 text-text px-8 py-2 rounded-full font-body text-base hover:opacity-90 transition-all ease-in disabled:opacity-40"
+                [disabled]="contentControl.invalid || submitting()">
+                {{ submitting() ? 'Sending...' : 'Send' }}
+            </button>
+        </div>
+    </form>
+</app-base-card>

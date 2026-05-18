@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { createProject, deleteProject, getProjectByCode, getProjects, updateProject } from "../controllers/project.controller";
+import { addProjectMember, createProject, deleteProject, getProjectByCode, getProjects, removeProjectMember, updateProject } from "../controllers/project.controller";
 import { zodValidate } from "../middlewares/zodValidate";
-import { CreateProjectSchema, UpdateProjectSchema } from "@packages/shared";
+import { CreateProjectSchema, ProjectMemberSchema, UpdateProjectSchema } from "@packages/shared";
 import { requireAuth } from "../middlewares/requireAuth";
 import { requireRole } from "../middlewares/requireRole";
 
@@ -38,6 +38,19 @@ router.delete(
     requireAuth,
     requireRole("ADMIN"),
     deleteProject
+);
+router.post(
+    "/:code/members",
+    requireAuth,
+    requireRole("ADMIN"),
+    zodValidate(ProjectMemberSchema),
+    addProjectMember
+);
+router.delete(
+    "/:code/members/:userCode",
+    requireAuth,
+    requireRole("ADMIN"),
+    removeProjectMember
 );
 
 export default router;

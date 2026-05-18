@@ -5,6 +5,7 @@ import projectRoutes from "./routes/project.routes"
 import userRoutes from "./routes/user.routes"
 import authRoutes from "./routes/auth.routes"
 import adminRoutes from "./routes/admin.routes"
+import commentRoutes from "./routes/comment.routes"
 import { globalErrorHandler } from "./middlewares/globalErrorHandler";
 import swaggerUi from "swagger-ui-express";
 import { generateOpenApiDoc } from "./openapi/generator";
@@ -44,5 +45,6 @@ app.use("/api/users", userRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/companies", companyRoutes);
 app.use("/api/tickets", ticketRoutes);
+app.use("/api/tickets/:code/comments", commentRoutes);
 
 app.use(globalErrorHandler)

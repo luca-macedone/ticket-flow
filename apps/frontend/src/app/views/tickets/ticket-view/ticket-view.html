@@ -1,4 +1,4 @@
-<section>
+<section class="grid grid-cols-2 gap-3">
     @if (error()) {
     <p class="text-red-400">{{ error() }}</p>
     } @else {
@@ -32,7 +32,7 @@
         @if (!loading() && ticket()) {
         <main class="grid grid-cols-2 gap-3">
             <app-base-card description="Ticket Details" class="col-span-2">
-                <div class="flex gap-3 w-full">
+                <div class="flex flex-col gap-3 w-full">
                     <app-base-card variant="opposite" class="w-full">
                         <span class="px-6 py-2 border border-text/10 rounded-full italic font-heading">
                             <strong class="not-italic text-base font-body">Code:</strong>
@@ -95,5 +95,11 @@
         }
 
     </app-base-card>
+    @if (!loading() && ticket()) {
+    <app-base-card variant="opposite" title="Comments" description="All the comments related to the ticket">
+        <app-ticket-comments [ticketCode]="ticket()!.ticketCode" />
+    </app-base-card>
+    }
+
     }
 </section>

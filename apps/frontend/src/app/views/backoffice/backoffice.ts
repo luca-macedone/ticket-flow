@@ -148,7 +148,7 @@ export class Backoffice implements OnInit, AfterViewInit {
 
   // ── badge helpers ─────────────────────────────────────
   actionBadge(action: string): string {
-    if (action.endsWith('_CREATE') || action.endsWith('_APPROVE') || action.endsWith('_REACTIVATE'))
+    if (action.endsWith('_CREATE') || action.endsWith('_APPROVE') || action.endsWith('_REACTIVATE') || action.endsWith('_ADD'))
       return 'bg-accent/20 border border-accent/40 text-accent';
     if (action.endsWith('_UPDATE'))
       return 'bg-secondary/30 border border-secondary/40 text-text';

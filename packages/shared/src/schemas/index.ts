@@ -4,3 +4,4 @@ export * from "./ticket.schema.js";
 export * from "./user.schema.js";
 export * from "./enums.js";
 export * from "./common.schema.js";
+export * from "./comment.schema.js";

@@ -199,3 +199,54 @@ export async function deleteProject(req: Request, res: Response) {
     }
 }
 
+// ? post:/projects/:code/members
+export const addProjectMember = async (req: AuthRequest, res: Response) => {
+    try {
+        const { code } = req.params;
+        const { userCode } = req.body;
+
+        const project = await prisma.project.findUnique({ where: { projectCode: code as string } });
+        if (!project) return res.status(404).json({ error: 'Project not found' });
+
+        const user = await prisma.user.findUnique({ where: { userCode } });
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        if (user.status !== 'APPROVED') return res.status(400).json({ error: 'User not approved' });
+
+        await prisma.project.update({
+            where: { id: project.id },
+            data: { users: { connect: { id: user.id } } },
+        });
+
+        logAdminAction(req.user!.userId, 'PROJECT_MEMBER_ADD', 'PROJECT', project.projectCode ?? undefined, project.projectName, { userCode });
+
+        return res.status(200).json({ data: { message: 'Member added' } });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+// ? delete:/projects/:code/members/:userCode
+export const removeProjectMember = async (req: AuthRequest, res: Response) => {
+    try {
+        const { code, userCode } = req.params;
+
+        const project = await prisma.project.findUnique({ where: { projectCode: code as string } });
+        if (!project) return res.status(404).json({ error: 'Project not found' });
+
+        const user = await prisma.user.findUnique({ where: { userCode: userCode as string } });
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        await prisma.project.update({
+            where: { id: project.id },
+            data: { users: { disconnect: { id: user.id } } },
+        });
+
+        logAdminAction(req.user!.userId, 'PROJECT_MEMBER_REMOVE', 'PROJECT', project.projectCode ?? undefined, project.projectName, { userCode });
+
+        return res.status(204).send();
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};

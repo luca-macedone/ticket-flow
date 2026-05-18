@@ -62,12 +62,53 @@
             </app-base-card>
             @if (isAdmin() || isAgent()) {
             <app-base-card title="users">
+
+                @if (isAdmin()) {
+                <!-- lista admin con bottone rimuovi -->
+                <div class="flex flex-col gap-2">
+                    @for (user of project()?.users ?? []; track user.id) {
+                    <div class="flex items-center justify-between px-4 py-2 border border-text/10 rounded-xl">
+                        <div class="flex flex-col">
+                            <span class="font-body font-medium text-sm">{{ user.name }}</span>
+                            <span class="font-body text-xs text-text/50">{{ user.email }}</span>
+                        </div>
+                        <button class="text-xs text-primary/60 hover:text-primary transition-all font-body"
+                            (click)="removeMember(user.userCode); $event.stopPropagation()">
+                            Remove
+                        </button>
+                    </div>
+                    } @empty {
+                    <p class="text-sm text-text/50 italic">No users assigned.</p>
+                    }
+                </div>
+
+                <!-- add member -->
+                <div class="flex flex-col gap-3 pt-3 border-t border-text/10 mt-1">
+                    <p class="text-sm font-body font-medium">Add member</p>
+                    <div class="flex gap-2 items-end">
+                        <div class="flex-1">
+                            <app-select-field label="" id="add-member" [control]="addMemberControl"
+                                [options]="availableUsers()" placeholder="Select a user..." />
+                        </div>
+                        <button
+                            class="border border-secondary/40 bg-secondary/30 text-text px-6 py-2 rounded-full font-body text-sm hover:opacity-90 transition-all ease-in disabled:opacity-40"
+                            [disabled]="!addMemberControl.value || addingMember()" (click)="addMember()">
+                            {{ addingMember() ? 'Adding...' : 'Add' }}
+                        </button>
+                    </div>
+                </div>
+
+                } @else {
+                <!-- vista agent: solo lettura -->
                 <app-data-table [columns]="userColumns" [rows]="pagedUsers()" [total]="(project()!.users?.length ?? 0)"
                     [page]="userPage()" [pageSize]="pageSize" emptyMessage="No users assigned."
                     (pageChange)="userPage.set($event)" (rowClick)="viewUser($event)" variant="opposite">
                 </app-data-table>
+                }
+
             </app-base-card>
             }
+
         </main>
         <footer class="col-span-2 flex justify-end">
             @if (isAdmin()) {
