@@ -36,3 +36,19 @@ export const TicketResponseSchema = TicketShape.extend({
     resolvedAt: isoDate.optional().nullable(),
     reporterId: idSchema.optional().nullable(),
 });
+
+export const TicketFilterQuerySchema = z.object({
+    status: StatusEnum.optional(),
+    category: TicketCategoryEnum.optional(),
+    priority: PriorityEnum.optional(),
+    projectCode: z.string().optional(),
+    assigneeCode: z.string().optional(),
+    page: z.coerce.number().min(1).default(1),
+    amount: z.coerce.number().min(1).max(100).default(20),
+    sortBy: z.enum(['ticketName', 'priority', 'status', 'createdAt']).default('priority'),
+    sortDir: z.enum(['asc', 'desc']).default('asc'),
+})
+
+export const AssignTicketSchema = z.object({
+    assigneeCode: z.string().nullable(),
+})
