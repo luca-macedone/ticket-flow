@@ -5,35 +5,60 @@ import { AuthRequest } from "../middlewares/requireAuth";
 import { parseSortParams, PRIORITY_SQL_ORDER, serializeOrmRow, serializeRawRow } from "../utils/ticket-sort";
 import { randomUUID } from 'crypto';
 import { logAdminAction } from "../utils/logger";
+import { AssignTicketSchema, TicketFilterQuerySchema } from "@packages/shared";
 
 const CLOSED = ['DONE', 'CANCELLED', 'REJECTED'] as const;
 
 //? get:/tickets
 export async function getTickets(req: Request, res: Response) {
     try {
-        const page = Number(req.query.page ?? 1);
-        const take = Number(req.query.amount ?? 20);
-        const skip = (page - 1) * take;
-        const { sortBy, sortDir, sqlDir } = parseSortParams(req.query as any);
+        const { status, category, priority, projectCode, assigneeCode, page, amount, sortBy, sortDir, sqlDir } = TicketFilterQuerySchema.parse(req.query);
+        const skip = (page - 1) * amount;
 
-        const total = await prisma.ticket.count();
+        const where: Prisma.TicketWhereInput = {};
+
+        if (status) where.status = status;
+
+        if (category) where.category = category;
+
+        if (priority) where.priority = priority;
+
+        if (projectCode) where.project = { projectCode };
+
+        if (assigneeCode) where.assignee = { userCode: assigneeCode };
+
+        const total = await prisma.ticket.count({ where });
         let data: any[];
 
         if (sortBy === 'priority') {
+            const conditions: Prisma.Sql[] = [];
+            if (status) conditions.push(Prisma.sql`t.status = ${status}`);
+            if (category) conditions.push(Prisma.sql`t.category = ${category}`);
+            if (priority) conditions.push(Prisma.sql`t.priority = ${priority}`);
+            if (projectCode) conditions.push(Prisma.sql`p.projectCode = ${projectCode}`);
+            if (assigneeCode) conditions.push(Prisma.sql`a.userCode = ${assigneeCode}`);
+
+            const whereClause = conditions.length
+                ? Prisma.sql`WHERE ${Prisma.join(conditions, ' AND ')}`
+                : Prisma.empty;
+
             const rows = await prisma.$queryRaw<any[]>`
                 SELECT t.*,
-                       p.id AS proj_id, p.projectName AS proj_name,
-                       a.id AS asn_id,  a.name        AS asn_name
+                    p.id AS proj_id, p.projectName AS proj_name,
+                    a.id AS asn_id,  a.name        AS asn_name
                 FROM   Ticket t
                 LEFT JOIN Project p ON t.projectId  = p.id
                 LEFT JOIN User    a ON t.assigneeId = a.id
+                ${whereClause}
                 ORDER BY ${PRIORITY_SQL_ORDER} ${sqlDir}
-                LIMIT ${take} OFFSET ${skip}
+                LIMIT ${amount} OFFSET ${skip}
             `;
             data = rows.map(serializeRawRow);
         } else {
             const rows = await prisma.ticket.findMany({
-                skip, take,
+                skip,
+                take: amount,
+                where,
                 include: {
                     project: { select: { id: true, projectName: true } },
                     assignee: { select: { id: true, name: true } },
@@ -54,30 +79,53 @@ export async function getTickets(req: Request, res: Response) {
 export async function getMyQueue(req: AuthRequest, res: Response) {
     try {
         const userId = BigInt(req.user!.userId);
-        const page = Number(req.query.page ?? 1);
-        const take = Number(req.query.amount ?? 20);
-        const skip = (page - 1) * take;
-        const { sortBy, sortDir, sqlDir } = parseSortParams(req.query as any);
+        const { status, category, priority, projectCode, assigneeCode, page, amount, sortBy, sortDir }
+            = TicketFilterQuerySchema.parse(req.query);
+        const skip = (page - 1) * amount;
 
-        const where = { assigneeId: userId, status: { notIn: [...CLOSED] } };
+        const where: Prisma.TicketWhereInput = {};
+        if (status) where.status = status
+        else where.status = { notIn: [...CLOSED] };
+
+        if (category) where.category = category;
+
+        if (priority) where.priority = priority;
+
+        if (projectCode) where.project = { projectCode };
+
+        if (assigneeCode) where.assignee = { userCode: assigneeCode };
+
+        where.assigneeId = userId;
+
         const total = await prisma.ticket.count({ where });
         let data: any[];
 
         if (sortBy === 'priority') {
+            const conditions: Prisma.Sql[] = [
+                Prisma.sql`t.assigneeId = ${userId}`,
+            ];
+            if (status) {
+                conditions.push(Prisma.sql`t.status = ${status}`);
+            } else {
+                conditions.push(Prisma.sql`t.status NOT IN ('DONE', 'CANCELLED', 'REJECTED')`);
+            }
+            if (category) conditions.push(Prisma.sql`t.category = ${category}`);
+            if (priority) conditions.push(Prisma.sql`t.priority = ${priority}`);
+            if (projectCode) conditions.push(Prisma.sql`p.projectCode = ${projectCode}`);
+
             const rows = await prisma.$queryRaw<any[]>`
                 SELECT t.*,
-                       p.id AS proj_id, p.projectName AS proj_name
+                    p.id AS proj_id, p.projectName AS proj_name
                 FROM   Ticket t
                 LEFT JOIN Project p ON t.projectId = p.id
-                WHERE  t.assigneeId = ${userId}
-                  AND  t.status NOT IN ('DONE', 'CANCELLED', 'REJECTED')
-                ORDER BY ${PRIORITY_SQL_ORDER} ${sqlDir}
-                LIMIT ${take} OFFSET ${skip}
+                WHERE ${Prisma.join(conditions, ' AND ')}
+                ORDER BY ${PRIORITY_SQL_ORDER} ${sortDir}
+                LIMIT ${amount} OFFSET ${skip}
             `;
             data = rows.map(serializeRawRow);
         } else {
             const rows = await prisma.ticket.findMany({
-                where, skip, take,
+                where, skip, take: amount,
                 include: { project: { select: { id: true, projectName: true } } },
                 orderBy: { [sortBy]: sortDir },
             });
@@ -96,36 +144,61 @@ export async function getMyQueue(req: AuthRequest, res: Response) {
 export async function getMyTickets(req: AuthRequest, res: Response) {
     try {
         const userId = BigInt(req.user!.userId);
-        const page = Number(req.query.page ?? 1);
-        const take = Number(req.query.amount ?? 20);
-        const skip = (page - 1) * take;
-        const { sortBy, sortDir, sqlDir } = parseSortParams(req.query as any);
+        const { status, category, priority, projectCode, assigneeCode, page, amount, sortBy, sortDir }
+            = TicketFilterQuerySchema.parse(req.query);
+        const skip = (page - 1) * amount;
 
-        const total = await prisma.ticket.count({ where: { reporterId: userId } });
+        const where: Prisma.TicketWhereInput = {};
+        if (status) where.status = status
+        else where.status = { notIn: [...CLOSED] };
+
+        if (category) where.category = category;
+
+        if (priority) where.priority = priority;
+
+        if (projectCode) where.project = { projectCode };
+
+        if (assigneeCode) where.assignee = { userCode: assigneeCode };
+
+        where.reporterId = userId;
+
+        const total = await prisma.ticket.count({ where });
         let data: any[];
 
         if (sortBy === 'priority') {
+            const conditions: Prisma.Sql[] = [
+                Prisma.sql`t.reporterId = ${userId}`,
+            ];
+            if (status) {
+                conditions.push(Prisma.sql`t.status = ${status}`);
+            } else {
+                conditions.push(Prisma.sql`t.status NOT IN ('DONE', 'CANCELLED', 'REJECTED')`);
+            }
+            if (category) conditions.push(Prisma.sql`t.category = ${category}`);
+            if (priority) conditions.push(Prisma.sql`t.priority = ${priority}`);
+            if (projectCode) conditions.push(Prisma.sql`p.projectCode = ${projectCode}`);
+
             const rows = await prisma.$queryRaw<any[]>`
                 SELECT t.*,
-                       p.id AS proj_id, p.projectName AS proj_name,
-                       a.id AS asn_id,  a.name        AS asn_name
+                    p.id AS proj_id, p.projectName AS proj_name,
+                    a.id AS asn_id,  a.name        AS asn_name
                 FROM   Ticket t
                 LEFT JOIN Project p ON t.projectId  = p.id
                 LEFT JOIN User    a ON t.assigneeId = a.id
-                WHERE  t.reporterId = ${userId}
-                ORDER BY ${PRIORITY_SQL_ORDER} ${sqlDir}
-                LIMIT ${take} OFFSET ${skip}
+                WHERE ${Prisma.join(conditions, ' AND ')}
+                ORDER BY ${PRIORITY_SQL_ORDER} ${sortDir}
+                LIMIT ${amount} OFFSET ${skip}
             `;
             data = rows.map(serializeRawRow);
         } else {
             const rows = await prisma.ticket.findMany({
-                where: { reporterId: userId },
+                where,
                 include: {
                     project: { select: { id: true, projectName: true } },
                     assignee: { select: { id: true, name: true } },
                 },
                 orderBy: { [sortBy]: sortDir },
-                skip, take,
+                skip, take: amount,
             });
             data = rows.map(serializeOrmRow);
         }
@@ -295,3 +368,37 @@ export async function deleteTicket(req: Request, res: Response) {
     }
 }
 
+export const assignTicket = async (req: AuthRequest, res: Response) => {
+    const { code } = req.params;
+    const { assigneeCode } = AssignTicketSchema.parse(req.body);
+    const { userId, role } = req.user!;
+
+    const ticket = await prisma.ticket.findUniqueOrThrow({ where: { ticketCode: code as string } });
+
+    if (role.toUpperCase() === 'AGENT') {
+        const me = await prisma.user.findUniqueOrThrow({ where: { id: BigInt(userId) } });
+        if (assigneeCode !== null && assigneeCode !== me.userCode)
+            return res.status(403).json({ error: 'Agent can only assign to self' });
+    }
+
+    let assigneeId: bigint | null = null;
+    if (assigneeCode !== null) {
+        const agent = await prisma.user.findUniqueOrThrow({
+            where: { userCode: assigneeCode },
+            select: { id: true, role: true },
+        })
+        if (agent.role.toUpperCase() === 'CUSTOMER')
+            return res.status(400).json({ error: 'Cannot assign to customer' });
+        assigneeId = agent.id;
+    }
+
+    const updated = await prisma.ticket.update({
+        where: { ticketCode: code as string },
+        data: { assigneeId },
+        include: { assignee: { select: { userCode: true, name: true } } },
+    });
+
+    await logAdminAction(userId, 'TICKET_UPDATE', 'TICKET', code as string, ticket.ticketName, { field: 'assignee', assigneeCode });
+
+    return res.json({ data: updated });
+}

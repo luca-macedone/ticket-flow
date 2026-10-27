@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { createTicket, deleteTicket, getMyQueue, getMyTickets, getTicketByCode, getTickets, updateTicket } from "../controllers/ticket.controller";
+import { assignTicket, createTicket, deleteTicket, getMyQueue, getMyTickets, getTicketByCode, getTickets, updateTicket } from "../controllers/ticket.controller";
 import { zodValidate } from "../middlewares/zodValidate";
-import { CreateTicketSchema, UpdateTicketSchema } from "@packages/shared";
+import { AssignTicketSchema, CreateTicketSchema, UpdateTicketSchema } from "@packages/shared";
 import { requireAuth } from "../middlewares/requireAuth";
 import { requireRole } from "../middlewares/requireRole";
 
@@ -52,5 +52,12 @@ router.delete(
     requireRole("ADMIN"),
     deleteTicket
 );
+router.patch(
+    "/:code/assign",
+    requireAuth,
+    requireRole("AGENT"),
+    zodValidate(AssignTicketSchema),
+    assignTicket
+)
 
 export default router;
